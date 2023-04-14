@@ -1,0 +1,51 @@
+# Template below
+# Ignore build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# Ignore Visual Studio files
+.vs/
+*.suo
+*.sln.docstates
+
+# Ignore user-specific files
+*.user
+*.suo
+*.sdf
+*.opensdf
+
+# Ignore CMake-generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CMakeSettings.json
+*.cmake
+
+# Ignore GLFW files
+glfw/src/CMakeLists.txt
+glfw/src/glfw_config.h.in
+glfw/src/glfw3Config.cmake
+glfw/src/glfw3ConfigVersion.cmake
+glfw/src/glfw3Targets.cmake
+glfw/src/glfw3Targets-debug.cmake
+
+# Ignore GLAD files
+glad/CMakeLists.txt
+glad/glad.h
+glad/glad.c
+glad/glad.hpp
+glad/KHR/khrplatform.h
+glad/*.txt
+glad/*.md
+
+# Ignore any other generated files or directories
+Debug/
+Release/
+x64/
+*.log
+*.userprefs
+Thumbs.db
+.DS_Store
