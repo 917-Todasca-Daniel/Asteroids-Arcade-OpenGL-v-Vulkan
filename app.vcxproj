@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(SolutionDir)src\shared\constants;$(SolutionDir)src\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -120,7 +120,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(SolutionDir)src\shared\constants;$(SolutionDir)src\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -136,11 +136,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="res\opengl\shaders\f_red_color.glsl" />
+    <None Include="res\opengl\shaders\v_basic_position.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AsteroidsOpenGL.cpp" />
     <ClCompile Include="src\opengl\GLTriangle.cpp" />
     <ClCompile Include="src\shared\data\Vector3d.cpp" />
+    <ClCompile Include="src\shared\data\Vector4d.cpp" />
     <ClCompile Include="src\shared\domain\LogicObject.cpp" />
     <ClCompile Include="src\shared\domain\Object3d.cpp" />
     <ClCompile Include="src\shared\domain\RootObject.cpp" />
@@ -149,9 +152,11 @@
     <ClInclude Include="src\opengl\GLTriangle.h" />
     <ClInclude Include="src\shared\constants\window_constants.hpp" />
     <ClInclude Include="src\shared\data\Vector3d.h" />
+    <ClInclude Include="src\shared\data\Vector4d.h" />
     <ClInclude Include="src\shared\domain\LogicObject.h" />
     <ClInclude Include="src\shared\domain\Object3d.h" />
     <ClInclude Include="src\shared\domain\RootObject.h" />
+    <ClInclude Include="src\shared\util\UColors.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

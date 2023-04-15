@@ -1,19 +1,20 @@
 #pragma once
 
+#include <ostream>
+
 
 namespace aa
 {
     //  inmutable data class for 3d vector
-    template <typename T>
     class Vector3d
     {
 
     public:
-        Vector3d(T x, T y, T z);
+        Vector3d(float x, float y, float z);
 
-        T xx() const;
-        T yy() const;
-        T zz() const;
+        const float x;
+        const float y;
+        const float z;
 
         //  delete all implicit constructors 
         Vector3d()                  = delete;
@@ -23,11 +24,9 @@ namespace aa
         Vector3d& operator = (const Vector3d&)  = delete;
         Vector3d& operator = (Vector3d&&)       = delete;
 
-
-    private:
-        T x;
-        T y;
-        T z;
-
     };
+
+
+    std::ostream& operator << (std::ostream& os, const Vector3d& v);
+
 }

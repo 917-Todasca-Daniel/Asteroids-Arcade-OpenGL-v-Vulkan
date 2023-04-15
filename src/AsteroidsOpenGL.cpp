@@ -13,7 +13,8 @@
 
 
 int main() {
-	std::cout << "Hello OpenGL!\n" << std::endl;
+	std::cout << "Hello OpenGL!" << std::endl;
+
 
 	//	init tasks
 	
@@ -42,6 +43,7 @@ int main() {
 	std::cout << "Finished init." << std::endl;
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
+
 	//	main loop in while()
 	
 	aa::GLTriangle* tri = new aa::GLTriangle(AA_ROOT);
@@ -56,6 +58,7 @@ int main() {
 	}
 
 	std::cout << "Finished main loop." << std::endl;
+
 
 	//	cleanup tasks
 	

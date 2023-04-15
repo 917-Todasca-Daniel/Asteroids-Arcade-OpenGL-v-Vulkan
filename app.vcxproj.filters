@@ -16,6 +16,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="res\opengl\shaders\v_basic_position.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\opengl\shaders\f_red_color.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AsteroidsOpenGL.cpp">
@@ -36,6 +42,9 @@
     <ClCompile Include="src\opengl\GLTriangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\shared\data\Vector4d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -54,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\opengl\GLTriangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\data\Vector4d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\util\UColors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

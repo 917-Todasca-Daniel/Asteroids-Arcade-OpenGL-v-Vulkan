@@ -3,27 +3,14 @@
 using namespace aa;
 
 
-template<typename T>
-Vector3d <T>::Vector3d(T x, T y, T z) : x(x), y(y), z(z)
+Vector3d::Vector3d(float x, float y, float z) : x(x), y(y), z(z)
 {
 
 }
 
 
-template<typename T>
-T Vector3d <T>::xx() const
+std::ostream& aa::operator<<(std::ostream& os, const Vector3d& v)
 {
-	return this->x;
-}
-
-template<typename T>
-T Vector3d <T>::yy() const
-{
-	return this->y;
-}
-
-template<typename T>
-T Vector3d <T>::zz() const
-{
-	return this->z;
+    os << "V(" << v.x << ", " << v.y << ", " << v.z << ")";
+    return os;
 }

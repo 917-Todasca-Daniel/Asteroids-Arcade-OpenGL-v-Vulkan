@@ -9,7 +9,7 @@ namespace aa
 {
     //  daemon-like singleton for other game logic objects;
     //  if there's no root, then there is no game
-    class RootObject : public LogicObject
+    class RootObject final : public LogicObject
     {
 
     public:
@@ -26,9 +26,9 @@ namespace aa
 
 
     private:
-        //  private dtor means we do not support further inheritance
         RootObject();
 
+        //  private dtor means we do not support further inheritance
         virtual ~RootObject();
 
         static RootObject* instance;
