@@ -10,6 +10,7 @@
 
 #include "shared/domain/RootObject.h"
 #include "opengl/GLTriangle.h"
+#include "opengl/GLShaders.h"
 
 
 int main() {
@@ -25,7 +26,14 @@ int main() {
 		return -1;
 	}
 
-	window = glfwCreateWindow(WINDOW_WIDTH_SM, WINDOW_HEIGHT_SM, WINDOW_GAME_TITLE, NULL, NULL);
+	window = glfwCreateWindow(
+		WINDOW_WIDTH_SM, 
+		WINDOW_HEIGHT_SM, 
+		WINDOW_GAME_TITLE, 
+		NULL, 
+		NULL
+	);
+
 	if (!window)
 	{
 		std::cout << "Exit on glfwCreateWindow()..." << std::endl;
@@ -47,6 +55,13 @@ int main() {
 	//	main loop in while()
 	
 	aa::GLTriangle* tri = new aa::GLTriangle(AA_ROOT);
+	tri->init();
+
+	unsigned int shader = aa::GLShaders::readShader(
+		"v_basic_position", 
+		"f_red_color"
+	);
+	glUseProgram(shader);
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);

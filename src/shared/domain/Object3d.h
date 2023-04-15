@@ -12,6 +12,8 @@ namespace aa
         Object3d(LogicObject *parent);
         virtual ~Object3d();
 
+        virtual void init() = 0;
+
         virtual void draw() = 0;
 
         //  delete all implicit constructors 

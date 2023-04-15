@@ -25,6 +25,11 @@ RootObject* RootObject::getRoot()
 	return instance;
 }
 
+void RootObject::init()
+{
+
+}
+
 void RootObject::loop(float lap)
 {
 

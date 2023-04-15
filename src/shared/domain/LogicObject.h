@@ -14,6 +14,8 @@ namespace aa
 
         virtual void kill();
 
+        virtual void init() = 0;
+
         virtual void loop(float lap);
 
         //  delete all implicit constructors 

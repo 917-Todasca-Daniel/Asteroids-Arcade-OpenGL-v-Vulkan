@@ -20,11 +20,20 @@ namespace aa
             GLSFragment
         };
 
-        static unsigned int compileShader(ShaderType type, const std::string& shader);
+        static unsigned int compileShader(
+            ShaderType type, 
+            const std::string& shader
+        );
 
-        static unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader);
+        static unsigned int createShader(
+            const std::string& vertexShader, 
+            const std::string& fragmentShader
+        );
 
-        static unsigned int createShaderFromFiles(const std::string& vertexName, const std::string& fragmentName);
+        static unsigned int readShader(
+            const std::string& vertexName, 
+            const std::string& fragmentName
+        );
 
         //  delete all implicit constructors 
         GLShaders()                 = delete;

@@ -13,7 +13,10 @@
 using namespace aa;
 
 
-unsigned int GLShaders::compileShader(ShaderType type, const std::string& shader)
+unsigned int GLShaders::compileShader(
+	ShaderType type, 
+	const std::string& shader
+)
 {
 	unsigned int glType = 0;
 	if (type == GLSVertex) {
@@ -26,6 +29,7 @@ unsigned int GLShaders::compileShader(ShaderType type, const std::string& shader
 	unsigned int id = glCreateShader(glType);
 
 	const char* src = shader.c_str();
+	glShaderSource(id, 1, &src, 0);
 	glCompileShader(id);
 
 	int result;
@@ -40,7 +44,7 @@ unsigned int GLShaders::compileShader(ShaderType type, const std::string& shader
 
 		std::cout << msg << std::endl;
 
-		delete msg;
+		delete[] msg;
 
 		glDeleteShader(id);
 		return 0;
@@ -50,7 +54,10 @@ unsigned int GLShaders::compileShader(ShaderType type, const std::string& shader
 }
 
 
-unsigned int GLShaders::createShader(const std::string& vertexShader, const std::string& fragmentShader)
+unsigned int GLShaders::createShader(
+	const std::string& vertexShader, 
+	const std::string& fragmentShader
+)
 {
 	unsigned int program = glCreateProgram();
 	unsigned int vs = compileShader(GLSVertex, vertexShader);
@@ -68,13 +75,16 @@ unsigned int GLShaders::createShader(const std::string& vertexShader, const std:
 }
 
 
-unsigned int GLShaders::createShaderFromFiles(const std::string& vertexName, const std::string& fragmentName)
+unsigned int GLShaders::readShader(
+	const std::string& vertexName, 
+	const std::string& fragmentName
+)
 {
-	std::string vertexPath = U_GLShaderPath(vertexName);
+	std::string vertexPath	 = U_GLShaderPath(vertexName);
 	std::string fragmentPath = U_GLShaderPath(fragmentName);
 
-	std::string vertexShader = U_readFileContent(vertexPath);
-	std::string fragmentShader = U_readFileContent(fragmentPath);
+	std::string vertexShader	= U_readFileContent(vertexPath);
+	std::string fragmentShader	= U_readFileContent(fragmentPath);
 
 	return createShader(vertexShader, fragmentShader);
 }

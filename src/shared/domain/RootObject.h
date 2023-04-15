@@ -15,6 +15,8 @@ namespace aa
     public:
         static RootObject* getRoot();
 
+        virtual void init();
+
         virtual void loop(float lap);
 
         //  delete all implicit constructors 

@@ -5,6 +5,7 @@
 
 namespace aa
 {
+    //  test object; draws a 2d triangle to the screen
     class GLTriangle : public Object3d
     {
 
@@ -12,7 +13,9 @@ namespace aa
         GLTriangle(LogicObject *parent);
         virtual ~GLTriangle();
 
-        void draw();
+        virtual void init();
+
+        virtual void draw();
 
         //  delete all implicit constructors 
         GLTriangle()                  = delete;
@@ -24,6 +27,13 @@ namespace aa
 
 
     private:
+        float positions[6] = {
+            -0.5f, -0.5f,
+             0.0f,  0.5f,
+             0.5f, -0.5f
+        };
+
+        unsigned int buffer;
 
     };
 }
