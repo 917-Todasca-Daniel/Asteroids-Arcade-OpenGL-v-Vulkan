@@ -5,7 +5,7 @@
 
 namespace aa
 {
-    //  inmutable data class for 3d vector
+    //  inmutable data class for 4d vector
     class Vector4d
     {
 

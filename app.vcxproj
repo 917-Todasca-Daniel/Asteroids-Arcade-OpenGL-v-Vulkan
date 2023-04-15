@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AsteroidsOpenGL.cpp" />
+    <ClCompile Include="src\opengl\GLShaders.cpp" />
     <ClCompile Include="src\opengl\GLTriangle.cpp" />
     <ClCompile Include="src\shared\data\Vector3d.cpp" />
     <ClCompile Include="src\shared\data\Vector4d.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="src\shared\domain\RootObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\opengl\GLShaders.h" />
     <ClInclude Include="src\opengl\GLTriangle.h" />
     <ClInclude Include="src\shared\constants\window_constants.hpp" />
     <ClInclude Include="src\shared\data\Vector3d.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="src\shared\domain\Object3d.h" />
     <ClInclude Include="src\shared\domain\RootObject.h" />
     <ClInclude Include="src\shared\util\UColors.hpp" />
+    <ClInclude Include="src\shared\util\UFile.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,3 @@
-#include "RootObject.h"
 #include "Object3d.h"
 
 using namespace aa;
