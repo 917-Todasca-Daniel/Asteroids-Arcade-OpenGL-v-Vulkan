@@ -2,6 +2,9 @@
 
 #include "LogicObject.h"
 
+#include "data/Vector3d.h"
+#include "data/Vector4d.h"
+
 
 namespace aa
 {
@@ -9,7 +12,7 @@ namespace aa
     {
 
     public:
-        Object3d(LogicObject *parent);
+        Object3d(LogicObject *parent, Vector3d position);
         virtual ~Object3d();
 
         virtual void init() = 0;
@@ -25,7 +28,8 @@ namespace aa
         Object3d& operator = (Object3d&&)       = delete;
 
 
-    private:
+    protected:
+        Vector3d position;
 
     };
 }

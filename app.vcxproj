@@ -137,6 +137,7 @@
   <ItemGroup>
     <None Include="README.md" />
     <None Include="res\opengl\shaders\f_red_color.glsl" />
+    <None Include="res\opengl\shaders\f_uniform_color.glsl" />
     <None Include="res\opengl\shaders\v_basic_position.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="src\shared\domain\RootObject.h" />
     <ClInclude Include="src\shared\util\UColors.hpp" />
     <ClInclude Include="src\shared\util\UFile.hpp" />
+    <ClInclude Include="src\shared\util\UMaths.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

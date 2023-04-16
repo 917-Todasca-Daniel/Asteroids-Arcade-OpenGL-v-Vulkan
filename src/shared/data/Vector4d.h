@@ -11,6 +11,7 @@ namespace aa
 
     public:
         Vector4d(float x, float y, float z, float w);
+        Vector4d(const Vector4d& other);
 
         const float x;
         const float y;
@@ -19,7 +20,6 @@ namespace aa
 
         //  delete all implicit constructors 
         Vector4d()                  = delete;
-        Vector4d(const Vector4d&)   = delete;
         Vector4d(Vector4d&&)        = delete;
 
         Vector4d& operator = (const Vector4d&)  = delete;

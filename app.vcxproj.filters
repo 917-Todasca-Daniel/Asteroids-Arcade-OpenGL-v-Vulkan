@@ -15,11 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
     <None Include="res\opengl\shaders\v_basic_position.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\opengl\shaders\f_red_color.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="README.md" />
+    <None Include="res\opengl\shaders\f_uniform_color.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -78,6 +81,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\shared\util\UFile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\util\UMaths.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,8 @@
 using namespace aa;
 
 
-Object3d::Object3d(LogicObject* parent) : LogicObject(parent)
+Object3d::Object3d(LogicObject* parent, Vector3d position) 
+	: LogicObject(parent), position(position)
 {
 
 }

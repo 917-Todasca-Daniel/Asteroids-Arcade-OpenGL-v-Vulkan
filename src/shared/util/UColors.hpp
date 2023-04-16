@@ -8,6 +8,12 @@
 
 namespace aa
 {
+    const Vector4d U_RED    = Vector4d(1.0, 0,   0,   1.0);
+    const Vector4d U_GREEN  = Vector4d(0,   1.0, 0,   1.0);
+    const Vector4d U_BLUE   = Vector4d(0,   0,   1.0, 1.0);
+    const Vector4d U_PINK   = Vector4d(1.0, 0,   1.0, 1.0);
+
+
     Vector4d U_fromRGB(int r, int g, int b) {
         float rx = static_cast<float>(r) / 255.0f;
         float gx = static_cast<float>(g) / 255.0f;
@@ -24,6 +30,7 @@ namespace aa
 
         return Vector4d(rx, gx, bx, a);
     }
+
 
     Vector4d U_fromHex(const char *hex) {
         unsigned int colorValue = 0;

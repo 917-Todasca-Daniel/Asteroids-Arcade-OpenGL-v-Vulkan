@@ -54,14 +54,12 @@ int main() {
 
 	//	main loop in while()
 	
-	aa::GLTriangle* tri = new aa::GLTriangle(AA_ROOT);
-	tri->init();
-
-	unsigned int shader = aa::GLShaders::readShader(
-		"v_basic_position", 
-		"f_red_color"
+	aa::GLTriangle* tri = new aa::GLTriangle(
+		AA_ROOT,
+		aa::Vector3d(0, WINDOW_HEIGHT, 0),
+		WINDOW_HEIGHT / 2
 	);
-	glUseProgram(shader);
+	tri->init();
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);

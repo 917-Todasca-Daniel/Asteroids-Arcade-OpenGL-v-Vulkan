@@ -11,6 +11,7 @@ namespace aa
 
     public:
         Vector3d(float x, float y, float z);
+        Vector3d(const Vector3d& other);
 
         const float x;
         const float y;
@@ -18,7 +19,6 @@ namespace aa
 
         //  delete all implicit constructors 
         Vector3d()                  = delete;
-        Vector3d(const Vector3d&)   = delete;
         Vector3d(Vector3d&&)        = delete;
 
         Vector3d& operator = (const Vector3d&)  = delete;

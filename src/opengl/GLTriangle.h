@@ -5,12 +5,20 @@
 
 namespace aa
 {
-    //  test object; draws a 2d triangle to the screen
+    // draws a 2d equilateral triangle to the screen;
+    // the given position is the topmost corner's position on the screen, 
+    //      relative to the game viewport
     class GLTriangle : public Object3d
     {
 
     public:
-        GLTriangle(LogicObject *parent);
+        GLTriangle(LogicObject *parent, Vector3d position, float altitude);
+        GLTriangle(
+            LogicObject*    parent, 
+            Vector3d        position, 
+            float           edge, 
+            Vector4d        color
+        );
         virtual ~GLTriangle();
 
         virtual void init();
@@ -27,13 +35,13 @@ namespace aa
 
 
     private:
-        float positions[6] = {
-            -0.5f, -0.5f,
-             0.0f,  0.5f,
-             0.5f, -0.5f
-        };
+        const Vector4d color;
+        const float altitude;
 
         unsigned int buffer;
+        unsigned int shader;
+
+        float vertices2d[6] = { };
 
     };
 }
