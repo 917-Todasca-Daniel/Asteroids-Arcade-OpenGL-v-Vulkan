@@ -61,13 +61,11 @@ void GLTriangle::init()
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertices2d, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-
 	shader = GLShaders::readShader(
 		"v_basic_position",
 		"f_uniform_color"
 	);
+
 }
 
 
@@ -76,6 +74,10 @@ void GLTriangle::draw()
 	if (rmPending) return;
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	
 	glUseProgram(shader);
 	glUniform4f(
 		glGetUniformLocation(

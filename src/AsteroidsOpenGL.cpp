@@ -12,6 +12,9 @@
 #include "opengl/GLTriangle.h"
 #include "opengl/GLShaders.h"
 
+#include "util/UMaths.h"
+#include "util/UColors.h"
+
 
 int main() {
 	std::cout << "Hello OpenGL!" << std::endl;
@@ -54,17 +57,38 @@ int main() {
 
 	//	main loop in while()
 	
-	aa::GLTriangle* tri = new aa::GLTriangle(
+	float ax, ay, bx, by, cx, cy;
+	ax = WINDOW_WIDTH / 2;
+	ay = 380;
+	float alt = 125;
+	aa::UMaths::worldTriangleTopAltitude(alt, ax, ay, bx, by, cx, cy);
+	aa::GLTriangle* tri1 = new aa::GLTriangle(
 		AA_ROOT,
-		aa::Vector3d(0, WINDOW_HEIGHT, 0),
-		WINDOW_HEIGHT / 2
+		aa::Vector3d(ax, ay, 0),
+		alt
 	);
-	tri->init();
+	aa::GLTriangle* tri2 = new aa::GLTriangle(
+		AA_ROOT,
+		aa::Vector3d(bx, by, 0),
+		alt,
+		aa::UColors::RED
+	);
+	aa::GLTriangle* tri3 = new aa::GLTriangle(
+		AA_ROOT,
+		aa::Vector3d(cx, cy, 0),
+		alt,
+		aa::UColors::BLUE
+	);
+	tri1->init();
+	tri2->init();
+	tri3->init();
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		tri->draw();
+		tri1->draw();
+		tri2->draw();
+		tri3->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -75,7 +99,9 @@ int main() {
 
 	//	cleanup tasks
 	
-	delete tri;
+	delete tri1;
+	delete tri2;
+	delete tri3;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
