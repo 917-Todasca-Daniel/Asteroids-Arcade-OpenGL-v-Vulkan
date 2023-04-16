@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 
 //	dev includes
-#include "util/UFile.hpp"
+#include "util/UFile.h"
 
 using namespace aa;
 
@@ -80,11 +80,11 @@ unsigned int GLShaders::readShader(
 	const std::string& fragmentName
 )
 {
-	std::string vertexPath	 = U_GLShaderPath(vertexName);
-	std::string fragmentPath = U_GLShaderPath(fragmentName);
+	std::string vertexPath	 = UFile::GLShaderPath(vertexName);
+	std::string fragmentPath = UFile::GLShaderPath(fragmentName);
 
-	std::string vertexShader	= U_readFileContent(vertexPath);
-	std::string fragmentShader	= U_readFileContent(fragmentPath);
+	std::string vertexShader	= UFile::readFileContent(vertexPath);
+	std::string fragmentShader	= UFile::readFileContent(fragmentPath);
 
 	return createShader(vertexShader, fragmentShader);
 }

@@ -7,8 +7,9 @@
 #include <GLFW/glfw3.h>
 
 //	dev includes
-#include "util/UColors.hpp"
-#include "util/UMaths.hpp"
+#include "util/UColors.h"
+
+#include "util/UMaths.h"
 #include "constants/window_constants.hpp"
 #include "GLShaders.h"
 
@@ -16,7 +17,7 @@ using namespace aa;
 
 
 GLTriangle::GLTriangle(LogicObject* parent, Vector3d position, float edge) 
-	: GLTriangle(parent, position, edge, U_PINK)
+	: GLTriangle(parent, position, edge, UColors::PINK)
 {
 
 }
@@ -27,7 +28,8 @@ GLTriangle::GLTriangle(
 	float			altitude,
 	Vector4d		color
 )
-	: Object3d(parent, position), buffer(0), altitude(altitude), color(color)
+	: Object3d(parent, position), buffer(0), shader(0), 
+	altitude(altitude), color(color)
 {
 
 }
@@ -44,16 +46,16 @@ void GLTriangle::init()
 	vertices2d[0] = 1.0f * position.x / WINDOW_UNIT;
 	vertices2d[1] = 1.0f * position.y / WINDOW_UNIT;
 
-	U_worldTriangleTopAltitude(
+	aa::UMaths::worldTriangleTopAltitude(
 		altitude,
 		vertices2d[0], vertices2d[1],
 		vertices2d[2], vertices2d[3],
 		vertices2d[4], vertices2d[5]
 	);
 
-	U_worldToGLCoord(vertices2d[0], vertices2d[1]);
-	U_worldToGLCoord(vertices2d[2], vertices2d[3]);
-	U_worldToGLCoord(vertices2d[4], vertices2d[5]);
+	aa::UMaths::worldToGLCoord(vertices2d[0], vertices2d[1]);
+	aa::UMaths::worldToGLCoord(vertices2d[2], vertices2d[3]);
+	aa::UMaths::worldToGLCoord(vertices2d[4], vertices2d[5]);
 
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);

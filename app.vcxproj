@@ -149,6 +149,9 @@
     <ClCompile Include="src\shared\domain\LogicObject.cpp" />
     <ClCompile Include="src\shared\domain\Object3d.cpp" />
     <ClCompile Include="src\shared\domain\RootObject.cpp" />
+    <ClCompile Include="src\shared\util\UColors.cpp" />
+    <ClCompile Include="src\shared\util\UFile.cpp" />
+    <ClCompile Include="src\shared\util\UMaths.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\opengl\GLShaders.h" />
@@ -159,9 +162,9 @@
     <ClInclude Include="src\shared\domain\LogicObject.h" />
     <ClInclude Include="src\shared\domain\Object3d.h" />
     <ClInclude Include="src\shared\domain\RootObject.h" />
-    <ClInclude Include="src\shared\util\UColors.hpp" />
-    <ClInclude Include="src\shared\util\UFile.hpp" />
-    <ClInclude Include="src\shared\util\UMaths.hpp" />
+    <ClInclude Include="src\shared\util\UColors.h" />
+    <ClInclude Include="src\shared\util\UFile.h" />
+    <ClInclude Include="src\shared\util\UMaths.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
