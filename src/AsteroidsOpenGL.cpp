@@ -10,6 +10,7 @@
 
 #include "shared/domain/RootObject.h"
 #include "opengl/GLTriangle.h"
+#include "opengl/GLRectangle.h"
 #include "opengl/GLShaders.h"
 
 #include "util/UMaths.h"
@@ -82,6 +83,20 @@ int main() {
 	tri1->init();
 	tri2->init();
 	tri3->init();
+	aa::GLRectangle* rect1 = new aa::GLRectangle(
+		AA_ROOT,
+		aa::Vector3d(20, WINDOW_HEIGHT * 0.75f, 0),
+		WINDOW_HEIGHT * 0.5f, 80,
+		aa::UColors::GREEN
+	);
+	rect1->init();
+	aa::GLRectangle* rect2 = new aa::GLRectangle(
+		AA_ROOT,
+		aa::Vector3d(20, WINDOW_HEIGHT * 0.25f, 0),
+		WINDOW_HEIGHT * 0.5f, 80,
+		aa::UColors::RED
+	);
+	rect2->init();
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -89,6 +104,8 @@ int main() {
 		tri1->draw();
 		tri2->draw();
 		tri3->draw();
+		rect1->draw();
+		rect2->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -20,6 +20,16 @@ namespace aa
 				float& cx, float& cy
 		);
 
+		//	rectangle given by abcd
+		//	a is the bottomleft corner, b is bottomright
+		static void worldRectangleBottomLeft(
+			float height, float width,
+			float ax, float ay,
+			float& bx, float& by,
+			float& cx, float& cy,
+			float& dx, float& dy
+		);
+
 
 	private:
 		//	prevents redundant slow calls of sqrt() fn

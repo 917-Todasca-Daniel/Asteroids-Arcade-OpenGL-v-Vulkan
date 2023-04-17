@@ -25,3 +25,21 @@ void UMaths::worldTriangleTopAltitude(
 	by = ay - altitude;
 	cy = by;
 }
+
+
+void UMaths::worldRectangleBottomLeft(
+	float height, float width, 
+	float ax, float ay, 
+	float& bx, float& by, 
+	float& cx, float& cy, 
+	float& dx, float& dy
+) {
+	bx = ax + width;
+	by = ay;
+
+	cx = bx;
+	cy = by + height;
+
+	dx = ax;
+	dy = cy;
+}
