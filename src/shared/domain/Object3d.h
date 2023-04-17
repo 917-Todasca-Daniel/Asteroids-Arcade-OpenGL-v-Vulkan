@@ -15,9 +15,9 @@ namespace aa
         Object3d(LogicObject *parent, Vector3d position);
         virtual ~Object3d();
 
-        virtual void init() = 0;
+        virtual void init();
 
-        virtual void draw() = 0;
+        virtual void draw();
 
         //  delete all implicit constructors 
         Object3d()                  = delete;
@@ -30,6 +30,8 @@ namespace aa
 
     protected:
         Vector3d position;
+
+        bool     bInit;
 
     };
 }

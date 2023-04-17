@@ -43,6 +43,8 @@ GLTriangle::~GLTriangle()
 
 void GLTriangle::init()
 {
+	Object3d::init();
+
 	vertices2d[0] = 1.0f * position.x / WINDOW_UNIT;
 	vertices2d[1] = 1.0f * position.y / WINDOW_UNIT;
 
@@ -71,6 +73,8 @@ void GLTriangle::init()
 
 void GLTriangle::draw()
 {
+	Object3d::draw();
+
 	if (rmPending) return;
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
