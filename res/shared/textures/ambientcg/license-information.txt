@@ -1,0 +1,31 @@
+License information
+
+
+
+All ambientCG assets are provided under theCreative Commons CC0 1.0 Universal License.This applies to the downloadable asset files and the material preview renders shown for each asset on the site.
+
+License details
+
+The Creative Commons CC0 license gives you near limitless freedom to use the materials, models and other assets:
+
+"You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission."
+
+You can read the full text on the Creative Commons website. There you can also read the full license in many languages by using the dropdown menu in the top right corner.
+
+Giving credit
+
+You don't need to give credit but I would appreciate it.Here is how you can do that.
+
+If you wish to give credit you can do so using this text:
+
+Created using <asset name> from ambientCG.com, licensed under the Creative Commons CC0 1.0 Universal License.
+
+Alternatively you can also use this shorter version.
+
+Created using assets from ambientCG.com (CC0).
+
+
+
+Materials used:
+- Ground 063
+

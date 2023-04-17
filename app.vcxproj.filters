@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Third Parties">
+      <UniqueIdentifier>{bf7bc9ee-3ba9-4c94-93b3-ca56c72d0a6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\opengl\shaders\v_basic_position.glsl">
@@ -63,6 +66,12 @@
     <ClCompile Include="src\opengl\GLRectangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\opengl\GLTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\3rdparty\stb_image.cpp">
+      <Filter>Third Parties</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -100,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="src\opengl\GLRectangle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3rdparty\stb_image.h">
+      <Filter>Third Parties</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

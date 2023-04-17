@@ -1,5 +1,7 @@
 #include "UFile.h"
 
+#include <algorithm>
+
 using namespace aa;
 
 
@@ -27,4 +29,16 @@ std::string UFile::GLShaderPath(const std::string& shaderName) {
     filename += ".glsl";
 
     return filename;
+}
+
+
+std::string UFile::normalizedDirectory(const std::string& directory)
+{
+    std::string dir = directory;
+    std::replace(dir.begin(), dir.end(), '\\', '/');
+    if (!dir.empty() && dir.back() != '/') {
+        dir.push_back('/');
+    }
+
+    return dir;
 }

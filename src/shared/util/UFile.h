@@ -15,6 +15,8 @@ namespace aa
 
         static std::string GLShaderPath(const std::string& shaderName);
 
+        static std::string normalizedDirectory(const std::string& directory);
+
 
     private:
         static const std::string ROOT;

@@ -43,6 +43,7 @@ GLRectangle::~GLRectangle()
 
 void GLRectangle::init()
 {
+	Object3d::init();
 
 	vertices2d[0] = 1.0f * (position.x - width /2) / WINDOW_UNIT;
 	vertices2d[1] = 1.0f * (position.y - height/2) / WINDOW_UNIT;
@@ -107,7 +108,7 @@ void GLRectangle::draw()
 	glUseProgram(shader);
 	glUniform4f(
 		glGetUniformLocation(
-			shader, "u_color"
+			shader, "u_Color"
 		),
 		color.x, color.y, color.z, color.w
 	);

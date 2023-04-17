@@ -85,7 +85,7 @@ void GLTriangle::draw()
 	glUseProgram(shader);
 	glUniform4f(
 		glGetUniformLocation(
-			shader, "u_color"
+			shader, "u_Color"
 		),
 		color.x, color.y, color.z, color.w
 	);
