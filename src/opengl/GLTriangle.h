@@ -5,7 +5,7 @@
 
 namespace aa
 {
-    // draws a 2d equilateral triangle to the screen;
+    // draws a static 2d equilateral triangle to the screen;
     // the given position is the topmost corner's position on the screen, 
     //      relative to the game viewport
     class GLTriangle : public Object3d

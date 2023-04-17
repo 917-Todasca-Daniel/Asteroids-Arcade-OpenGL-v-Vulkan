@@ -12,6 +12,7 @@
 #include "opengl/GLTriangle.h"
 #include "opengl/GLRectangle.h"
 #include "opengl/GLShaders.h"
+#include "opengl/GLTexture.h"
 
 #include "util/UMaths.h"
 #include "util/UColors.h"
@@ -90,22 +91,28 @@ int main() {
 		aa::UColors::GREEN
 	);
 	rect1->init();
+
+	aa::GLTexture* tex = aa::GLTextureFileBuilder(
+		"D:\\licenta\\dev\\app\\res\\shared\\textures\\ambientcg"
+	)	.setColorFile("Ground063_1K_Color", "jpg")
+		.build();
+
 	aa::GLRectangle* rect2 = new aa::GLRectangle(
 		AA_ROOT,
-		aa::Vector3d(20, WINDOW_HEIGHT * 0.25f, 0),
-		WINDOW_HEIGHT * 0.5f, 80,
-		aa::UColors::RED
+		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0),
+		WINDOW_HEIGHT, WINDOW_WIDTH,
+		tex
 	);
 	rect2->init();
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		rect2->draw();
 		tri1->draw();
 		tri2->draw();
 		tri3->draw();
 		rect1->draw();
-		rect2->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

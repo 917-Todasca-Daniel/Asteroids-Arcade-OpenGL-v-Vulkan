@@ -18,6 +18,9 @@ Object3d::~Object3d()
 
 
 void Object3d::init() {
+	if (bInit) {
+		std::cout << this << " called init multiple times!\n";
+	}
 	bInit = true;
 }
 

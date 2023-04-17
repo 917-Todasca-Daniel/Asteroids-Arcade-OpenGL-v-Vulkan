@@ -44,7 +44,7 @@ namespace aa
     public:
         IGLTextureBuilder();
 
-        virtual GLTexture* build() = 0;
+        virtual GLTexture* build() const = 0;
 
         //  delete all implicit constructors 
         IGLTextureBuilder(const IGLTextureBuilder&) = delete;
