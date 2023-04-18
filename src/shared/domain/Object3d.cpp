@@ -24,7 +24,7 @@ void Object3d::init() {
 	bInit = true;
 }
 
-void Object3d::draw() {
+void Object3d::draw() const {
 	if (!bInit) {
 		std::cout << this << " did not call init!\n";
 	}
