@@ -136,9 +136,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="res\opengl\shaders\f_basic_tex.glsl" />
     <None Include="res\opengl\shaders\f_red_color.glsl" />
     <None Include="res\opengl\shaders\f_uniform_color.glsl" />
     <None Include="res\opengl\shaders\v_basic_position.glsl" />
+    <None Include="res\opengl\shaders\v_basic_tex_position.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\3rdparty\stb_image.cpp" />
@@ -171,6 +173,13 @@
     <ClInclude Include="src\shared\util\UColors.h" />
     <ClInclude Include="src\shared\util\UFile.h" />
     <ClInclude Include="src\shared\util\UMaths.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_AmbientOcclusion.jpg" />
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Color.jpg" />
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Displacement.jpg" />
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_NormalGL.jpg" />
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Roughness.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

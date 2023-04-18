@@ -1,50 +1,131 @@
 #pragma once
 
-
 //  cpp includes
 #include <string>
+#include <vector>
 
 //  dev includes
 #include "domain/Object3d.h"
+#include "data/Vector4d.h"
 
 
 namespace aa
 {
-    //  static class contains shader types and wraps shader operations from OpenGL
-    class GLShaders final
+
+    // forward declaration
+    class GLTexture;
+
+
+    // base class wrapping common openGL shaders pipeline (vertex, fragment shaders and uniforms)
+    // create new objects using IGLShaderBuilders
+    class GLShader {
+
+    public:
+        ~GLShader();
+
+        void bind() const;
+
+        //  delete all implicit constructors 
+        GLShader(const GLShader&)   = delete;
+        GLShader(GLShader&&)        = delete;
+
+        GLShader& operator = (const GLShader&)  = delete;
+        GLShader& operator = (GLShader&&)       = delete;
+
+
+    protected:
+        GLShader();
+
+        unsigned int shaderProgram;
+
+        struct UniformTex {
+            std::string     uniformKey;
+            GLTexture*      tex;
+            unsigned int    slot;
+        };
+
+        struct Uniform4f {
+            std::string     uniformKey;
+            Vector4d        value;
+        };
+
+        std::vector <UniformTex> uniformsTex;
+        std::vector <Uniform4f>  uniforms4f;
+
+        static unsigned int compileShader(unsigned int glType, const std::string& shader);
+
+
+        friend class GLShaderFileBuilder;
+
+    };
+
+
+    // pure virtual class, acting as an interface for shader builders
+    class IGLShaderBuilder
     {
 
     public:
-        enum ShaderType {
-            GLSVertex,
-            GLSFragment
-        };
+        IGLShaderBuilder();
 
-        static unsigned int compileShader(
-            ShaderType type, 
-            const std::string& shader
-        );
-
-        static unsigned int createShader(
-            const std::string& vertexShader, 
-            const std::string& fragmentShader
-        );
-
-        static unsigned int readShader(
-            const std::string& vertexName, 
-            const std::string& fragmentName
-        );
+        virtual GLShader* build() = 0;
 
         //  delete all implicit constructors 
-        GLShaders()                 = delete;
-        GLShaders(const GLShaders&) = delete;
-        GLShaders(GLShaders&&)      = delete;
+        IGLShaderBuilder(const IGLShaderBuilder&) = delete;
+        IGLShaderBuilder(IGLShaderBuilder&&) = delete;
 
-        GLShaders& operator = (const GLShaders&)    = delete;
-        GLShaders& operator = (GLShaders&&)         = delete;
+        IGLShaderBuilder& operator = (const IGLShaderBuilder&) = delete;
+        IGLShaderBuilder& operator = (IGLShaderBuilder&&) = delete;
+
+
+    };
+
+
+    // shader file builder with eager and lazy operations
+    class GLShaderFileBuilder final : IGLShaderBuilder
+    {
+
+    public:
+        // shadersDirectory is the base directory for all files read by the builder
+        GLShaderFileBuilder(const std::string& shadersDirectory);
+        ~GLShaderFileBuilder();
+
+        // lazy operation; expected location is at shadersDirectory
+        GLShaderFileBuilder& setVertexShader(
+            const std::string& filename
+        );
+
+        // lazy operation; expected location is at shadersDirectory
+        GLShaderFileBuilder& setFragmentShader(
+            const std::string& filename
+        );
+
+        // eager operation
+        GLShaderFileBuilder& addUniformTex(
+            const std::string&  uniformKey,
+            GLTexture*          tex,
+            unsigned int        slot
+        );
+
+        // eager operation
+        GLShaderFileBuilder& addUniform4f(
+            const std::string&  uniformKey,
+            Vector4d            value 
+        );
+
+        virtual GLShader* build();
+
+        const std::string shadersDirectory;
 
 
     private:
+        GLShader* shaderOutput;
+
+        std::string vertexFilepath;
+        std::string fragmentFilepath;
+
+        std::vector <GLShader::UniformTex>  uniformsTex;
+        std::vector <GLShader::Uniform4f>   uniformsRef4f;
 
     };
+
 }

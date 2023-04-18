@@ -16,17 +16,26 @@
     <Filter Include="Third Parties">
       <UniqueIdentifier>{bf7bc9ee-3ba9-4c94-93b3-ca56c72d0a6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GLSL">
+      <UniqueIdentifier>{52767e08-7406-4e6e-aded-b7b3048681ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\opengl\shaders\v_basic_position.glsl">
-      <Filter>Resource Files</Filter>
+    <None Include="README.md" />
+    <None Include="res\opengl\shaders\f_basic_tex.glsl">
+      <Filter>GLSL</Filter>
     </None>
     <None Include="res\opengl\shaders\f_red_color.glsl">
-      <Filter>Resource Files</Filter>
+      <Filter>GLSL</Filter>
     </None>
-    <None Include="README.md" />
     <None Include="res\opengl\shaders\f_uniform_color.glsl">
-      <Filter>Resource Files</Filter>
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="res\opengl\shaders\v_basic_position.glsl">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="res\opengl\shaders\v_basic_tex_position.glsl">
+      <Filter>GLSL</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -116,5 +125,22 @@
     <ClInclude Include="src\3rdparty\stb_image.h">
       <Filter>Third Parties</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_AmbientOcclusion.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Color.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Displacement.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_NormalGL.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\shared\textures\ambientcg\Ground063_1K_Roughness.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

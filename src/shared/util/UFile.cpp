@@ -21,17 +21,6 @@ std::string UFile::readFileContent(const std::string& filename) {
 }
 
 
-std::string UFile::GLShaderPath(const std::string& shaderName) {
-    std::string filename = ROOT;
-
-    filename += "res/opengl/shaders/";
-    filename += shaderName;
-    filename += ".glsl";
-
-    return filename;
-}
-
-
 std::string UFile::normalizedDirectory(const std::string& directory)
 {
     std::string dir = directory;

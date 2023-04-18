@@ -10,22 +10,27 @@
 //	dev includes
 #include "util/UFile.h"
 
+#include "GLTexture.h"
+
 using namespace aa;
 
 
-unsigned int GLShaders::compileShader(
-	ShaderType type, 
+
+GLShader::GLShader() : shaderProgram(0)
+{
+
+}
+
+GLShader::~GLShader() {
+	glDeleteProgram(shaderProgram);
+}
+
+
+unsigned int GLShader::compileShader(
+	unsigned int glType,
 	const std::string& shader
 )
 {
-	unsigned int glType = 0;
-	if (type == GLSVertex) {
-		glType = GL_VERTEX_SHADER;
-	}
-	else if (type == GLSFragment) {
-		glType = GL_FRAGMENT_SHADER;
-	}
-
 	unsigned int id = glCreateShader(glType);
 
 	const char* src = shader.c_str();
@@ -34,7 +39,7 @@ unsigned int GLShaders::compileShader(
 
 	int result;
 	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-	
+
 	if (result == GL_FALSE) {
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
@@ -47,21 +52,114 @@ unsigned int GLShaders::compileShader(
 		delete[] msg;
 
 		glDeleteShader(id);
-		return 0;
+		id = 0;
 	}
 
 	return id;
 }
 
-
-unsigned int GLShaders::createShader(
-	const std::string& vertexShader, 
-	const std::string& fragmentShader
-)
+void GLShader::bind() const
 {
+	glUseProgram(shaderProgram);
+
+	for (auto& uTex : uniformsTex) {
+		uTex.tex->bindToSlot(uTex.slot);
+	}
+
+	for (auto& u4f : uniforms4f) {
+		glUniform4f(
+			glGetUniformLocation(shaderProgram, u4f.uniformKey.c_str()),
+			u4f.value.x, u4f.value.y, u4f.value.z, u4f.value.w
+		);
+	}
+}
+
+
+
+IGLShaderBuilder::IGLShaderBuilder()
+{
+
+}
+
+
+
+GLShaderFileBuilder::GLShaderFileBuilder(const std::string& shadersDirectory)
+	: shadersDirectory(UFile::normalizedDirectory(shadersDirectory)), 
+	  vertexFilepath(), fragmentFilepath(), shaderOutput(nullptr)
+{
+
+}
+
+GLShaderFileBuilder::~GLShaderFileBuilder()
+{
+	if (shaderOutput) {
+		delete shaderOutput;
+	}
+}
+
+
+GLShaderFileBuilder& GLShaderFileBuilder::setVertexShader(const std::string& filename)
+{
+	std::string filepath = shadersDirectory;
+	filepath += filename;
+	filepath += ".glsl";
+	this->vertexFilepath = filepath;
+	return *this;
+}
+
+GLShaderFileBuilder& GLShaderFileBuilder::setFragmentShader(const std::string& filename)
+{
+	std::string filepath = shadersDirectory;
+	filepath += filename;
+	filepath += ".glsl";
+	this->fragmentFilepath = filepath;
+	return *this;
+}
+
+GLShaderFileBuilder& GLShaderFileBuilder::addUniformTex(
+	const std::string&	uniformKey, 
+	GLTexture*			tex,
+	unsigned int		slot
+) {
+	if (!shaderOutput) {
+		shaderOutput = new GLShader();
+	}
+	shaderOutput->uniformsTex.push_back({ uniformKey, tex, slot });
+	return *this;
+}
+
+GLShaderFileBuilder& GLShaderFileBuilder::addUniform4f(
+	const std::string&	uniformKey, 
+	Vector4d 			value
+) {
+	if (!shaderOutput) {
+		shaderOutput = new GLShader();
+	}
+	shaderOutput->uniforms4f.push_back({ uniformKey, value });
+	return *this;
+}
+
+
+GLShader* GLShaderFileBuilder::build()
+{
+	if (vertexFilepath.empty()) {
+		std::cout << "GLShaderFileBuilder::vertexFilepath is empty!\n";
+		return nullptr;
+	}
+	if (fragmentFilepath.empty()) {
+		std::cout << "GLShaderFileBuilder::vertexFilepath is empty!\n";
+		return nullptr;
+	}
+
+	GLShader* output = shaderOutput;
+	shaderOutput = nullptr;
+
+	std::string vertexShader	= UFile::readFileContent(vertexFilepath);
+	std::string fragmentShader	= UFile::readFileContent(fragmentFilepath);
+
 	unsigned int program = glCreateProgram();
-	unsigned int vs = compileShader(GLSVertex, vertexShader);
-	unsigned int fs = compileShader(GLSFragment, fragmentShader);
+	unsigned int vs = GLShader::compileShader(GL_VERTEX_SHADER,   vertexShader);
+	unsigned int fs = GLShader::compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);
@@ -71,20 +169,7 @@ unsigned int GLShaders::createShader(
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
-	return program;
-}
-
-
-unsigned int GLShaders::readShader(
-	const std::string& vertexName, 
-	const std::string& fragmentName
-)
-{
-	std::string vertexPath	 = UFile::GLShaderPath(vertexName);
-	std::string fragmentPath = UFile::GLShaderPath(fragmentName);
-
-	std::string vertexShader	= UFile::readFileContent(vertexPath);
-	std::string fragmentShader	= UFile::readFileContent(fragmentPath);
-
-	return createShader(vertexShader, fragmentShader);
+	output->shaderProgram = program;
+	
+	return output;
 }

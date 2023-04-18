@@ -13,8 +13,6 @@ namespace aa
     public:
         static std::string readFileContent(const std::string& filename);
 
-        static std::string GLShaderPath(const std::string& shaderName);
-
         static std::string normalizedDirectory(const std::string& directory);
 
 
