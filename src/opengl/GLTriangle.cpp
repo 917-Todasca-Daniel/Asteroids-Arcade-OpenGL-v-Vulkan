@@ -8,28 +8,24 @@
 
 //	dev includes
 #include "util/UColors.h"
-
 #include "util/UMaths.h"
+
 #include "constants/window_constants.hpp"
+
 #include "GLShaders.h"
 
 using namespace aa;
 
 
-GLTriangle::GLTriangle(LogicObject* parent, Vector3d position, float edge) 
-	: GLTriangle(parent, position, edge, UColors::PINK)
-{
-
-}
 
 GLTriangle::GLTriangle(
 	LogicObject*	parent, 
 	Vector3d		position, 
 	float			altitude,
-	Vector4d		color
+	GLShader*		shader
 )
-	: Object3d(parent, position), buffer(0), shader(0), 
-	altitude(altitude), color(color)
+	: Object3d(parent, position), buffer(0),
+	altitude(altitude), shader(shader)
 {
 
 }
@@ -37,7 +33,8 @@ GLTriangle::GLTriangle(
 GLTriangle::~GLTriangle()
 {
 	glDeleteBuffers(1, &buffer);
-
+	
+	// make sure shader is deleted in a module above
 }
 
 
@@ -63,15 +60,10 @@ void GLTriangle::init()
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertices2d, GL_STATIC_DRAW);
 
-	shader = GLShaders::readShader(
-		"v_basic_position",
-		"f_uniform_color"
-	);
-
 }
 
 
-void GLTriangle::draw()
+void GLTriangle::draw() const
 {
 	Object3d::draw();
 
@@ -82,13 +74,7 @@ void GLTriangle::draw()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 	
-	glUseProgram(shader);
-	glUniform4f(
-		glGetUniformLocation(
-			shader, "u_Color"
-		),
-		color.x, color.y, color.z, color.w
-	);
+	shader->bind();
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 

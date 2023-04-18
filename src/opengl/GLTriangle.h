@@ -5,25 +5,28 @@
 
 namespace aa
 {
+
+    class GLShader;
+
+
     // draws a static 2d equilateral triangle to the screen;
-    // the given position is the topmost corner's position on the screen, 
-    //      relative to the game viewport
+    // the given position is the topmost corner's position on the screen relative to WINDOW_UNIT
+    // expected shader: position
     class GLTriangle : public Object3d
     {
 
     public:
-        GLTriangle(LogicObject *parent, Vector3d position, float altitude);
         GLTriangle(
             LogicObject*    parent, 
             Vector3d        position, 
             float           edge, 
-            Vector4d        color
+            GLShader*       shader
         );
         virtual ~GLTriangle();
 
         virtual void init();
 
-        virtual void draw();
+        virtual void draw() const;
 
         //  delete all implicit constructors 
         GLTriangle()                  = delete;
@@ -35,11 +38,9 @@ namespace aa
 
 
     private:
-        const Vector4d color;
-        const float altitude;
-
-        unsigned int buffer;
-        unsigned int shader;
+        const GLShader* shader;
+        const float     altitude;
+        unsigned int    buffer;
 
         float vertices2d[6] = { };
 

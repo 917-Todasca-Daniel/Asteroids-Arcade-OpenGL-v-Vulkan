@@ -11,39 +11,20 @@
 #include "constants/window_constants.hpp"
 
 #include "GLShaders.h"
-#include "GLTexture.h"
 
 using namespace aa;
 
 
-GLRectangle::GLRectangle(LogicObject* parent, Vector3d position, float height, float width)
-	: GLRectangle(parent, position, height, width, UColors::PINK)
-{
-
-}
 
 GLRectangle::GLRectangle(
 	LogicObject*	parent, 
 	Vector3d		position, 
 	float			height,
 	float			width,
-	GLTexture*		texture
+	GLShader*		shader
 )
-	: Object3d(parent, position), buffer(0), shader(0), ibo(0),
-	height(height), width(width), color(UColors::PINK), texture(texture)
-{
-
-}
-
-GLRectangle::GLRectangle(
-	LogicObject* parent,
-	Vector3d		position,
-	float			height,
-	float			width,
-	Vector4d		color
-)
-	: Object3d(parent, position), buffer(0), shader(0), ibo(0),
-	height(height), width(width), color(color), texture(nullptr)
+	: Object3d(parent, position), buffer(0), ibo(0),
+	height(height), width(width), shader(shader)
 {
 
 }
@@ -53,10 +34,8 @@ GLRectangle::~GLRectangle()
 	glDeleteBuffers(1, &buffer);
 	glDeleteBuffers(1, &ibo);
 
-	if (texture) {
-		delete texture;
-	}
-
+	// shader not deleted, as we allow for shader to be reused by other GL objects
+	// make sure shader deletion is handled in a module above GLRectangle
 }
 
 
@@ -64,7 +43,7 @@ void GLRectangle::init()
 {
 	Object3d::init();
 
-	{	// may be moved to shader, but vertices don't change
+	{	// optimise by using CPU instead of a shader for calculating coords
 		vertices2d[0] = 1.0f * (position.x - width / 2) / WINDOW_UNIT;
 		vertices2d[1] = 1.0f * (position.y - height / 2) / WINDOW_UNIT;
 
@@ -90,14 +69,10 @@ void GLRectangle::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
-	shader = texture ?
-		GLShaders::readShader("v_basic_tex_position",	"f_basic_tex") :
-		GLShaders::readShader("v_basic_position",		"f_uniform_color");
-
 }
 
 
-void GLRectangle::draw()
+void GLRectangle::draw() const
 {
 	Object3d::draw();
 
@@ -107,26 +82,18 @@ void GLRectangle::draw()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+	glVertexAttribPointer(
+		0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 
+		0
+	);
 
-	if (texture) {
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(
-			1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 
-			(void*)(sizeof(float) * 2)
-		);
-		texture->bindToSlot(0);
-		
-		glUseProgram(shader);
-		glUniform1i(glGetUniformLocation(shader, "u_Texture"), 0 );
-	}
-	else {
-		glUseProgram(shader);
-		glUniform4f(
-			glGetUniformLocation(shader, "u_Color"),
-			color.x, color.y, color.z, color.w
-		);
-	}
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(
+		1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
+		(void*)(sizeof(float) * 2)
+	);
+
+	shader->bind();
 
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
