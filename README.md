@@ -1,4 +1,4 @@
-# Asteroids Arcade Game: OpenGL vs Vulkan\
+# Asteroids Arcade Game: OpenGL vs Vulkan
 
 
 ## Images  
