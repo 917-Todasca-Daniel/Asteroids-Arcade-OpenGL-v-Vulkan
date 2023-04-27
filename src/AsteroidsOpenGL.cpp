@@ -2,6 +2,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+//	assimp
+#include <assimp/Importer.hpp>
+
 //	cpp includes
 #include <iostream>
 
@@ -13,8 +16,10 @@
 #include "opengl/GLRectangle.h"
 #include "opengl/GLShaders.h"
 #include "opengl/GLTexture.h"
+#include "opengl/GLMesh.h"
 
 #include "util/UMaths.h"
+#include "util/UFile.h"
 #include "util/UColors.h"
 
 
@@ -24,6 +29,9 @@ int main() {
 
 	//	init tasks
 	
+	Assimp::Importer* importer = new Assimp::Importer();
+	aa::UFile::setAssimpFileReader(importer);
+
 	GLFWwindow* window;
 
 	if (!glfwInit()) {
@@ -73,8 +81,21 @@ int main() {
 	aa::GLShader* texShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
 		.setVertexShader("v_basic_tex_position")
 		.setFragmentShader("f_basic_tex")
-		.addUniformTex("u_Texture", tex, 0)
+		.addUniformTex("u_Texture", tex)
 		.build();
+
+	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+		.setVertexShader("v_3d_mesh")
+		.setFragmentShader("f_3d_mesh")
+		.build();
+
+	aa::GLMesh* obj = new aa::GLMesh(
+		AA_ROOT,
+		aa::Vector3d(300, 300, 0),
+		meshShader
+	);
+	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
+	obj->init();
 
 
 	float ax, ay, bx, by, cx, cy;
@@ -120,13 +141,14 @@ int main() {
 	rect2->init();
 
 	while (!glfwWindowShouldClose(window)) {
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		rect2->draw();
-		tri1->draw();
-		tri2->draw();
-		tri3->draw();
-		rect1->draw();
+		obj->draw();
+		//tri1->draw();
+		//tri2->draw();
+		//tri3->draw();
+		//rect1->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -142,9 +164,12 @@ int main() {
 	delete tri3;
 	delete rect1;
 	delete rect2;
+	delete meshShader;
+	delete obj;
 	delete flatShader;
 	delete texShader;
 	delete tex;
+	delete importer;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

@@ -2,10 +2,14 @@
 
 #include <algorithm>
 
+#include <assimp/Importer.hpp>
+
 using namespace aa;
 
 
 const std::string UFile::ROOT = "D:/licenta/dev/app/";
+
+Assimp::Importer* UFile::IMPORTER = nullptr;
 
 
 std::string UFile::readFileContent(const std::string& filename) {
@@ -30,4 +34,13 @@ std::string UFile::normalizedDirectory(const std::string& directory)
     }
 
     return dir;
+}
+
+
+Assimp::Importer* UFile::getAssimpFileReader() {
+    return IMPORTER;
+}
+
+void UFile::setAssimpFileReader(Assimp::Importer* importer) {
+    IMPORTER = importer;
 }
