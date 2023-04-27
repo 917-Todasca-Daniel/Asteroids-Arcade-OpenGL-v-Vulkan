@@ -136,9 +136,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="res\opengl\shaders\f_3d_mesh.glsl" />
     <None Include="res\opengl\shaders\f_basic_tex.glsl" />
     <None Include="res\opengl\shaders\f_red_color.glsl" />
     <None Include="res\opengl\shaders\f_uniform_color.glsl" />
+    <None Include="res\opengl\shaders\v_3d_mesh.glsl" />
     <None Include="res\opengl\shaders\v_basic_position.glsl" />
     <None Include="res\opengl\shaders\v_basic_tex_position.glsl" />
     <Content Include="Dependencies\assimp\assimp-vc143-mt.dll">

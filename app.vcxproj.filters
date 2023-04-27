@@ -19,6 +19,9 @@
     <Filter Include="GLSL">
       <UniqueIdentifier>{52767e08-7406-4e6e-aded-b7b3048681ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="openGL">
+      <UniqueIdentifier>{3f39a3f8-7f0a-4bc0-9bb0-68c7990a0fc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -35,6 +38,12 @@
       <Filter>GLSL</Filter>
     </None>
     <None Include="res\opengl\shaders\v_basic_tex_position.glsl">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="res\opengl\shaders\f_3d_mesh.glsl">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="res\opengl\shaders\v_3d_mesh.glsl">
       <Filter>GLSL</Filter>
     </None>
   </ItemGroup>
@@ -54,13 +63,7 @@
     <ClCompile Include="src\shared\domain\Object3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\opengl\GLTriangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\shared\data\Vector4d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\opengl\GLShaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\shared\util\UMaths.cpp">
@@ -72,17 +75,23 @@
     <ClCompile Include="src\shared\util\UColors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\opengl\GLRectangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\opengl\GLTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\3rdparty\stb_image.cpp">
       <Filter>Third Parties</Filter>
     </ClCompile>
     <ClCompile Include="src\opengl\GLMesh.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\GLRectangle.cpp">
+      <Filter>openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\GLShaders.cpp">
+      <Filter>openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\GLTexture.cpp">
+      <Filter>openGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\GLTriangle.cpp">
+      <Filter>openGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,16 +110,10 @@
     <ClInclude Include="src\shared\domain\Object3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\opengl\GLTriangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\shared\data\Vector4d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\shared\util\UColors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\opengl\GLShaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\shared\util\UFile.h">
@@ -119,17 +122,23 @@
     <ClInclude Include="src\shared\util\UMaths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\opengl\GLRectangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\opengl\GLTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\3rdparty\stb_image.h">
       <Filter>Third Parties</Filter>
     </ClInclude>
     <ClInclude Include="src\opengl\GLMesh.h">
-      <Filter>Header Files</Filter>
+      <Filter>openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLRectangle.h">
+      <Filter>openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLShaders.h">
+      <Filter>openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLTexture.h">
+      <Filter>openGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLTriangle.h">
+      <Filter>openGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
