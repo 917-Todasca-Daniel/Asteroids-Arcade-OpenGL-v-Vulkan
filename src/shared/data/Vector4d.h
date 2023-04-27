@@ -13,16 +13,17 @@ namespace aa
         Vector4d(float x, float y, float z, float w);
         Vector4d(const Vector4d& other);
 
-        const float x;
-        const float y;
-        const float z;
-        const float w;
+        Vector4d& operator = (const Vector4d&);
+
+        float x;
+        float y;
+        float z;
+        float w;
 
         //  delete all implicit constructors 
         Vector4d()                  = delete;
         Vector4d(Vector4d&&)        = delete;
 
-        Vector4d& operator = (const Vector4d&)  = delete;
         Vector4d& operator = (Vector4d&&)       = delete;
 
     };

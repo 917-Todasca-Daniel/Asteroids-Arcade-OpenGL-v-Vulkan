@@ -14,6 +14,15 @@ Vector3d::Vector3d(const Vector3d& other) : x(other.x), y(other.y), z(other.z)
 }
 
 
+Vector3d& Vector3d::operator = (const Vector3d& other)
+{
+    this->x = other.x;
+    this->y = other.y;
+    this->z = other.z;
+    return *this;
+}
+
+
 std::ostream& aa::operator<<(std::ostream& os, const Vector3d& v)
 {
     os << "V(" << v.x << ", " << v.y << ", " << v.z << ")";

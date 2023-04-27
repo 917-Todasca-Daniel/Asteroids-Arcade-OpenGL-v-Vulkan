@@ -15,6 +15,16 @@ Vector4d::Vector4d(const Vector4d& other)
 }
 
 
+Vector4d& Vector4d::operator = (const Vector4d& other)
+{
+    this->x = other.x;
+    this->y = other.y;
+    this->z = other.z;
+    this->w = other.w;
+    return *this;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const Vector4d& v)
 {
     os << "V(" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << ")";

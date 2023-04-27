@@ -7,6 +7,7 @@
 //  dev includes
 #include "domain/Object3d.h"
 #include "data/Vector4d.h"
+#include "data/Vector3d.h"
 
 
 namespace aa
@@ -25,6 +26,24 @@ namespace aa
 
         void bind() const;
 
+        // lazy operation until shader is bound
+        void addUniformTex(
+            const std::string& uniformKey,
+            GLTexture*         tex
+        );
+        
+        // lazy operation until shader is bound
+        void addUniform3f(
+            const std::string& uniformKey,
+            Vector3d           value
+        );
+
+        // lazy operation until shader is bound
+        void addUniform4f(
+            const std::string& uniformKey,
+            Vector4d           value
+        );
+
         //  delete all implicit constructors 
         GLShader(const GLShader&)   = delete;
         GLShader(GLShader&&)        = delete;
@@ -40,20 +59,33 @@ namespace aa
 
         struct UniformTex {
             std::string     uniformKey;
-            GLTexture*      tex;
-            unsigned int    slot;
+            GLTexture*      value;
         };
-
         struct Uniform4f {
             std::string     uniformKey;
             Vector4d        value;
         };
+        struct Uniform3f {
+            std::string     uniformKey;
+            Vector3d        value;
+        };
 
         std::vector <UniformTex> uniformsTex;
         std::vector <Uniform4f>  uniforms4f;
+        std::vector <Uniform3f>  uniforms3f;
 
-        static unsigned int compileShader(unsigned int glType, const std::string& shader);
+        static unsigned int compileShader(
+            unsigned int glType, 
+            const std::string& shader
+        );
 
+
+    private:
+        template <typename wrapperT>
+        void updateOrPutIfExists(
+            std::vector <wrapperT> &container,
+            const wrapperT &value
+        );
 
         friend class GLShaderFileBuilder;
 
@@ -102,8 +134,13 @@ namespace aa
         // eager operation
         GLShaderFileBuilder& addUniformTex(
             const std::string&  uniformKey,
-            GLTexture*          tex,
-            unsigned int        slot
+            GLTexture*          tex
+        );
+
+        // eager operation
+        GLShaderFileBuilder& addUniform3f(
+            const std::string& uniformKey,
+            Vector3d           value
         );
 
         // eager operation
@@ -122,9 +159,6 @@ namespace aa
 
         std::string vertexFilepath;
         std::string fragmentFilepath;
-
-        std::vector <GLShader::UniformTex>  uniformsTex;
-        std::vector <GLShader::Uniform4f>   uniformsRef4f;
 
     };
 

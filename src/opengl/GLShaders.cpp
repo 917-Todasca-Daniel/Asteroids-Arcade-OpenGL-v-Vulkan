@@ -37,16 +37,15 @@ unsigned int GLShader::compileShader(
 	glShaderSource(id, 1, &src, 0);
 	glCompileShader(id);
 
-	int result;
-	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-
-	if (result == GL_FALSE) {
+	int isCompiled;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &isCompiled);
+	if (isCompiled == GL_FALSE) {
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 
-		char* msg = new char[length];
+		char* msg = new char[length + 1];
 		glGetShaderInfoLog(id, length, &length, msg);
-
+		msg[length] = '\0';
 		std::cout << msg << std::endl;
 
 		delete[] msg;
@@ -63,7 +62,7 @@ void GLShader::bind() const
 	glUseProgram(shaderProgram);
 
 	for (auto& uTex : uniformsTex) {
-		uTex.tex->bindToSlot(uTex.slot);
+		uTex.value->bindToSlot(0);
 	}
 
 	for (auto& u4f : uniforms4f) {
@@ -72,6 +71,58 @@ void GLShader::bind() const
 			u4f.value.x, u4f.value.y, u4f.value.z, u4f.value.w
 		);
 	}
+
+	for (auto& u4f : uniforms3f) {
+		glUniform3f(
+			glGetUniformLocation(shaderProgram, u4f.uniformKey.c_str()),
+			u4f.value.x, u4f.value.y, u4f.value.z
+		);
+	}
+}
+
+
+template <typename wrapperT>
+void GLShader::updateOrPutIfExists(
+	std::vector <wrapperT>& container,
+	const wrapperT& lookUp
+) {
+	for (auto& obj : container) {
+		if (obj.uniformKey == lookUp.uniformKey) {
+			obj.value = lookUp.value;
+			return;
+		}
+	}
+	container.push_back(lookUp);
+}
+
+void GLShader::addUniformTex(
+	const std::string& uniformKey,
+	GLTexture*		   tex
+) {
+	this->updateOrPutIfExists <UniformTex>(
+		this->uniformsTex,
+		{ uniformKey, tex }
+	);
+}
+
+void GLShader::addUniform3f(
+	const std::string& uniformKey,
+	Vector3d           value
+) {
+	this->updateOrPutIfExists <Uniform3f>(
+		this->uniforms3f,
+		{ uniformKey, value }
+	);
+}
+
+void GLShader::addUniform4f(
+	const std::string& uniformKey,
+	Vector4d           value
+) {
+	this->updateOrPutIfExists <Uniform4f>(
+		this->uniforms4f,
+		{ uniformKey, value }
+	);
 }
 
 
@@ -118,13 +169,12 @@ GLShaderFileBuilder& GLShaderFileBuilder::setFragmentShader(const std::string& f
 
 GLShaderFileBuilder& GLShaderFileBuilder::addUniformTex(
 	const std::string&	uniformKey, 
-	GLTexture*			tex,
-	unsigned int		slot
+	GLTexture*			tex
 ) {
 	if (!shaderOutput) {
 		shaderOutput = new GLShader();
 	}
-	shaderOutput->uniformsTex.push_back({ uniformKey, tex, slot });
+	shaderOutput->addUniformTex(uniformKey, tex);
 	return *this;
 }
 
@@ -135,7 +185,18 @@ GLShaderFileBuilder& GLShaderFileBuilder::addUniform4f(
 	if (!shaderOutput) {
 		shaderOutput = new GLShader();
 	}
-	shaderOutput->uniforms4f.push_back({ uniformKey, value });
+	shaderOutput->addUniform4f(uniformKey, value);
+	return *this;
+}
+
+GLShaderFileBuilder& GLShaderFileBuilder::addUniform3f(
+	const std::string& uniformKey,
+	Vector3d 		   value
+) {
+	if (!shaderOutput) {
+		shaderOutput = new GLShader();
+	}
+	shaderOutput->addUniform3f(uniformKey, value);
 	return *this;
 }
 
@@ -149,6 +210,10 @@ GLShader* GLShaderFileBuilder::build()
 	if (fragmentFilepath.empty()) {
 		std::cout << "GLShaderFileBuilder::vertexFilepath is empty!\n";
 		return nullptr;
+	}
+
+	if (!shaderOutput) {
+		shaderOutput = new GLShader();
 	}
 
 	GLShader* output = shaderOutput;
