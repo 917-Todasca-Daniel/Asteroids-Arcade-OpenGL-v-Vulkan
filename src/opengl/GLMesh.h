@@ -29,6 +29,10 @@ namespace aa
 
         virtual void draw() const;
 
+        void setPosition(Vector3d other) {
+            this->position = other;
+        }
+
         //  delete all implicit constructors 
         GLMesh()                = delete;
         GLMesh(const GLMesh&)   = delete;
@@ -40,7 +44,7 @@ namespace aa
 
     protected:
         // this shader must be managed by a module above
-        const GLShader*  shader;
+        GLShader* shader;
 
         // contains vertex position and vertex normals (for reflecting light)
         std::vector <float> vertices;

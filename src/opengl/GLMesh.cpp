@@ -139,6 +139,28 @@ void GLMesh::draw() const
 		(void*)(3 * sizeof(float))
 	);
 
+	{	// fixed lightning and camera perspective
+		shader->addUniform3f(
+			"u_LightColor",
+			Vector3d(1.0f,	1.0f,	1.0f)
+		);
+		shader->addUniform3f(
+			"u_LightDirection",
+			Vector3d(-1.0f, -1.0f, -1.0f)
+		);
+		shader->addUniform3f(
+			"u_ViewPos",
+			Vector3d(0.0f,	0.0f,	10000.0)
+		);
+	}
+
+	{	// position and rotation geometry
+		shader->addUniform3f(
+			"u_Origin",
+			position
+		);
+	}
+
 	shader->bind();
 
 	glDrawElements(GL_TRIANGLES, (unsigned int) indices.size(), GL_UNSIGNED_INT, 0);

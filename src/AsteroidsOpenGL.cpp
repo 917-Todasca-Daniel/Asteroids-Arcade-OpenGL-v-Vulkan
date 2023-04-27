@@ -12,6 +12,8 @@
 #include "window_constants.hpp"	// WINDOW_* macros
 
 #include "shared/domain/RootObject.h"
+#include "shared/domain/Asteroid.h"
+
 #include "opengl/GLTriangle.h"
 #include "opengl/GLRectangle.h"
 #include "opengl/GLShaders.h"
@@ -95,7 +97,12 @@ int main() {
 		meshShader
 	);
 	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
-	obj->init();
+
+	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT,
+		aa::Vector3d(0.0, 0.0f, 0.0f),
+		obj
+	);
+	ast->init();
 
 
 	float ax, ay, bx, by, cx, cy;
@@ -140,15 +147,21 @@ int main() {
 	);
 	rect2->init();
 
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	while (!glfwWindowShouldClose(window)) {
+		static double previousTime = glfwGetTime();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		double currentTime = glfwGetTime();
+		float lap = (float)(currentTime - previousTime);
+		previousTime = currentTime;
+		
+		ast->loop(lap);
+		
 		rect2->draw();
 		obj->draw();
-		//tri1->draw();
-		//tri2->draw();
-		//tri3->draw();
-		//rect1->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
