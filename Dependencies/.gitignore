@@ -2,3 +2,5 @@ include/GLFW/*
 lib-vc2022/*
 include/GL/*
 glew/*
+assimp/*
+include/assimp/*

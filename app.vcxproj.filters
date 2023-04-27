@@ -81,6 +81,9 @@
     <ClCompile Include="src\3rdparty\stb_image.cpp">
       <Filter>Third Parties</Filter>
     </ClCompile>
+    <ClCompile Include="src\opengl\GLMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -124,6 +127,9 @@
     </ClInclude>
     <ClInclude Include="src\3rdparty\stb_image.h">
       <Filter>Third Parties</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl\GLMesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
