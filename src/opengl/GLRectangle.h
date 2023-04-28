@@ -27,7 +27,7 @@ namespace aa
 
         virtual void init();
 
-        virtual void draw() const;
+        virtual void draw();
 
         //  delete all implicit constructors 
         GLRectangle()                   = delete;
@@ -39,7 +39,7 @@ namespace aa
 
 
     private:
-        const GLShader*  shader;
+        GLShader*       shader;
 
         const float      height;
         const float      width;

@@ -17,7 +17,7 @@ namespace aa
 
         virtual void init();
 
-        virtual void draw() const;
+        virtual void draw();
 
         //  delete all implicit constructors 
         Object3d()                  = delete;

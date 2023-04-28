@@ -72,7 +72,7 @@ void GLRectangle::init()
 }
 
 
-void GLRectangle::draw() const
+void GLRectangle::draw()
 {
 	Object3d::draw();
 

@@ -63,7 +63,7 @@ void GLTriangle::init()
 }
 
 
-void GLTriangle::draw() const
+void GLTriangle::draw()
 {
 	Object3d::draw();
 

@@ -26,7 +26,7 @@ namespace aa
 
         virtual void init();
 
-        virtual void draw() const;
+        virtual void draw();
 
         //  delete all implicit constructors 
         GLTriangle()                  = delete;
@@ -38,7 +38,7 @@ namespace aa
 
 
     private:
-        const GLShader* shader;
+        GLShader*       shader;
         const float     altitude;
         unsigned int    buffer;
 
