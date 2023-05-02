@@ -2,6 +2,8 @@
 
 #include "domain/Object3d.h"
 
+#include "data/Quaternion.hpp"
+
 #include <vector>
 
 
@@ -27,10 +29,23 @@ namespace aa
 
         virtual void init();
 
-        virtual void draw() const;
+        virtual void draw();
 
+        // getters and setter
         void setPosition(Vector3d other) {
             this->position = other;
+        }
+
+        void setRotation(Quaternion rot) {
+            this->rotation = rot;
+        }
+
+        Quaternion& getRotation() {
+            return this->rotation;
+        }
+
+        Vector3d getCenter() const {
+            return center;
         }
 
         //  delete all implicit constructors 
@@ -47,9 +62,13 @@ namespace aa
         GLShader* shader;
 
         // contains vertex position and vertex normals (for reflecting light)
-        std::vector <float> vertices;
+        std::vector <float>         vertices;
+        std::vector <unsigned int>  indices;
 
-        std::vector <unsigned int> indices;
+        // by default, the mean average of all points
+        Vector3d                    center;
+        // rotation around the center
+        Quaternion                  rotation;
 
         // vertex buffer object
         unsigned int vbo;

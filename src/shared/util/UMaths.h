@@ -30,7 +30,6 @@ namespace aa
 			float& dx, float& dy
 		);
 
-
 	private:
 		//	prevents redundant slow calls of sqrt() fn
 		static constexpr float SQRT_3 = 1.73205080757f;

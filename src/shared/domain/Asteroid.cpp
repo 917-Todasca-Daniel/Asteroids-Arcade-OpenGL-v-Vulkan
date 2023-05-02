@@ -28,14 +28,16 @@ void Asteroid::kill()
 void Asteroid::init()
 {
 	asteroidMesh->init();
+	asteroidMesh->setRotation(Quaternion(0, 0.01, 0.1, 0.01));
 }
 
 void Asteroid::loop(float lap)
 {
 	Object3d::loop(lap);
 
-	position.x += lap * 100;
-	position.y += lap * 100;
+	position.x += lap * 1000;
+	position.y += lap * 1000;
 
 	asteroidMesh->setPosition(position);
+	asteroidMesh->getRotation().w += lap;
 }

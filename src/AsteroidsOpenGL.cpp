@@ -160,7 +160,6 @@ int main() {
 		
 		ast->loop(lap);
 		
-		rect2->draw();
 		obj->draw();
 
 		glfwSwapBuffers(window);

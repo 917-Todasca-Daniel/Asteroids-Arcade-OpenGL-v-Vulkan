@@ -57,7 +57,7 @@ unsigned int GLShader::compileShader(
 	return id;
 }
 
-void GLShader::bind() const
+void GLShader::bind()
 {
 	glUseProgram(shaderProgram);
 
@@ -76,6 +76,15 @@ void GLShader::bind() const
 		glUniform3f(
 			glGetUniformLocation(shaderProgram, u4f.uniformKey.c_str()),
 			u4f.value.x, u4f.value.y, u4f.value.z
+		);
+	}
+
+	for (auto& mat4f : uniformsMat4f) {
+		glUniformMatrix4fv(
+			glGetUniformLocation(shaderProgram, mat4f.uniformKey.c_str()),
+			1, 
+			GL_TRUE,
+			mat4f.value.data()
 		);
 	}
 }
@@ -121,6 +130,16 @@ void GLShader::addUniform4f(
 ) {
 	this->updateOrPutIfExists <Uniform4f>(
 		this->uniforms4f,
+		{ uniformKey, value }
+	);
+}
+
+void GLShader::addUniformMat4f(
+	const std::string& uniformKey,
+	Matrix4d           value
+) {
+	this->updateOrPutIfExists <UniformMat4f>(
+		this->uniformsMat4f,
 		{ uniformKey, value }
 	);
 }

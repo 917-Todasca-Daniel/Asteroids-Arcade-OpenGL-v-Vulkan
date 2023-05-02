@@ -22,6 +22,9 @@
 #include "util/UMaths.h"
 #include "constants/window_constants.hpp"
 
+#include "data/Matrix4d.hpp"
+#include "data/Quaternion.hpp"
+
 using namespace aa;
 
 
@@ -38,7 +41,7 @@ GLMesh::GLMesh(
 	GLShader*		shader
 )
 	: Object3d(parent, position), shader(shader), 
-	ibo(0), vbo(0)
+	ibo(0), vbo(0), center(0, 0, 0), rotation(0, 0, 0, 0)
 {
 
 }
@@ -67,6 +70,9 @@ void GLMesh::loadFromFbx(const char* filepath) {
 		std::cout << "Error loading scene: " << importer->GetErrorString() << std::endl;
 	}
 	else {
+		double centerX = 0, centerY = 0, centerZ = 0;
+		unsigned int totalVertices = 0;
+
 		for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
 			const aiMesh* mesh = scene->mMeshes[i];
 
@@ -78,6 +84,9 @@ void GLMesh::loadFromFbx(const char* filepath) {
 					vertices.end(), 
 					{ pos.x, pos.y, pos.z, normal.x, normal.y, normal.z }
 				);
+
+				center.x += pos.x, center.y += pos.y, center.z += pos.z;
+				totalVertices += 1;
 			}
 
 			for (unsigned int j = 0; j < mesh->mNumFaces; ++j) {
@@ -88,6 +97,10 @@ void GLMesh::loadFromFbx(const char* filepath) {
 				}
 			}
 		}
+
+		center.x = centerX / totalVertices;
+		center.y = centerY / totalVertices;
+		center.z = centerZ / totalVertices;
 	}
 
 }
@@ -118,7 +131,7 @@ void GLMesh::init()
 }
 
 
-void GLMesh::draw() const
+void GLMesh::draw()
 {
 	Object3d::draw();
 
@@ -154,10 +167,24 @@ void GLMesh::draw() const
 		);
 	}
 
-	{	// position and rotation geometry
-		shader->addUniform3f(
-			"u_Origin",
-			position
+	{	// translation, scaling and rotation geometry
+		Matrix4d projection = Matrix4d::ViewportMatrix();
+		projection *= Matrix4d::TranslationMatrix(position);
+
+		if (rotation.w > 0) {
+			projection *= Matrix4d::RotateAround(rotation, center);
+		}
+
+		for (size_t i = 0; i < 4; i++) {
+			for (size_t j = 0; j < 4; j++) {
+				std::cout << projection.data()[i*4 + j] << " ";
+			}
+			std::cout << std::endl;
+		}
+
+		shader->addUniformMat4f(
+			"u_Projection",
+			projection
 		);
 	}
 

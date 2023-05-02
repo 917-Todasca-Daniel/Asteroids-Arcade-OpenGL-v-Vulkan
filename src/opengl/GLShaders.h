@@ -6,6 +6,7 @@
 
 //  dev includes
 #include "domain/Object3d.h"
+#include "data/Matrix4d.hpp"
 #include "data/Vector4d.h"
 #include "data/Vector3d.h"
 
@@ -24,7 +25,7 @@ namespace aa
     public:
         ~GLShader();
 
-        void bind() const;
+        void bind();
 
         // lazy operation until shader is bound
         void addUniformTex(
@@ -42,6 +43,12 @@ namespace aa
         void addUniform4f(
             const std::string& uniformKey,
             Vector4d           value
+        );
+
+        // lazy operation until shader is bound
+        void addUniformMat4f(
+            const std::string& uniformKey,
+            Matrix4d           value
         );
 
         //  delete all implicit constructors 
@@ -69,10 +76,15 @@ namespace aa
             std::string     uniformKey;
             Vector3d        value;
         };
+        struct UniformMat4f {
+            std::string     uniformKey;
+             Matrix4d       value;
+        };
 
-        std::vector <UniformTex> uniformsTex;
-        std::vector <Uniform4f>  uniforms4f;
-        std::vector <Uniform3f>  uniforms3f;
+        std::vector <UniformTex>    uniformsTex;
+        std::vector <Uniform4f>     uniforms4f;
+        std::vector <Uniform3f>     uniforms3f;
+        std::vector <UniformMat4f>  uniformsMat4f;
 
         static unsigned int compileShader(
             unsigned int glType, 
