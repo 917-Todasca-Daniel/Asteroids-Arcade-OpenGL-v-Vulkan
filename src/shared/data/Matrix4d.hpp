@@ -57,25 +57,29 @@ namespace aa
         Matrix4d(const Matrix4d& other) : elements(other.elements) { }
 
         Matrix4d(const Quaternion& other) {
-            float xx = other.x * other.x;
-            float xy = other.x * other.y;
-            float xz = other.x * other.z;
-            float xw = other.x * other.w;
+            double xx = other.x * other.x;
+            double xy = other.x * other.y;
+            double xz = other.x * other.z;
+            double xw = other.x * other.w;
 
-            float yy = other.y * other.y;
-            float yz = other.y * other.z;
-            float yw = other.y * other.w;
+            double yy = other.y * other.y;
+            double yz = other.y * other.z;
+            double yw = other.y * other.w;
 
-            float zz = other.z * other.z;
-            float zw = other.z * other.w;
+            double zz = other.z * other.z;
+            double zw = other.z * other.w;
 
             elements.insert(
                 elements.end(),
                 {
-                    1.0f - 2.0f * (yy + zz), 2.0f * (xy - zw), 2.0f * (xz + yw), 0.0f,
-                    2.0f * (xy + zw), 1.0f - 2.0f * (xx + zz), 2.0f * (yz - xw), 0.0f,
-                    2.0f * (xz - yw), 2.0f * (yz + xw), 1.0f - 2.0f * (xx + yy), 0.0f,
-                    0.0f, 0.0f, 0.0f, 1.0f
+                    1.0f - 2.0f * float(yy + zz), 2.0f * float(xy - zw), 
+                    2.0f * float(xz + yw), 0.0f,
+                    2.0f * float(xy + zw), 1.0f - 2.0f * float(xx + zz), 
+                    2.0f * float(yz - xw), 0.0f,
+                    2.0f * float(xz - yw), 2.0f * float(yz + xw), 
+                    1.0f - 2.0f * float(xx + yy), 0.0f,
+                    0.0f, 0.0f, 
+                    0.0f, 1.0f
                 }
             );
         }

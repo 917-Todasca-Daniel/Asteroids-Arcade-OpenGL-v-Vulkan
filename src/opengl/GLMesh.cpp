@@ -98,9 +98,9 @@ void GLMesh::loadFromFbx(const char* filepath) {
 			}
 		}
 
-		center.x = centerX / totalVertices;
-		center.y = centerY / totalVertices;
-		center.z = centerZ / totalVertices;
+		center.x = float(centerX / totalVertices);
+		center.y = float(centerY / totalVertices);
+		center.z = float(centerZ / totalVertices);
 	}
 
 }
@@ -173,13 +173,6 @@ void GLMesh::draw()
 
 		if (rotation.w > 0) {
 			projection *= Matrix4d::RotateAround(rotation, center);
-		}
-
-		for (size_t i = 0; i < 4; i++) {
-			for (size_t j = 0; j < 4; j++) {
-				std::cout << projection.data()[i*4 + j] << " ";
-			}
-			std::cout << std::endl;
 		}
 
 		shader->addUniformMat4f(
