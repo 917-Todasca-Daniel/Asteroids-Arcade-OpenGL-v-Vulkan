@@ -22,6 +22,11 @@ Vector3d& Vector3d::operator = (const Vector3d& other)
     return *this;
 }
 
+Vector3d Vector3d::operator - () const
+{
+    return Vector3d(-x, -y, -z);
+}
+
 
 std::ostream& aa::operator<<(std::ostream& os, const Vector3d& v)
 {

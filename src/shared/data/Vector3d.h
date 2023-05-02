@@ -15,6 +15,8 @@ namespace aa
 
         Vector3d& operator = (const Vector3d&);
 
+        Vector3d operator - () const;
+
         float x;
         float y;
         float z;

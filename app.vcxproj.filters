@@ -146,6 +146,12 @@
     <ClInclude Include="src\shared\domain\Asteroid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\shared\data\Quaternion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\data\Matrix4d.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\shared\textures\ambientcg\Ground063_1K_AmbientOcclusion.jpg">
