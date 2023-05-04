@@ -79,10 +79,14 @@ void GLMesh::loadFromFbx(const char* filepath) {
 			for (unsigned int j = 0; j < mesh->mNumVertices; ++j) {
 				const aiVector3D& pos = mesh->mVertices[j];
 				const aiVector3D& normal = mesh->mNormals[j];
+				const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
 
 				vertices.insert(
 					vertices.end(), 
-					{ pos.x, pos.y, pos.z, normal.x, normal.y, normal.z }
+					{ 
+						pos.x, pos.y, pos.z, normal.x, normal.y, normal.z,
+						texCoord.y, texCoord.x
+					}
 				);
 
 				center.x += pos.x, center.y += pos.y, center.z += pos.z;
@@ -142,14 +146,19 @@ void GLMesh::draw()
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(
-		0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 
+		0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 
 		0
 	);
 	glVertexAttribPointer(
-		1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 
+		1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 
 		(void*)(3 * sizeof(float))
+	);
+	glVertexAttribPointer(
+		2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+		(void*)(6 * sizeof(float))
 	);
 
 	{	// fixed lightning and camera perspective
@@ -163,7 +172,7 @@ void GLMesh::draw()
 		);
 		shader->addUniform3f(
 			"u_ViewPos",
-			Vector3d(0.0f,	0.0f,	10000.0)
+			Vector3d(0.0f,	0.0f,	100.0)
 		);
 	}
 

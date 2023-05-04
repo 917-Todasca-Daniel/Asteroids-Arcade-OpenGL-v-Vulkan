@@ -73,6 +73,11 @@ int main() {
 		"D:\\licenta\\dev\\app\\res\\shared\\textures\\ambientcg"
 	)	.setColorFile("Ground063_1K_Color", "jpg")
 		.build();
+
+	aa::GLTexture* asteroidTex = aa::GLTextureFileBuilder(
+		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
+	)	.setColorFile("Rock02_BaseColor", "tga")
+		.build();
 	
 	aa::GLShader* flatShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
 		.setVertexShader("v_basic_position")
@@ -89,6 +94,7 @@ int main() {
 	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
 		.setVertexShader("v_3d_mesh")
 		.setFragmentShader("f_3d_mesh")
+		.addUniformTex("u_Texture", asteroidTex)
 		.build();
 
 	aa::GLMesh* obj = new aa::GLMesh(
@@ -159,7 +165,8 @@ int main() {
 		previousTime = currentTime;
 		
 		ast->loop(lap);
-		
+		rect2->draw();
+
 		obj->draw();
 
 		glfwSwapBuffers(window);

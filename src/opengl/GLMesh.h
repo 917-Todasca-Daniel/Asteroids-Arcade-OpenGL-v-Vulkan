@@ -61,7 +61,7 @@ namespace aa
         // this shader must be managed by a module above
         GLShader* shader;
 
-        // contains vertex position and vertex normals (for reflecting light)
+        // contains vertex position, vertex normals, tex coord (for reflecting light)
         std::vector <float>         vertices;
         std::vector <unsigned int>  indices;
 
