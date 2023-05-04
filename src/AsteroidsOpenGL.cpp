@@ -73,26 +73,9 @@ int main() {
 
 	//	main loop in while()
 
-	aa::GLTexture* tex = aa::GLTextureFileBuilder(
-		"D:\\licenta\\dev\\app\\res\\shared\\textures\\ambientcg"
-	)	.setColorFile("Ground063_1K_Color", "jpg")
-		.build();
-
 	aa::GLTexture* asteroidTex = aa::GLTextureFileBuilder(
 		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
 	)	.setColorFile("Rock02_BaseColor", "tga")
-		.build();
-	
-	aa::GLShader* flatShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader("v_basic_position")
-		.setFragmentShader("f_uniform_color")
-		.addUniform4f("u_Color", aa::UColors::PINK)
-		.build();
-
-	aa::GLShader* texShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader("v_basic_tex_position")
-		.setFragmentShader("f_basic_tex")
-		.addUniformTex("u_Texture", tex)
 		.build();
 
 	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
@@ -106,60 +89,18 @@ int main() {
 		aa::Vector3d(300, 300, 0),
 		meshShader
 	);
-	aa::SkyRectangle* sky = new aa::SkyRectangle(
-		AA_ROOT
-	);
-	sky->init();
-	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
 
 	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT,
 		aa::Vector3d(0.0, 0.0f, 600.0f),
 		obj
 	);
+	aa::SkyRectangle* sky = new aa::SkyRectangle(
+		AA_ROOT
+	);
+
+	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
+	sky->init();
 	ast->init();
-
-
-	float ax, ay, bx, by, cx, cy;
-	ax = WINDOW_WIDTH / 2;
-	ay = 380;
-	float alt = 125;
-	aa::UMaths::worldTriangleTopAltitude(alt, ax, ay, bx, by, cx, cy);
-	aa::GLTriangle* tri1 = new aa::GLTriangle(
-		AA_ROOT,
-		aa::Vector3d(ax, ay, 0),
-		alt,
-		flatShader
-	);
-	aa::GLTriangle* tri2 = new aa::GLTriangle(
-		AA_ROOT,
-		aa::Vector3d(bx, by, 0),
-		alt,
-		flatShader
-	);
-	aa::GLTriangle* tri3 = new aa::GLTriangle(
-		AA_ROOT,
-		aa::Vector3d(cx, cy, 0),
-		alt,
-		flatShader
-	);
-	tri1->init();
-	tri2->init();
-	tri3->init();
-	aa::GLRectangle* rect1 = new aa::GLRectangle(
-		AA_ROOT,
-		aa::Vector3d(20, WINDOW_HEIGHT * 0.75f, 0),
-		WINDOW_HEIGHT * 0.5f, 80,
-		flatShader
-	);
-	rect1->init();
-
-	aa::GLRectangle* rect2 = new aa::GLRectangle(
-		AA_ROOT,
-		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0),
-		WINDOW_HEIGHT, WINDOW_WIDTH,
-		texShader
-	);
-	rect2->init();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -173,10 +114,9 @@ int main() {
 		previousTime = currentTime;
 
 		sky->loop(lap);
-		sky->draw();
 		ast->loop(lap);
-		rect2->draw();
 
+		sky->draw();
 		obj->draw();
 
 		glfwSwapBuffers(window);
@@ -187,17 +127,12 @@ int main() {
 
 
 	//	cleanup tasks
-	
-	delete tri1;
-	delete tri2;
-	delete tri3;
-	delete rect1;
-	delete rect2;
+
+	delete asteroidTex;
 	delete meshShader;
+	delete sky;
+	delete ast;
 	delete obj;
-	delete flatShader;
-	delete texShader;
-	delete tex;
 	delete importer;
 
 	glfwDestroyWindow(window);
