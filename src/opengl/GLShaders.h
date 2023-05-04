@@ -51,6 +51,11 @@ namespace aa
             Matrix4d           value
         );
 
+        void addUniform1iRef(
+            const std::string& uniformKey,
+            const void*        value
+        );
+
         //  delete all implicit constructors 
         GLShader(const GLShader&)   = delete;
         GLShader(GLShader&&)        = delete;
@@ -80,11 +85,16 @@ namespace aa
             std::string     uniformKey;
              Matrix4d       value;
         };
+        struct Uniform1iRef {
+            std::string     uniformKey;
+            const void*     value;
+        };
 
         std::vector <UniformTex>    uniformsTex;
         std::vector <Uniform4f>     uniforms4f;
         std::vector <Uniform3f>     uniforms3f;
         std::vector <UniformMat4f>  uniformsMat4f;
+        std::vector <Uniform1iRef>  uniforms1iRef;
 
         static unsigned int compileShader(
             unsigned int glType, 

@@ -61,8 +61,19 @@ void GLShader::bind()
 {
 	glUseProgram(shaderProgram);
 
+	for (auto& i1ref : uniforms1iRef) {
+		glUniform1f(
+			glGetUniformLocation(shaderProgram, i1ref.uniformKey.c_str()),
+			*(float*)i1ref.value
+		);
+	}
+
 	for (auto& uTex : uniformsTex) {
 		uTex.value->bindToSlot(0);
+		glUniform1i(
+			glGetUniformLocation(shaderProgram, uTex.uniformKey.c_str()),
+			0
+		);
 	}
 
 	for (auto& u4f : uniforms4f) {
@@ -140,6 +151,16 @@ void GLShader::addUniformMat4f(
 ) {
 	this->updateOrPutIfExists <UniformMat4f>(
 		this->uniformsMat4f,
+		{ uniformKey, value }
+	);
+}
+
+void GLShader::addUniform1iRef(
+	const std::string& uniformKey,
+	const void*		   value
+) {
+	this->updateOrPutIfExists <Uniform1iRef>(
+		this->uniforms1iRef,
 		{ uniformKey, value }
 	);
 }

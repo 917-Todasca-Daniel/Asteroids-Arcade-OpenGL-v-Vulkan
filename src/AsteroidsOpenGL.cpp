@@ -13,6 +13,7 @@
 
 #include "shared/domain/RootObject.h"
 #include "shared/domain/Asteroid.h"
+#include "shared/domain/SkyRectangle.h"
 
 #include "opengl/GLTriangle.h"
 #include "opengl/GLRectangle.h"
@@ -23,6 +24,9 @@
 #include "util/UMaths.h"
 #include "util/UFile.h"
 #include "util/UColors.h"
+
+
+
 
 
 int main() {
@@ -102,10 +106,14 @@ int main() {
 		aa::Vector3d(300, 300, 0),
 		meshShader
 	);
+	aa::SkyRectangle* sky = new aa::SkyRectangle(
+		AA_ROOT
+	);
+	sky->init();
 	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
 
 	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT,
-		aa::Vector3d(0.0, 0.0f, 0.0f),
+		aa::Vector3d(0.0, 0.0f, 600.0f),
 		obj
 	);
 	ast->init();
@@ -163,7 +171,9 @@ int main() {
 		double currentTime = glfwGetTime();
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
-		
+
+		sky->loop(lap);
+		sky->draw();
 		ast->loop(lap);
 		rect2->draw();
 
