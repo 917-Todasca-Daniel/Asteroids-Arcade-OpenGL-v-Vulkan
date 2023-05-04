@@ -13,7 +13,9 @@ namespace aa
     class GLShader;
     class GLTexture;
 
-    // TODO
+    // loads and draws 3d objects
+    // no rotation is applied by default and position is additive to vertex positions
+    // shader expects position, normal vector, and texture coordinate
     class GLMesh : public Object3d
     {
 
