@@ -27,8 +27,7 @@
 
 
 
-
-
+#ifdef IMPL_OPENGL
 int main() {
 	std::cout << "Hello OpenGL!" << std::endl;
 
@@ -140,3 +139,4 @@ int main() {
 
 	return 0;
 }
+#endif
