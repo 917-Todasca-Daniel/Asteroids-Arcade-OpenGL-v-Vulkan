@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <optional>
+#include <algorithm>
 
 #include "constants/window_constants.hpp"
 
@@ -17,14 +18,30 @@ VkQueue					 _presentQueue;
 VkPhysicalDevice		 _gpuWorker		 = VK_NULL_HANDLE;
 VkDevice				 _logicWorker	 = VK_NULL_HANDLE;
 VkSurfaceKHR			 _drawSurface;
+VkSwapchainKHR			 _swapChain;
 float					 _queuePriorities = 1.0f;
 const char *			 _engineName	 = "Asteroidum";
 const char *			 _appName		 = "Arcade Asteroids";
+GLFWwindow*				 _glfwWindow;
+std::vector<VkImage>	 _swapChainImages;
+VkFormat				 _swapChainImageFormat;
+VkExtent2D				 _swapChainExtent;
+
 
 const std::vector<const char*> _validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
 
+const std::vector<const char*> _deviceExtensions = {
+	"VK_KHR_swapchain"
+};
+
+
+struct SwapChainSupportDetails {
+	VkSurfaceCapabilitiesKHR capabilities;
+	std::vector<VkSurfaceFormatKHR> formats;
+	std::vector<VkPresentModeKHR> presentModes;
+};
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
@@ -106,6 +123,7 @@ bool _checkValidationLayerSupport() {
 std::vector<const char*> _getMandatoryVulkanExtensions() {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
+
 	// includes VK_KHR_surface
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -116,6 +134,60 @@ std::vector<const char*> _getMandatoryVulkanExtensions() {
 	}
 
 	return extensions;
+}
+
+
+VkSurfaceFormatKHR _chooseSwapSurfaceFormat(
+	const std::vector<VkSurfaceFormatKHR>& availableFormats
+) {
+	for (const auto& availableFormat : availableFormats) {
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB 
+			&& availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+			return availableFormat;
+		}
+	}
+
+	return availableFormats[0];
+}
+
+VkPresentModeKHR _chooseSwapPresentMode(
+	const std::vector<VkPresentModeKHR>& availablePresentModes
+) {
+	for (const auto& availablePresentMode : availablePresentModes) {
+		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+			return availablePresentMode;
+		}
+	}
+
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+VkExtent2D _chooseSwapExtent(
+	const VkSurfaceCapabilitiesKHR& capabilities
+) {
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+		return capabilities.currentExtent;
+	}
+	else {
+		int width, height;
+		glfwGetFramebufferSize(_glfwWindow, &width, &height);
+
+		VkExtent2D actualExtent = {
+			static_cast<uint32_t>(width),
+			static_cast<uint32_t>(height)
+		};
+
+		actualExtent.width = std::clamp(
+			actualExtent.width, capabilities.minImageExtent.width, 
+			capabilities.maxImageExtent.width
+		);
+		actualExtent.height = std::clamp(
+			actualExtent.height, capabilities.minImageExtent.height, 
+			capabilities.maxImageExtent.height
+		);
+
+		return actualExtent;
+	}
 }
 
 
@@ -142,6 +214,40 @@ int _rateDevice(VkPhysicalDevice candidate) {
 	std::cout << candidate << ' ' << score << '\n';
 
 	return score;
+}
+
+
+SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device) {
+	SwapChainSupportDetails details;
+	uint32_t presentModeCount;
+	uint32_t formatCount;
+
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+		device, _drawSurface, &details.capabilities
+	);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(
+		device, _drawSurface, &formatCount, nullptr
+	);
+
+	if (formatCount != 0) {
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(
+			device, _drawSurface, &formatCount, details.formats.data()
+		);
+	}
+
+	vkGetPhysicalDeviceSurfacePresentModesKHR(
+		device, _drawSurface, &presentModeCount, nullptr
+	);
+
+	if (presentModeCount != 0) {
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(
+			device, _drawSurface, &presentModeCount, details.presentModes.data()
+		);
+	}
+
+	return details;
 }
 
 
@@ -201,6 +307,8 @@ void _initVulkanInstance() {
 }
 
 void _initDebug() {
+	if (!_enableValidationLayers) return;
+
 	VkDebugUtilsMessengerCreateInfoEXT createInfo{
 		VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,	// sType
 		nullptr,													// pNext
@@ -252,6 +360,7 @@ void _initPhysicalDevices() {
 		_gpuWorker = scoredDevices.rbegin()->second;
 	}
 
+	std::cout << _gpuWorker << '\n';
 	if (_gpuWorker == VK_NULL_HANDLE) {
 		std::cout << "Failed to find a suitable GPU for Vulkan!";
 	}
@@ -259,7 +368,6 @@ void _initPhysicalDevices() {
 
 void _initLogicalDevice() {
 	QueueFamilyIndices indices = _findQueueFamilies(_gpuWorker);
-
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { 
@@ -282,11 +390,12 @@ void _initLogicalDevice() {
 	VkPhysicalDeviceFeatures deviceFeatures { };
 
 	VkDeviceCreateInfo createInfo { };
-	createInfo.sType				 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos	 = queueCreateInfos.data();
-	createInfo.queueCreateInfoCount  = (uint32_t) (queueCreateInfos.size());
-	createInfo.pEnabledFeatures		 = &deviceFeatures;
-	createInfo.enabledExtensionCount = 0;
+	createInfo.sType				   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	createInfo.pQueueCreateInfos	   = queueCreateInfos.data();
+	createInfo.queueCreateInfoCount    = (uint32_t) (queueCreateInfos.size());
+	createInfo.pEnabledFeatures		   = &deviceFeatures;
+	createInfo.enabledExtensionCount   = (uint32_t) (_deviceExtensions.size());
+	createInfo.ppEnabledExtensionNames = _deviceExtensions.data();
 
 	if (_enableValidationLayers) {
 		createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
@@ -305,10 +414,67 @@ void _initLogicalDevice() {
 }
 
 void _initWindow(GLFWwindow *window) {
-	if (glfwCreateWindowSurface(_vkInstance, window, nullptr, &_drawSurface) != VK_SUCCESS) {
+	_glfwWindow = window;
+	if (glfwCreateWindowSurface(_vkInstance, _glfwWindow, nullptr, &_drawSurface) != VK_SUCCESS) {
 		std::cout << "Failed to create window surface!";
 	}
 }
+
+void _initSwapChain() {
+	SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(_gpuWorker);
+
+	VkSurfaceFormatKHR vkSurfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
+	VkPresentModeKHR   vkPresentMode   = _chooseSwapPresentMode  (swapChainSupport.presentModes);
+	VkExtent2D		   vkExtent		   = _chooseSwapExtent	     (swapChainSupport.capabilities);
+
+	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+	if (swapChainSupport.capabilities.maxImageCount > 0 && 
+		imageCount > swapChainSupport.capabilities.maxImageCount) {
+		imageCount = swapChainSupport.capabilities.maxImageCount;
+	}
+
+	VkSwapchainCreateInfoKHR createInfo { };
+	createInfo.sType			= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	createInfo.surface			= _drawSurface;
+	createInfo.minImageCount	= imageCount;
+	createInfo.imageFormat		= vkSurfaceFormat.format;
+	createInfo.imageColorSpace	= vkSurfaceFormat.colorSpace;
+	createInfo.imageExtent		= vkExtent;
+	createInfo.imageArrayLayers = 1;
+	createInfo.imageUsage		= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+	createInfo.preTransform		= swapChainSupport.capabilities.currentTransform;
+	createInfo.compositeAlpha	= VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	createInfo.presentMode		= vkPresentMode;
+	createInfo.clipped			= VK_TRUE;
+	createInfo.oldSwapchain		= VK_NULL_HANDLE;
+
+	QueueFamilyIndices indices = _findQueueFamilies(_gpuWorker);
+	uint32_t queueFamilyIndices[] = { 
+		indices.graphicsFamily.value(), indices.presentFamily.value() 
+	};
+
+	if (indices.graphicsFamily != indices.presentFamily) {
+		createInfo.imageSharingMode			= VK_SHARING_MODE_CONCURRENT;
+		createInfo.queueFamilyIndexCount	= 2;
+		createInfo.pQueueFamilyIndices		= queueFamilyIndices;
+	}
+	else {
+		createInfo.imageSharingMode			= VK_SHARING_MODE_EXCLUSIVE;
+	}
+
+	if (vkCreateSwapchainKHR(_logicWorker, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
+		std::cout << "Failed to create swap chain!\n";
+	}
+
+	vkGetSwapchainImagesKHR(_logicWorker, _swapChain, &imageCount, nullptr);
+	_swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(_logicWorker, _swapChain, &imageCount, _swapChainImages.data());
+
+	_swapChainImageFormat = vkSurfaceFormat.format;
+	_swapChainExtent = vkExtent;
+}
+
 
 void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initVulkanInstance();
@@ -316,9 +482,12 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initWindow(window);
 	_initPhysicalDevices();
 	_initLogicalDevice();
+	_initSwapChain();
 }
 
 void VulkanRegistrar::cleanVulkan() {
+	vkDestroySwapchainKHR(_logicWorker, _swapChain, nullptr);
+
 	vkDestroyDevice(_logicWorker, nullptr);
 
 	if (_enableValidationLayers) {
