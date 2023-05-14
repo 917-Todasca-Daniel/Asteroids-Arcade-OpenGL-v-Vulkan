@@ -22,6 +22,9 @@
     <Filter Include="openGL">
       <UniqueIdentifier>{3f39a3f8-7f0a-4bc0-9bb0-68c7990a0fc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vulkan">
+      <UniqueIdentifier>{d7d6cd6e-bb04-48d8-9980-192190471727}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -102,6 +105,9 @@
     <ClCompile Include="src\AsteroidsVulkan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\VulkanRegistrar.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -160,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="src\shared\domain\SkyRectangle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VulkanRegistrar.h">
+      <Filter>vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

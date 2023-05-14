@@ -1,6 +1,5 @@
 //	GLFW for the game window
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "vulkan/VulkanRegistrar.h"
 
 //	cpp includes
 #include <iostream>
@@ -57,38 +56,7 @@ int main() {
 
 	std::cout << extensionCount << " VK extensions supported\n";
 
-	VkInstance vkInstance;
-
-	{	// setting data for vulkan instance
-		VkApplicationInfo vkAppInfo{
-			VK_STRUCTURE_TYPE_APPLICATION_INFO,	// sType
-			nullptr,							// pNext
-			"Vulkan Asteroids",					// pApplicationName
-			VK_MAKE_VERSION(1, 0, 0),			// applicationVersion
-			"Asteroidum",						// pEngineName
-			VK_MAKE_VERSION(1, 0, 0),			// engineVersion
-			VK_API_VERSION_1_3					// apiVersion
-		};
-
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-		VkInstanceCreateInfo createInfo{
-			VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,	// sType
-			nullptr,								// pNext
-			0,										// flags
-			&vkAppInfo,								// pApplicationInfo
-			0,										// enabledLayerCount
-			nullptr,								// ppEnabledLayerName
-			glfwExtensionCount,						// enabledExtensionCount
-			glfwExtensions							// ppEnabledExtensionNames
-		};
-
-		if (vkCreateInstance(&createInfo, nullptr, &vkInstance) != VK_SUCCESS) {
-			std::cout << "Failed to create Vulkan App instance!\n";
-		}
-	}
+	aa::VulkanRegistrar::registerVulkan();
 
 
 	//	main loop in while()
@@ -109,7 +77,7 @@ int main() {
 
 	//	cleanup tasks
 
-	vkDestroyInstance(vkInstance, nullptr);
+	aa::VulkanRegistrar::cleanVulkan();
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
