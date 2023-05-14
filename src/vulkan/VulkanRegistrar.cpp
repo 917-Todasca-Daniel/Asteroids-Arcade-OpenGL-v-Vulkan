@@ -13,8 +13,10 @@ using namespace aa;
 VkInstance				 _vkInstance;
 VkDebugUtilsMessengerEXT _debugMessenger;
 VkQueue					 _graphicsQueue;
+VkQueue					 _presentQueue;
 VkPhysicalDevice		 _gpuWorker		 = VK_NULL_HANDLE;
 VkDevice				 _logicWorker	 = VK_NULL_HANDLE;
+VkSurfaceKHR			 _drawSurface;
 float					 _queuePriorities = 1.0f;
 const char *			 _engineName	 = "Asteroidum";
 const char *			 _appName		 = "Arcade Asteroids";
@@ -26,9 +28,10 @@ const std::vector<const char*> _validationLayers = {
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
+	std::optional<uint32_t> presentFamily;
 
 	bool isComplete() {
-		return graphicsFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
 
@@ -55,6 +58,13 @@ QueueFamilyIndices _findQueueFamilies(VkPhysicalDevice device) {
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
         }
+
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _drawSurface, &presentSupport);
+
+		if (presentSupport) {
+			indices.presentFamily = i;
+		}
 
         if (indices.isComplete()) {
             break;
@@ -96,6 +106,7 @@ bool _checkValidationLayerSupport() {
 std::vector<const char*> _getMandatoryVulkanExtensions() {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
+	// includes VK_KHR_surface
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
@@ -249,21 +260,31 @@ void _initPhysicalDevices() {
 void _initLogicalDevice() {
 	QueueFamilyIndices indices = _findQueueFamilies(_gpuWorker);
 
-	VkDeviceQueueCreateInfo queueCreateInfo{
-		VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,	// sType
-		nullptr,									// pNext
-		0,											// flags
-		indices.graphicsFamily.value(),				// queueFamilyIndex
-		1,											// queueCount
-		&_queuePriorities,							// pQueuePriorities
+
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	std::set<uint32_t> uniqueQueueFamilies = { 
+		indices.graphicsFamily.value(), 
+		indices.presentFamily.value() 
 	};
+
+	for (uint32_t queueFamilyIndex : uniqueQueueFamilies) {
+		VkDeviceQueueCreateInfo queueCreateInfo{
+			VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,	// sType
+			nullptr,									// pNext
+			0,											// flags
+			queueFamilyIndex,							// queueFamilyIndex
+			1,											// queueCount
+			&_queuePriorities,							// pQueuePriorities
+		};
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
 
 	VkPhysicalDeviceFeatures deviceFeatures { };
 
 	VkDeviceCreateInfo createInfo { };
 	createInfo.sType				 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos	 = &queueCreateInfo;
-	createInfo.queueCreateInfoCount  = 1;
+	createInfo.pQueueCreateInfos	 = queueCreateInfos.data();
+	createInfo.queueCreateInfoCount  = (uint32_t) (queueCreateInfos.size());
 	createInfo.pEnabledFeatures		 = &deviceFeatures;
 	createInfo.enabledExtensionCount = 0;
 
@@ -280,12 +301,19 @@ void _initLogicalDevice() {
 	}
 
 	vkGetDeviceQueue(_logicWorker, indices.graphicsFamily.value(), 0, &_graphicsQueue);
+	vkGetDeviceQueue(_logicWorker, indices.presentFamily .value(), 0, &_presentQueue);
 }
 
+void _initWindow(GLFWwindow *window) {
+	if (glfwCreateWindowSurface(_vkInstance, window, nullptr, &_drawSurface) != VK_SUCCESS) {
+		std::cout << "Failed to create window surface!";
+	}
+}
 
-void VulkanRegistrar::registerVulkan() {
+void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initVulkanInstance();
 	_initDebug();
+	_initWindow(window);
 	_initPhysicalDevices();
 	_initLogicalDevice();
 }
@@ -300,6 +328,8 @@ void VulkanRegistrar::cleanVulkan() {
 			func(_vkInstance, _debugMessenger, nullptr);
 		}
 	}
+
+	vkDestroySurfaceKHR(_vkInstance, _drawSurface, nullptr);
 
 	vkDestroyInstance(_vkInstance, nullptr);
 }

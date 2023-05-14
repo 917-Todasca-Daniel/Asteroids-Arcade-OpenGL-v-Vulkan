@@ -56,7 +56,7 @@ int main() {
 
 	std::cout << extensionCount << " VK extensions supported\n";
 
-	aa::VulkanRegistrar::registerVulkan();
+	aa::VulkanRegistrar::registerVulkan(window);
 
 
 	//	main loop in while()
