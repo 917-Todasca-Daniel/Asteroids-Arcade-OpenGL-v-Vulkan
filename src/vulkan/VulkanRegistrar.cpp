@@ -27,6 +27,7 @@ std::vector<VkImage>	 _swapChainImages;
 VkFormat				 _swapChainImageFormat;
 VkExtent2D				 _swapChainExtent;
 std::vector<VkImageView> _swapChainImageViews;
+VkRenderPass			 _renderPass;
 
 
 
@@ -505,6 +506,47 @@ void _initImageViews() {
 	}
 }
 
+void _initRenderPass() {
+	VkAttachmentDescription colorAttachment		{ };
+	VkAttachmentReference	colorAttachmentRef	{ };
+	VkSubpassDescription	subpass				{ };
+	VkRenderPassCreateInfo	renderPassInfo		{ };
+
+	{
+		colorAttachment.format			= _swapChainImageFormat;
+		colorAttachment.samples			= VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp			= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		colorAttachment.storeOp			= VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp	= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp	= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout		= VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	}
+
+	{	// no additional subpasses (post-processing)
+		colorAttachmentRef.attachment	= 0;
+		colorAttachmentRef.layout		= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	}
+
+	{	// main draw pass
+		subpass.pipelineBindPoint		= VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount	= 1;
+		subpass.pColorAttachments		= &colorAttachmentRef;
+	}
+
+	{	// create the render pass
+		renderPassInfo.sType			= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.attachmentCount	= 1;
+		renderPassInfo.pAttachments		= &colorAttachment;
+		renderPassInfo.subpassCount		= 1;
+		renderPassInfo.pSubpasses		= &subpass;
+	}
+
+	if (vkCreateRenderPass(_logicWorker, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
+		std::cout << "Failed to create render pass!\n";
+	}
+}
+
 
 void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initVulkanInstance();
@@ -514,9 +556,12 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initLogicalDevice();
 	_initSwapChain();
 	_initImageViews();
+	_initRenderPass();
 }
 
 void VulkanRegistrar::cleanVulkan() {
+	vkDestroyRenderPass(_logicWorker, _renderPass, nullptr);
+
 	for (auto imageView : _swapChainImageViews) {
 		vkDestroyImageView(_logicWorker, imageView, nullptr);
 	}
@@ -543,7 +588,10 @@ const VkInstance& VulkanRegistrar::getVkInstance() {
 	return _vkInstance;
 }
 
-const VkDevice& aa::VulkanRegistrar::getDevice()
-{
+const VkDevice& aa::VulkanRegistrar::getDevice() {
 	return _logicWorker;
+}
+
+const VkRenderPass& aa::VulkanRegistrar::getRenderPass() {
+	return _renderPass;
 }
