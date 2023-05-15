@@ -542,3 +542,8 @@ void VulkanRegistrar::cleanVulkan() {
 const VkInstance& VulkanRegistrar::getVkInstance() {
 	return _vkInstance;
 }
+
+const VkDevice& aa::VulkanRegistrar::getDevice()
+{
+	return _logicWorker;
+}

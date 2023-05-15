@@ -108,6 +108,12 @@
     <ClCompile Include="src\vulkan\VulkanRegistrar.cpp">
       <Filter>vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\VKPipeline.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\VKShader.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -168,6 +174,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vulkan\VulkanRegistrar.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VKPipeline.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VKShader.h">
       <Filter>vulkan</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,9 @@
 #include <GLFW/glfw3.h>
 
 
-#define VULKAN_INSTANCE aa::VulkanRegistrar::getVkInstance()
+#define VK_INSTANCE aa::VulkanRegistrar::getVkInstance()
+
+#define VK_DEVICE   aa::VulkanRegistrar::getDevice()
 
 
 namespace aa
@@ -19,6 +21,9 @@ namespace aa
 
         // must call registerVulkan() before accessing
         const VkInstance& getVkInstance();
+
+        // must call registerVulkan() before accessing
+        const VkDevice& getDevice();
 
     }
 }
