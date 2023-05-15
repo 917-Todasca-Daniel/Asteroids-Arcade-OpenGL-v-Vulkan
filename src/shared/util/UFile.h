@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 
 namespace Assimp {
@@ -17,6 +18,8 @@ namespace aa
 
     public:
         static std::string readFileContent(const std::string& filename);
+
+        static std::vector <char> readBinaryFileContent(const std::string& filename);
 
         static std::string normalizedDirectory(const std::string& directory);
 
