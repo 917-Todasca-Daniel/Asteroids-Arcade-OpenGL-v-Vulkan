@@ -12,22 +12,47 @@
 using namespace aa;
 
 
-VKPipeline::VKPipeline(const VkPipelineLayoutCreateInfo& createInfo)
- : vkPipelineLayout(createPipeline(createInfo)) {
+VKPipeline::VKPipeline(
+    const VkPipelineLayoutCreateInfo&   layoutCreateInfo,
+          VkGraphicsPipelineCreateInfo& pipelineCreateInfo
+) : vkPipelineLayout(createPipelineLayout(layoutCreateInfo)), 
+    vkPipeline(createPipeline(pipelineCreateInfo)) {
 
 }
 
 VKPipeline::~VKPipeline() {
-    vkDestroyPipelineLayout(VK_DEVICE, vkPipelineLayout, nullptr);
+    vkDestroyPipeline       (VK_DEVICE, vkPipeline,         nullptr);
+    vkDestroyPipelineLayout (VK_DEVICE, vkPipelineLayout,   nullptr);
 }
 
 
-VkPipelineLayout VKPipeline::createPipeline(const VkPipelineLayoutCreateInfo& createInfo) const {
-    VkPipelineLayout vkPipeline { };
-    auto ret = vkCreatePipelineLayout(VK_DEVICE, &createInfo, nullptr, &vkPipeline);
+VkPipelineLayout VKPipeline::createPipelineLayout(const VkPipelineLayoutCreateInfo& createInfo) const {
+    VkPipelineLayout vkPipelineLayout{ };
+
+    auto ret = vkCreatePipelineLayout(VK_DEVICE, &createInfo, nullptr, &vkPipelineLayout);
     if (ret != VK_SUCCESS) {
         std::cout << "Failed to create pipeline layout!\n";
     }
+
+    return vkPipelineLayout;
+}
+
+VkPipeline VKPipeline::createPipeline(VkGraphicsPipelineCreateInfo& pipelineCreateInfo) const {
+    VkPipeline vkPipeline{ };
+
+    pipelineCreateInfo.layout = vkPipelineLayout;
+
+    if (vkCreateGraphicsPipelines(
+        VK_DEVICE, 
+        VK_NULL_HANDLE, 
+        1, 
+        &pipelineCreateInfo,
+        nullptr, 
+        &vkPipeline
+    ) != VK_SUCCESS) {
+        std::cout << "Failed to create graphics pipeline!\n";;
+    }
+
     return vkPipeline;
 }
 
@@ -91,7 +116,24 @@ VKPipeline* VKPipelineBuilder::build() const
     createDynamicState      (&dynamicState);
     createPipelineLayout    (&pipelineLayoutInfo);
 
-    VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo);
+    VkGraphicsPipelineCreateInfo pipelineInfo{ };
+    pipelineInfo.sType                      = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount                 = 2;
+    pipelineInfo.pStages                    = shaderStages;
+    pipelineInfo.pVertexInputState          = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState        = &inputAssembly;
+    pipelineInfo.pViewportState             = &viewportState;
+    pipelineInfo.pRasterizationState        = &rasterizer;
+    pipelineInfo.pMultisampleState          = &multisampling;
+    pipelineInfo.pDepthStencilState         = nullptr; 
+    pipelineInfo.pColorBlendState           = &colorBlending;
+    pipelineInfo.pDynamicState              = &dynamicState;
+    pipelineInfo.renderPass           = VK_RENDER_PASS;
+    pipelineInfo.subpass              = 0;
+    pipelineInfo.basePipelineHandle   = VK_NULL_HANDLE;
+    pipelineInfo.basePipelineIndex    = -1;
+
+    VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo, pipelineInfo);
 
     return vkPipeline;
 }

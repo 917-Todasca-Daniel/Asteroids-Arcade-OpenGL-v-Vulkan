@@ -29,10 +29,14 @@ namespace aa
     {
 
     public:
-        VKPipeline(const VkPipelineLayoutCreateInfo& createInfo);
+        VKPipeline(
+            const VkPipelineLayoutCreateInfo& layoutCreateInfo,
+                  VkGraphicsPipelineCreateInfo& pipelineCreateInfo
+        );
         ~VKPipeline();
 
         const VkPipelineLayout vkPipelineLayout;
+        const VkPipeline       vkPipeline;
         
         //  delete all implicit constructors 
         VKPipeline(const VKPipeline&)   = delete;
@@ -43,7 +47,11 @@ namespace aa
 
 
     private:
-        VkPipelineLayout createPipeline(
+        VkPipeline       createPipeline(
+                  VkGraphicsPipelineCreateInfo&
+        ) const;
+
+        VkPipelineLayout createPipelineLayout(
             const VkPipelineLayoutCreateInfo& createInfo
         ) const;
 
