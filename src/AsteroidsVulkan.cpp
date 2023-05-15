@@ -1,12 +1,17 @@
 //	GLFW for the game window
 #include "vulkan/VulkanRegistrar.h"
 
+#include "vulkan/VKShader.h"
+#include "vulkan/VKPipeline.h"
+
 //	cpp includes
 #include <iostream>
 #include <vector>
 
 //	dev code
 #include "window_constants.hpp"	// WINDOW_* macros
+
+#include "util/UFile.h"
 
 
 
@@ -59,6 +64,23 @@ int main() {
 	aa::VulkanRegistrar::registerVulkan(window);
 
 
+	// create shader
+	auto vertexBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/v-hardcoded_triangle.spv"
+	);
+	auto fragmentBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/f-hardcoded_triangle.spv"
+	);
+	auto vShader = new aa::VKShader(vertexBinaryContent);
+	auto fShader = new aa::VKShader(fragmentBinaryContent);
+
+	// create pipeline
+	auto pipeline = aa::VKPipelineBuilder()
+		.setVertexShader(vShader)
+		.setFragmentShader(fShader)
+		.build();
+
+
 	//	main loop in while()
 
 	while (!glfwWindowShouldClose(window)) {
@@ -76,6 +98,10 @@ int main() {
 
 
 	//	cleanup tasks
+
+	delete pipeline;
+	delete vShader;
+	delete fShader;
 
 	aa::VulkanRegistrar::cleanVulkan();
 	glfwDestroyWindow(window);

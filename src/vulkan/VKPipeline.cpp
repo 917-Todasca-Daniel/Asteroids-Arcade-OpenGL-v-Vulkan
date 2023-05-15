@@ -113,6 +113,7 @@ VKPipeline* VKPipelineBuilder::build() const
     createMultisampleState  (&multisampling);
     createColorBlendAttach  (&colorBlendAttachment);
     createColorBlendState   (&colorBlending, &colorBlendAttachment);
+    createViewportState     (&viewportState);
     createDynamicState      (&dynamicState);
     createPipelineLayout    (&pipelineLayoutInfo);
 
@@ -128,10 +129,10 @@ VKPipeline* VKPipelineBuilder::build() const
     pipelineInfo.pDepthStencilState         = nullptr; 
     pipelineInfo.pColorBlendState           = &colorBlending;
     pipelineInfo.pDynamicState              = &dynamicState;
-    pipelineInfo.renderPass           = VK_RENDER_PASS;
-    pipelineInfo.subpass              = 0;
-    pipelineInfo.basePipelineHandle   = VK_NULL_HANDLE;
-    pipelineInfo.basePipelineIndex    = -1;
+    pipelineInfo.renderPass                 = VK_RENDER_PASS;
+    pipelineInfo.subpass                    = 0;
+    pipelineInfo.basePipelineHandle         = VK_NULL_HANDLE;
+    pipelineInfo.basePipelineIndex          = -1;
 
     VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo, pipelineInfo);
 

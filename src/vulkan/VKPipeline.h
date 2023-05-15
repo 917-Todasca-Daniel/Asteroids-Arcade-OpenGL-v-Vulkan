@@ -65,7 +65,7 @@ namespace aa
     public:
         IVKPipelineBuilder();
 
-        virtual VKPipeline* build() = 0;
+        virtual VKPipeline* build() const = 0;
 
         //  delete all implicit constructors 
         IVKPipelineBuilder(const IVKPipelineBuilder&)   = delete;
