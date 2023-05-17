@@ -217,6 +217,10 @@ int _rateDevice(VkPhysicalDevice candidate) {
 		score += 1000;
 	}
 
+	if (deviceProperties.limits.maxVertexInputBindings == 0) {
+		return 0;
+	}
+
 	score += deviceProperties.limits.maxImageDimension2D;
 
 	// application can't function without geometry shaders
