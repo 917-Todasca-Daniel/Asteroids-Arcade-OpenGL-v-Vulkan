@@ -30,5 +30,11 @@ namespace aa
         // must call registerVulkan() before accessing
         const VkRenderPass& getRenderPass();
 
+        void recordCommandBuffer(
+            const VkCommandBuffer& buffer,
+            const VkPipeline& graphicsPipeline,
+            uint32_t               imageIndex
+        );
+
     }
 }

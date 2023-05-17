@@ -11,24 +11,27 @@
 using namespace aa;
 
 
-VkInstance				 _vkInstance;
-VkDebugUtilsMessengerEXT _debugMessenger;
-VkQueue					 _graphicsQueue;
-VkQueue					 _presentQueue;
-VkPhysicalDevice		 _gpuWorker		 = VK_NULL_HANDLE;
-VkDevice				 _logicWorker	 = VK_NULL_HANDLE;
-VkSurfaceKHR			 _drawSurface;
-VkSwapchainKHR			 _swapChain;
-float					 _queuePriorities = 1.0f;
-const char *			 _engineName	 = "Asteroidum";
-const char *			 _appName		 = "Arcade Asteroids";
-GLFWwindow*				 _glfwWindow;
-std::vector<VkImage>	 _swapChainImages;
-VkFormat				 _swapChainImageFormat;
-VkExtent2D				 _swapChainExtent;
-std::vector<VkImageView> _swapChainImageViews;
-VkRenderPass			 _renderPass;
-
+VkInstance				   _vkInstance;
+VkDebugUtilsMessengerEXT   _debugMessenger;
+VkQueue					   _graphicsQueue;
+VkQueue					   _presentQueue;
+VkSurfaceKHR			   _drawSurface;
+VkSwapchainKHR			   _swapChain;
+GLFWwindow*				   _glfwWindow;
+std::vector<VkImage>	   _swapChainImages;
+VkFormat				   _swapChainImageFormat;
+VkExtent2D				   _swapChainExtent;
+std::vector<VkImageView>   _swapChainImageViews;
+VkRenderPass			   _renderPass;
+std::vector<VkFramebuffer> _swapChainFramebuffers;
+VkCommandPool			   _commandPool;
+VkCommandBuffer 		   _commandBuffer;
+VkPhysicalDevice		   _gpuWorker		= VK_NULL_HANDLE;
+VkDevice				   _logicWorker		= VK_NULL_HANDLE;
+float					   _queuePriorities = 1.0f;
+const char *			   _engineName		= "Asteroidum";
+const char *			   _appName			= "Arcade Asteroids";
+VkClearValue			   _clearColor		= { {{0.0f, 0.0f, 0.0f, 1.0f}} };
 
 
 const std::vector<const char*> _validationLayers = {
@@ -547,6 +550,59 @@ void _initRenderPass() {
 	}
 }
 
+void _initFrameBuffers() {
+	_swapChainFramebuffers.resize(_swapChainImageViews.size());
+
+	for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
+		VkImageView attachments[] = {
+			_swapChainImageViews[i]
+		};
+
+		VkFramebufferCreateInfo framebufferInfo{};
+		framebufferInfo.sType			= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass		= _renderPass;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments	= attachments;
+		framebufferInfo.width			= _swapChainExtent.width;
+		framebufferInfo.height			= _swapChainExtent.height;
+		framebufferInfo.layers			= 1;
+
+		if (vkCreateFramebuffer(
+			_logicWorker, 
+			&framebufferInfo, 
+			nullptr,
+			&_swapChainFramebuffers[i]
+		) != VK_SUCCESS) {
+			std::cout << "Failed to create framebuffer!\n";
+		}
+	}
+}
+
+void _initCommandPool() {
+	QueueFamilyIndices queueFamilyIndices = _findQueueFamilies(_gpuWorker);
+
+	VkCommandPoolCreateInfo poolInfo{};
+	poolInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.flags				= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	poolInfo.queueFamilyIndex	= queueFamilyIndices.graphicsFamily.value();
+
+	if (vkCreateCommandPool(_logicWorker, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS) {
+		std::cout << "Failed to create command pool!\n";
+	}
+}
+
+void _initCommandBuffer() {
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType				 = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool		 = _commandPool;
+	allocInfo.level				 = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	if (vkAllocateCommandBuffers(_logicWorker, &allocInfo, &_commandBuffer) != VK_SUCCESS) {
+		std::cout << "Failed to allocate command buffers!\n";
+	}
+}
+
 
 void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initVulkanInstance();
@@ -557,9 +613,18 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initSwapChain();
 	_initImageViews();
 	_initRenderPass();
+	_initFrameBuffers();
+	_initCommandPool();
+	_initCommandBuffer();
 }
 
 void VulkanRegistrar::cleanVulkan() {
+	vkDestroyCommandPool(_logicWorker, _commandPool, nullptr);
+
+	for (auto framebuffer : _swapChainFramebuffers) {
+		vkDestroyFramebuffer(_logicWorker, framebuffer, nullptr);
+	}
+
 	vkDestroyRenderPass(_logicWorker, _renderPass, nullptr);
 
 	for (auto imageView : _swapChainImageViews) {
@@ -594,4 +659,53 @@ const VkDevice& aa::VulkanRegistrar::getDevice() {
 
 const VkRenderPass& aa::VulkanRegistrar::getRenderPass() {
 	return _renderPass;
+}
+
+
+void VulkanRegistrar::recordCommandBuffer(
+	const VkCommandBuffer& buffer, 
+	const VkPipeline&      graphicsPipeline,
+	uint32_t               imageIndex
+) {
+	VkCommandBufferBeginInfo	beginInfo		{ };
+	VkRenderPassBeginInfo		renderPassInfo	{ };
+	VkViewport					viewport		{ };
+	VkRect2D					scissor			{ };
+
+	beginInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags				= 0;
+	beginInfo.pInheritanceInfo	= nullptr; 
+
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass		 = _renderPass;
+	renderPassInfo.framebuffer		 = _swapChainFramebuffers[imageIndex];
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = _swapChainExtent;
+	renderPassInfo.clearValueCount	= 1;
+	renderPassInfo.pClearValues		= &_clearColor;
+
+	viewport.x			= 0.0f;
+	viewport.y			= 0.0f;
+	viewport.width		= (float)_swapChainExtent.width;
+	viewport.height		= (float)_swapChainExtent.height;
+	viewport.minDepth	= 0.0f;
+	viewport.maxDepth	= 1.0f;
+
+	scissor.offset = { 0, 0 };
+	scissor.extent = _swapChainExtent;
+
+	if (vkBeginCommandBuffer(_commandBuffer, &beginInfo) != VK_SUCCESS) {
+		std::cout << "Failed to begin recording command buffer!\n";
+	}
+
+	vkCmdBeginRenderPass(_commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBindPipeline	(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+	vkCmdSetViewport	(_commandBuffer, 0, 1, &viewport);
+	vkCmdSetScissor		(_commandBuffer, 0, 1, &scissor);
+	vkCmdDraw			(_commandBuffer, 3, 1, 0, 0);
+	vkCmdEndRenderPass	(_commandBuffer);
+
+	if (vkEndCommandBuffer(_commandBuffer) != VK_SUCCESS) {
+		std::cout << "Failed to record command buffer!\n";
+	}
 }
