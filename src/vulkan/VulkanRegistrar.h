@@ -31,8 +31,8 @@ namespace aa
         const VkRenderPass& getRenderPass();
 
         void recordCommandBuffer(
-            const VkCommandBuffer& buffer,
-            const VkPipeline& graphicsPipeline,
+            const VkCommandBuffer& buffer, 
+            const VkPipeline&      graphicsPipeline,
             uint32_t               imageIndex
         );
 

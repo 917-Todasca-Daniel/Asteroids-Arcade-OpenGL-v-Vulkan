@@ -691,8 +691,8 @@ void VulkanRegistrar::recordCommandBuffer(
 	viewport.minDepth	= 0.0f;
 	viewport.maxDepth	= 1.0f;
 
-	scissor.offset = { 0, 0 };
-	scissor.extent = _swapChainExtent;
+	scissor.offset		= { 0, 0 };
+	scissor.extent		= _swapChainExtent;
 
 	if (vkBeginCommandBuffer(_commandBuffer, &beginInfo) != VK_SUCCESS) {
 		std::cout << "Failed to begin recording command buffer!\n";
