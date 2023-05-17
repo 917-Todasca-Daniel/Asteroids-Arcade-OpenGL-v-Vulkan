@@ -29,3 +29,25 @@ VkShaderModule VKShader::createShaderModule(const std::vector <char>& spirvCode)
 
     return shaderModule;
 }
+
+
+
+VKVertexShader::VKVertexShader(const std::vector <char>& spirvCode)
+    : VKShader(spirvCode), bindingDescription(VkVertexInputBindingDescription{}) {
+    bindingDescription.binding      = 0;
+    bindingDescription.stride       = 0;
+    bindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_VERTEX;
+}
+
+VKVertexShader::~VKVertexShader() {
+
+}
+
+
+const VkVertexInputBindingDescription& VKVertexShader::getBindingDescription() {
+    return bindingDescription;
+}
+
+const std::vector <VkVertexInputAttributeDescription>& VKVertexShader::getAttributeDescriptions() {
+    return attributeDescriptions;
+}

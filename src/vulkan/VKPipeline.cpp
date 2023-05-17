@@ -163,6 +163,18 @@ void VKPipelineBuilder::createVertexInputInfo(VkPipelineVertexInputStateCreateIn
     createInfo->pVertexBindingDescriptions      = nullptr;
     createInfo->vertexAttributeDescriptionCount = 0;
     createInfo->pVertexAttributeDescriptions    = nullptr;
+
+    auto concreteVertexShaderCast = dynamic_cast <VKVertexShader*> (vertexShader);
+
+    if (concreteVertexShaderCast != nullptr) {
+        auto& attrDesc = concreteVertexShaderCast->getAttributeDescriptions();
+        auto& bindDesc = concreteVertexShaderCast->getBindingDescription();
+
+        createInfo->vertexBindingDescriptionCount   = 1;
+        createInfo->vertexAttributeDescriptionCount = (uint32_t)(attrDesc.size());
+        createInfo->pVertexBindingDescriptions      = &bindDesc;
+        createInfo->pVertexAttributeDescriptions    = attrDesc.data();
+    }
 }
 
 void VKPipelineBuilder::createInputAssembly(VkPipelineInputAssemblyStateCreateInfo* createInfo) const

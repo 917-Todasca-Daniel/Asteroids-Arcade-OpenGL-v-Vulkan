@@ -24,7 +24,8 @@ namespace aa
     class VKShader;
 
 
-    // TODO
+    // wrapper over VkPipeline; build using one of the concrete builders
+    // manages and frees resources
     class VKPipeline
     {
 
