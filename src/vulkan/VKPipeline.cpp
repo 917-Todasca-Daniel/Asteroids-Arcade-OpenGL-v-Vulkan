@@ -21,15 +21,15 @@ VKPipeline::VKPipeline(
 }
 
 VKPipeline::~VKPipeline() {
-    vkDestroyPipeline       (VK_DEVICE, vkPipeline,         nullptr);
-    vkDestroyPipelineLayout (VK_DEVICE, vkPipelineLayout,   nullptr);
+    vkDestroyPipeline       (*VK_DEVICE, vkPipeline,         nullptr);
+    vkDestroyPipelineLayout (*VK_DEVICE, vkPipelineLayout,   nullptr);
 }
 
 
 VkPipelineLayout VKPipeline::createPipelineLayout(const VkPipelineLayoutCreateInfo& createInfo) const {
     VkPipelineLayout vkPipelineLayout{ };
 
-    auto ret = vkCreatePipelineLayout(VK_DEVICE, &createInfo, nullptr, &vkPipelineLayout);
+    auto ret = vkCreatePipelineLayout(*VK_DEVICE, &createInfo, nullptr, &vkPipelineLayout);
     if (ret != VK_SUCCESS) {
         std::cout << "Failed to create pipeline layout!\n";
     }
@@ -43,7 +43,7 @@ VkPipeline VKPipeline::createPipeline(VkGraphicsPipelineCreateInfo& pipelineCrea
     pipelineCreateInfo.layout = vkPipelineLayout;
 
     if (vkCreateGraphicsPipelines(
-        VK_DEVICE, 
+        *VK_DEVICE, 
         VK_NULL_HANDLE, 
         1, 
         &pipelineCreateInfo,
@@ -129,7 +129,7 @@ VKPipeline* VKPipelineBuilder::build() const
     pipelineInfo.pDepthStencilState         = nullptr; 
     pipelineInfo.pColorBlendState           = &colorBlending;
     pipelineInfo.pDynamicState              = &dynamicState;
-    pipelineInfo.renderPass                 = VK_RENDER_PASS;
+    pipelineInfo.renderPass                 = *VK_RENDER_PASS;
     pipelineInfo.subpass                    = 0;
     pipelineInfo.basePipelineHandle         = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex          = -1;

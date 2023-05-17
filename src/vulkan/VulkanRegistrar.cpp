@@ -11,27 +11,34 @@
 using namespace aa;
 
 
-VkInstance				   _vkInstance;
-VkDebugUtilsMessengerEXT   _debugMessenger;
-VkQueue					   _graphicsQueue;
-VkQueue					   _presentQueue;
-VkSurfaceKHR			   _drawSurface;
-VkSwapchainKHR			   _swapChain;
-GLFWwindow*				   _glfwWindow;
-std::vector<VkImage>	   _swapChainImages;
-VkFormat				   _swapChainImageFormat;
-VkExtent2D				   _swapChainExtent;
-std::vector<VkImageView>   _swapChainImageViews;
-VkRenderPass			   _renderPass;
-std::vector<VkFramebuffer> _swapChainFramebuffers;
-VkCommandPool			   _commandPool;
-VkCommandBuffer 		   _commandBuffer;
-VkPhysicalDevice		   _gpuWorker		= VK_NULL_HANDLE;
-VkDevice				   _logicWorker		= VK_NULL_HANDLE;
-float					   _queuePriorities = 1.0f;
-const char *			   _engineName		= "Asteroidum";
-const char *			   _appName			= "Arcade Asteroids";
-VkClearValue			   _clearColor		= { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+uint32_t currentFrame = 0;
+
+VkInstance						_vkInstance;
+VkDebugUtilsMessengerEXT		_debugMessenger;
+VkQueue							_graphicsQueue;
+VkQueue							_presentQueue;
+VkSurfaceKHR					_drawSurface;
+VkSwapchainKHR					_swapChain;
+GLFWwindow*						_glfwWindow;
+std::vector<VkImage>			_swapChainImages;
+VkFormat						_swapChainImageFormat;
+VkExtent2D						_swapChainExtent;
+std::vector<VkImageView>		_swapChainImageViews;
+VkRenderPass					_renderPass;
+std::vector<VkFramebuffer>		_swapChainFramebuffers;
+VkCommandPool					_commandPool;
+std::vector<VkCommandBuffer>	_commandBuffers;
+VkPhysicalDevice				_gpuWorker			= VK_NULL_HANDLE;
+VkDevice						_logicWorker		= VK_NULL_HANDLE;
+float							_queuePriorities	= 1.0f;
+const char *					_engineName			= "Asteroidum";
+const char *					_appName			= "Arcade Asteroids";
+VkClearValue					_clearColor			= { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+
+std::vector<VkSemaphore>		_imageAvailableSemaphores;
+std::vector<VkSemaphore>		_renderFinishedSemaphores;
+std::vector<VkFence>			_inFlightFences;
+
 
 
 const std::vector<const char*> _validationLayers = {
@@ -513,6 +520,7 @@ void _initRenderPass() {
 	VkAttachmentDescription colorAttachment		{ };
 	VkAttachmentReference	colorAttachmentRef	{ };
 	VkSubpassDescription	subpass				{ };
+	VkSubpassDependency		dependency			{ };
 	VkRenderPassCreateInfo	renderPassInfo		{ };
 
 	{
@@ -535,6 +543,17 @@ void _initRenderPass() {
 		subpass.pipelineBindPoint		= VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpass.colorAttachmentCount	= 1;
 		subpass.pColorAttachments		= &colorAttachmentRef;
+	}
+
+	{
+		dependency.srcSubpass			= VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass			= 0;
+		dependency.srcStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcAccessMask		= 0;
+		dependency.dstStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstAccessMask		= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		renderPassInfo.dependencyCount	= 1;
+		renderPassInfo.pDependencies	= &dependency;
 	}
 
 	{	// create the render pass
@@ -592,14 +611,43 @@ void _initCommandPool() {
 }
 
 void _initCommandBuffer() {
+	_commandBuffers.resize(VK_MAX_FRAMES_IN_FLIGHT);
+
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType				 = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool		 = _commandPool;
 	allocInfo.level				 = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = (uint32_t) _commandBuffers.size();
 
-	if (vkAllocateCommandBuffers(_logicWorker, &allocInfo, &_commandBuffer) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(
+		_logicWorker, 
+		&allocInfo,
+		_commandBuffers.data()
+	) != VK_SUCCESS) {
 		std::cout << "Failed to allocate command buffers!\n";
+	}
+}
+
+void _initSyncObjects() {
+	_imageAvailableSemaphores.resize(VK_MAX_FRAMES_IN_FLIGHT);
+	_renderFinishedSemaphores.resize(VK_MAX_FRAMES_IN_FLIGHT);
+	_inFlightFences.resize(VK_MAX_FRAMES_IN_FLIGHT);
+
+	VkSemaphoreCreateInfo	semaphoreInfo{ };
+	VkFenceCreateInfo		fenceInfo	{ };
+
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	fenceInfo.sType		= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags		= VK_FENCE_CREATE_SIGNALED_BIT;
+
+	for (size_t i = 0; i < VK_MAX_FRAMES_IN_FLIGHT; i++) {
+		if (vkCreateSemaphore(_logicWorker, &semaphoreInfo, 
+			nullptr, &_imageAvailableSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(_logicWorker, &semaphoreInfo, 
+				nullptr, &_renderFinishedSemaphores[i]) != VK_SUCCESS ||
+			vkCreateFence(_logicWorker, &fenceInfo, nullptr, &_inFlightFences[i]) != VK_SUCCESS) {
+			std::cout << "Failed to create synchronization objects for a frame!\n";
+		}
 	}
 }
 
@@ -616,22 +664,34 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initFrameBuffers();
 	_initCommandPool();
 	_initCommandBuffer();
+	_initSyncObjects();
 }
 
-void VulkanRegistrar::cleanVulkan() {
-	vkDestroyCommandPool(_logicWorker, _commandPool, nullptr);
 
+void _cleanSwapChain() {
 	for (auto framebuffer : _swapChainFramebuffers) {
 		vkDestroyFramebuffer(_logicWorker, framebuffer, nullptr);
 	}
-
-	vkDestroyRenderPass(_logicWorker, _renderPass, nullptr);
 
 	for (auto imageView : _swapChainImageViews) {
 		vkDestroyImageView(_logicWorker, imageView, nullptr);
 	}
 
 	vkDestroySwapchainKHR(_logicWorker, _swapChain, nullptr);
+}
+
+void VulkanRegistrar::cleanVulkan() {
+	_cleanSwapChain();
+
+	for (size_t i = 0; i < VK_MAX_FRAMES_IN_FLIGHT; i++) {
+		vkDestroySemaphore(_logicWorker, _imageAvailableSemaphores[i], nullptr);
+		vkDestroySemaphore(_logicWorker, _renderFinishedSemaphores[i], nullptr);
+		vkDestroyFence(_logicWorker, _inFlightFences[i], nullptr);
+	}
+
+	vkDestroyCommandPool(_logicWorker, _commandPool, nullptr);
+
+	vkDestroyRenderPass(_logicWorker, _renderPass, nullptr);
 
 	vkDestroyDevice(_logicWorker, nullptr);
 
@@ -649,16 +709,44 @@ void VulkanRegistrar::cleanVulkan() {
 }
 
 
-const VkInstance& VulkanRegistrar::getVkInstance() {
-	return _vkInstance;
+VkInstance* VulkanRegistrar::getVkInstance() {
+	return &_vkInstance;
 }
 
-const VkDevice& aa::VulkanRegistrar::getDevice() {
-	return _logicWorker;
+VkDevice* aa::VulkanRegistrar::getDevice() {
+	return &_logicWorker;
 }
 
-const VkRenderPass& aa::VulkanRegistrar::getRenderPass() {
-	return _renderPass;
+VkRenderPass* aa::VulkanRegistrar::getRenderPass() {
+	return &_renderPass;
+}
+
+VkCommandBuffer* aa::VulkanRegistrar::getCommandBuffer() {
+	return &_commandBuffers[currentFrame];
+}
+
+VkSwapchainKHR* aa::VulkanRegistrar::getSwapChain() {
+	return &_swapChain;
+}
+
+VkQueue* aa::VulkanRegistrar::getGraphicsQueue() {
+	return &_graphicsQueue;
+}
+
+VkQueue* aa::VulkanRegistrar::getPresentationQueue() {
+	return &_presentQueue;
+}
+
+VkFence* aa::VulkanRegistrar::getInFlightFence() {
+	return &_inFlightFences[currentFrame];
+}
+
+VkSemaphore* aa::VulkanRegistrar::getImageSemaphore() {
+	return &_imageAvailableSemaphores[currentFrame];
+}
+
+VkSemaphore* aa::VulkanRegistrar::getRenderSemaphore() {
+	return &_renderFinishedSemaphores[currentFrame];
 }
 
 
@@ -694,18 +782,41 @@ void VulkanRegistrar::recordCommandBuffer(
 	scissor.offset		= { 0, 0 };
 	scissor.extent		= _swapChainExtent;
 
-	if (vkBeginCommandBuffer(_commandBuffer, &beginInfo) != VK_SUCCESS) {
+	if (vkBeginCommandBuffer(buffer, &beginInfo) != VK_SUCCESS) {
 		std::cout << "Failed to begin recording command buffer!\n";
 	}
 
-	vkCmdBeginRenderPass(_commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdBindPipeline	(_commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-	vkCmdSetViewport	(_commandBuffer, 0, 1, &viewport);
-	vkCmdSetScissor		(_commandBuffer, 0, 1, &scissor);
-	vkCmdDraw			(_commandBuffer, 3, 1, 0, 0);
-	vkCmdEndRenderPass	(_commandBuffer);
+	vkCmdBeginRenderPass(buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBindPipeline	(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+	vkCmdSetViewport	(buffer, 0, 1, &viewport);
+	vkCmdSetScissor		(buffer, 0, 1, &scissor);
+	vkCmdDraw			(buffer, 3, 1, 0, 0);
+	vkCmdEndRenderPass	(buffer);
 
-	if (vkEndCommandBuffer(_commandBuffer) != VK_SUCCESS) {
+	if (vkEndCommandBuffer(buffer) != VK_SUCCESS) {
 		std::cout << "Failed to record command buffer!\n";
 	}
+}
+
+void aa::VulkanRegistrar::recreateSwapChain() {
+	{	// minimizing
+		int width = 0, height = 0;
+		glfwGetFramebufferSize(_glfwWindow, &width, &height);
+		while (width == 0 || height == 0) {
+			glfwGetFramebufferSize(_glfwWindow, &width, &height);
+			glfwWaitEvents();
+		}
+	}
+
+	vkDeviceWaitIdle(_logicWorker);
+	
+	_cleanSwapChain();
+
+	_initSwapChain();
+	_initImageViews();
+	_initFrameBuffers();
+}
+
+void aa::VulkanRegistrar::loop() {
+	currentFrame = (currentFrame + 1) % VK_MAX_FRAMES_IN_FLIGHT;
 }

@@ -177,6 +177,7 @@
     <ClCompile Include="src\shared\util\UMaths.cpp" />
     <ClCompile Include="src\vulkan\VKPipeline.cpp" />
     <ClCompile Include="src\vulkan\VKShader.cpp" />
+    <ClCompile Include="src\vulkan\VKTriangle.cpp" />
     <ClCompile Include="src\vulkan\VulkanRegistrar.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -201,6 +202,7 @@
     <ClInclude Include="src\shared\util\UMaths.h" />
     <ClInclude Include="src\vulkan\VKPipeline.h" />
     <ClInclude Include="src\vulkan\VKShader.h" />
+    <ClInclude Include="src\vulkan\VKTriangle.h" />
     <ClInclude Include="src\vulkan\VulkanRegistrar.h" />
   </ItemGroup>
   <ItemGroup>

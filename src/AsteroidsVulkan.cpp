@@ -3,6 +3,7 @@
 
 #include "vulkan/VKShader.h"
 #include "vulkan/VKPipeline.h"
+#include "vulkan/VKTriangle.h"
 
 //	cpp includes
 #include <iostream>
@@ -10,6 +11,8 @@
 
 //	dev code
 #include "window_constants.hpp"	// WINDOW_* macros
+
+#include "shared/domain/RootObject.h"
 
 #include "util/UFile.h"
 
@@ -80,6 +83,12 @@ int main() {
 		.setFragmentShader(fShader)
 		.build();
 
+	auto tri = new aa::VKTriangle(
+		AA_ROOT,
+		pipeline
+	);
+
+	tri->init();
 
 	//	main loop in while()
 
@@ -90,15 +99,21 @@ int main() {
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
+		tri->draw();
+		aa::VulkanRegistrar::loop();
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	vkDeviceWaitIdle(*VK_DEVICE);
 
 	std::cout << "Finished main loop." << std::endl;
 
 
 	//	cleanup tasks
 
+	delete tri;
 	delete pipeline;
 	delete vShader;
 	delete fShader;

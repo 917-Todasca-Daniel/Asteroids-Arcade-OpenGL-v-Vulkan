@@ -114,6 +114,9 @@
     <ClCompile Include="src\vulkan\VKShader.cpp">
       <Filter>vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\VKTriangle.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -180,6 +183,9 @@
       <Filter>vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\vulkan\VKShader.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VKTriangle.h">
       <Filter>vulkan</Filter>
     </ClInclude>
   </ItemGroup>
