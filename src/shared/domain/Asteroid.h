@@ -7,7 +7,7 @@ namespace aa
 {
 
     // forward declarations
-    class GLMesh;
+    class Mesh;
 
     // logic class for the asteroids inside the game
     class Asteroid : public Object3d
@@ -17,7 +17,7 @@ namespace aa
         Asteroid(
             LogicObject* parent, 
             Vector3d position,
-            GLMesh* mesh
+            Mesh* mesh
         );
         virtual ~Asteroid();
 
@@ -29,7 +29,7 @@ namespace aa
 
 
     protected:
-        GLMesh* asteroidMesh;
+        Mesh* asteroidMesh;
 
     };
 }

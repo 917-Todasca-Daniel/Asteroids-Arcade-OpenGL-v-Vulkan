@@ -8,7 +8,7 @@
 using namespace aa;
 
 
-Asteroid::Asteroid(LogicObject* parent, Vector3d position, GLMesh *mesh) 
+Asteroid::Asteroid(LogicObject* parent, Vector3d position, Mesh *mesh) 
 	: Object3d(parent, position), asteroidMesh(mesh)
 {
 	

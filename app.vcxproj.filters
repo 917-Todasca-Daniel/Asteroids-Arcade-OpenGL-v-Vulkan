@@ -117,6 +117,9 @@
     <ClCompile Include="src\vulkan\VKTriangle.cpp">
       <Filter>vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\shared\domain\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -187,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="src\vulkan\VKTriangle.h">
       <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\domain\Mesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

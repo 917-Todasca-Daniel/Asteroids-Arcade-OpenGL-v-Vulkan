@@ -169,6 +169,7 @@
     <ClCompile Include="src\shared\data\Vector4d.cpp" />
     <ClCompile Include="src\shared\domain\Asteroid.cpp" />
     <ClCompile Include="src\shared\domain\LogicObject.cpp" />
+    <ClCompile Include="src\shared\domain\Mesh.cpp" />
     <ClCompile Include="src\shared\domain\Object3d.cpp" />
     <ClCompile Include="src\shared\domain\RootObject.cpp" />
     <ClCompile Include="src\shared\domain\SkyRectangle.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="src\shared\data\Vector4d.h" />
     <ClInclude Include="src\shared\domain\Asteroid.h" />
     <ClInclude Include="src\shared\domain\LogicObject.h" />
+    <ClInclude Include="src\shared\domain\Mesh.h" />
     <ClInclude Include="src\shared\domain\Object3d.h" />
     <ClInclude Include="src\shared\domain\RootObject.h" />
     <ClInclude Include="src\shared\domain\SkyRectangle.h" />

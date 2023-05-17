@@ -1,8 +1,6 @@
 #pragma once
 
-#include "domain/Object3d.h"
-
-#include "data/Quaternion.hpp"
+#include "domain/Mesh.h"
 
 #include <vector>
 
@@ -12,11 +10,11 @@ namespace aa
 
     class GLShader;
     class GLTexture;
+    
 
-    // loads and draws 3d objects
-    // no rotation is applied by default and position is additive to vertex positions
+    // OpenGL concrete implementation of the aa::Mesh interface
     // shader expects position, normal vector, and texture coordinate
-    class GLMesh : public Object3d
+    class GLMesh : public Mesh
     {
 
     public:
@@ -32,19 +30,6 @@ namespace aa
         virtual void init();
 
         virtual void draw();
-
-        // getters and setter
-        void setPosition(Vector3d other) {
-            this->position = other;
-        }
-
-        void setRotation(Quaternion rot) {
-            this->rotation = rot;
-        }
-
-        Quaternion& getRotation() {
-            return this->rotation;
-        }
 
         Vector3d getCenter() const {
             return center;
@@ -69,8 +54,6 @@ namespace aa
 
         // by default, the mean average of all points
         Vector3d                    center;
-        // rotation around the center
-        Quaternion                  rotation;
 
         // vertex buffer object
         unsigned int vbo;

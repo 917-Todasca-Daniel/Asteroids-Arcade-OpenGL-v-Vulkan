@@ -40,8 +40,8 @@ GLMesh::GLMesh(
 	Vector3d		position, 
 	GLShader*		shader
 )
-	: Object3d(parent, position), shader(shader), 
-	ibo(0), vbo(0), center(0, 0, 0), rotation(0, 0, 0, 0)
+	: Mesh(parent, position), shader(shader), 
+	ibo(0), vbo(0), center(0, 0, 0)
 {
 
 }

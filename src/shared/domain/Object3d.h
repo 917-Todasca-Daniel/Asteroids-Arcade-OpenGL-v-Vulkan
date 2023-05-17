@@ -19,6 +19,11 @@ namespace aa
 
         virtual void draw();
 
+        // getters and setter
+        void setPosition(Vector3d other) {
+            this->position = other;
+        }
+
         //  delete all implicit constructors 
         Object3d()                  = delete;
         Object3d(const Object3d&)   = delete;
