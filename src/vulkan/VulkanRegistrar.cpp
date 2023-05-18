@@ -488,7 +488,6 @@ void _initSwapChain() {
 	}
 
 	vkGetSwapchainImagesKHR(_logicWorker, _swapChain, &imageCount, nullptr);
-	std::cout << "image count: " << imageCount << '\n';
 	_swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(_logicWorker, _swapChain, &imageCount, _swapChainImages.data());
 
