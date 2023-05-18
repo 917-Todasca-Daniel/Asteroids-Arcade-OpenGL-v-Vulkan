@@ -28,9 +28,22 @@ namespace aa
             this->rotation = rot;
         }
 
+        Vector3d getCenter() const {
+            return center;
+        }
+
 
     protected:
-        Quaternion rotation;
+        Quaternion              rotation;
+
+        // contains vertex position, vertex normals, tex coord (for reflecting light)
+        std::vector <float>     vertices;
+        std::vector <uint32_t>  indices;
+
+        // by default, the mean average of all points
+        Vector3d                center;
+
+        void loadFromFbx(const char* filepath, unsigned int pFlags);
 
     };
 }
