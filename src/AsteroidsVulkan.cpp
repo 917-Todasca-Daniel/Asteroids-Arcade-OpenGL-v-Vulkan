@@ -18,6 +18,7 @@
 #include "window_constants.hpp"	// WINDOW_* macros
 
 #include "shared/domain/RootObject.h"
+#include "shared/domain/Asteroid.h"
 
 #include "util/UFile.h"
 
@@ -126,8 +127,10 @@ int main() {
 		astPipeline
 	);
 
+	ast->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
 
 	rect->init();
+	ast->init();
 
 	//	main loop in while()
 
@@ -141,8 +144,10 @@ int main() {
 		{
 			aa::VulkanRegistrar::predraw();
 
+			ast->loop(lap);
 			rect->loop(lap);
 			rect->draw();
+			ast->draw();
 
 			aa::VulkanRegistrar::postdraw();
 		}

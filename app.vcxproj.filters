@@ -126,6 +126,9 @@
     <ClCompile Include="src\vulkan\VKRectangle.cpp">
       <Filter>vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\vulkan\VKMesh.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -204,6 +207,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vulkan\VKRectangle.h">
+      <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VKMesh.h">
       <Filter>vulkan</Filter>
     </ClInclude>
   </ItemGroup>
