@@ -19,6 +19,8 @@
 
 #define VK_CURRENT_FRAME      aa::VulkanRegistrar::getCurrentFrame()
 
+#define VK_CURRENT_IMAGE      aa::VulkanRegistrar::getImageIndex()
+
 #define VK_MAX_FRAMES_IN_FLIGHT 2
 
 
@@ -58,6 +60,8 @@ namespace aa
 
         uint32_t         getCurrentFrame();
 
+        uint32_t         getImageIndex();
+
         void recordCommandBuffer(
             const VkCommandBuffer& buffer, 
             VKPipeline*            pipeline,
@@ -78,6 +82,10 @@ namespace aa
         void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize);
 
         void loop();
+
+        void predraw();
+
+        void postdraw();
 
     }
 }

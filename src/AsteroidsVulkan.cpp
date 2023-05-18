@@ -124,9 +124,16 @@ int main() {
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
-		rect->loop(lap);
-		rect->draw();
-		// tri->draw();
+		{
+			aa::VulkanRegistrar::predraw();
+
+			rect->loop(lap);
+			rect->draw();
+			tri->draw();
+
+			aa::VulkanRegistrar::postdraw();
+		}
+
 		aa::VulkanRegistrar::loop();
 
 		glfwSwapBuffers(window);
