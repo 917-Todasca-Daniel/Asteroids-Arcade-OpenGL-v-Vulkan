@@ -120,6 +120,12 @@
     <ClCompile Include="src\shared\domain\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\shared\domain\AsteroidFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vulkan\VKRectangle.cpp">
+      <Filter>vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -193,6 +199,12 @@
     </ClInclude>
     <ClInclude Include="src\shared\domain\Mesh.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\domain\AsteroidFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vulkan\VKRectangle.h">
+      <Filter>vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
