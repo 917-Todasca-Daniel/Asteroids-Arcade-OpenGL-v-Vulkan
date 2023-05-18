@@ -74,6 +74,8 @@ namespace aa
             VkBuffer&, VkDeviceMemory&
         );
 
+        void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize);
+
         void loop();
 
     }
