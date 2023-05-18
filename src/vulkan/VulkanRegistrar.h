@@ -62,7 +62,8 @@ namespace aa
             const VkCommandBuffer& buffer, 
             VKPipeline*            pipeline,
             uint32_t               imageIndex,
-            VkBuffer*              vertexBuffer = nullptr
+            VkBuffer*              vertexBuffer = nullptr,
+            VkBuffer*              indexBuffer  = nullptr
         );
 
         uint32_t findDeviceMemoryType(uint32_t, VkMemoryPropertyFlags);

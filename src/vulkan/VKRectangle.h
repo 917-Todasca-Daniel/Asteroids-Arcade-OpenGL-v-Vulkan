@@ -37,16 +37,21 @@ namespace aa
     private:
         float       width;
         float       height;
-        float       vertices2d[6] = {
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+        float       vertices2d[8] = {
+            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
         };
+        uint16_t    indices2d[6] = { 0, 1, 2, 2, 3, 0 };
         VKPipeline* pipeline;
 
-        void*             dataMapper;
         VkBuffer          vertexBuffer;
         VkDeviceMemory    vertexBufferMemory;
+        VkBuffer          indexBuffer;
+        VkDeviceMemory    indexBufferMemory;
 
         float uniformValue;
+
+        void createVertexBuffer();
+        void createIndexBuffer ();
 
     };
 }

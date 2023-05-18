@@ -764,7 +764,8 @@ void VulkanRegistrar::recordCommandBuffer(
 	const VkCommandBuffer& buffer, 
     VKPipeline*            pipeline,
 	uint32_t               imageIndex,
-	VkBuffer*			   vertexBuffer
+	VkBuffer*			   vertexBuffer,
+	VkBuffer*			   indexBuffer
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
 
@@ -804,7 +805,7 @@ void VulkanRegistrar::recordCommandBuffer(
 	vkCmdSetViewport	(buffer, 0, 1, &viewport);
 	vkCmdSetScissor		(buffer, 0, 1, &scissor);
 
-	if (vertexBuffer) {
+	if (indexBuffer) {
 		VkBuffer	 vertexBuffers[] = { *vertexBuffer };
 		VkDeviceSize offsets[]		 = { 0 };
 
@@ -812,13 +813,16 @@ void VulkanRegistrar::recordCommandBuffer(
 		VkDescriptorSet descriptorSet = pipeline->vertexShader->getDescriptorSet(currentFrame);
 
 		vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
 		vkCmdBindDescriptorSets(
 			buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 			pipelineLayout, 0, 1,
 			&descriptorSet,
 			0, nullptr
 		);
-		vkCmdDraw(buffer, 3, 1, 0, 0);
+		
+		vkCmdDrawIndexed(buffer, 6, 1, 0, 0, 0);
 	}
 	else {
 		vkCmdDraw(buffer, 3, 1, 0, 0);
