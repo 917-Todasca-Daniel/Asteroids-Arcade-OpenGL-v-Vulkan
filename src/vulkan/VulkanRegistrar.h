@@ -17,11 +17,17 @@
 #define VK_IMAGE_SEMAPHORE    aa::VulkanRegistrar::getImageSemaphore()
 #define VK_RENDER_SEMAPHORE   aa::VulkanRegistrar::getRenderSemaphore()
 
+#define VK_CURRENT_FRAME      aa::VulkanRegistrar::getCurrentFrame()
+
 #define VK_MAX_FRAMES_IN_FLIGHT 2
 
 
 namespace aa
 {
+
+    class VKPipeline;
+
+
     // namespace contains methods dealing with everything about Vulkan setup
     namespace VulkanRegistrar {
         // creates vulkan instance, adds validation layers, registers devices
@@ -50,13 +56,23 @@ namespace aa
         VkSemaphore*     getImageSemaphore();
         VkSemaphore*     getRenderSemaphore();
 
+        uint32_t         getCurrentFrame();
+
         void recordCommandBuffer(
             const VkCommandBuffer& buffer, 
-            const VkPipeline&      graphicsPipeline,
-            uint32_t               imageIndex
+            VKPipeline*            pipeline,
+            uint32_t               imageIndex,
+            VkBuffer*              vertexBuffer = nullptr
         );
 
+        uint32_t findDeviceMemoryType(uint32_t, VkMemoryPropertyFlags);
+
         void recreateSwapChain();
+
+        void createBuffer(
+            VkDeviceSize, VkBufferUsageFlags, VkMemoryPropertyFlags,
+            VkBuffer&, VkDeviceMemory&
+        );
 
         void loop();
 

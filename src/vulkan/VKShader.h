@@ -32,7 +32,7 @@ namespace aa
     };
 
 
-    // concrete wrapper over vertex shaders, allows for binding to uniforms
+    // concrete wrapper over vertex shaders, allows for binding to uniforms and vertices
     class VKVertexShader : public VKShader
     {
     public:
@@ -42,13 +42,32 @@ namespace aa
         template <typename uniformType>
         void addBinding();
 
-        const VkVertexInputBindingDescription&                 getBindingDescription();
-        const std::vector <VkVertexInputAttributeDescription>& getAttributeDescriptions();
+        const VkVertexInputBindingDescription& getBindingDescription    ()           const;
+        const VkDescriptorSetLayout&           getDescriptorLayout      ()           const;
+              VkDescriptorSet                  getDescriptorSet         (int index)  const;
+              void*                            getUniformBuffersMap     (int index)  const;
+        
+        const std::vector <VkVertexInputAttributeDescription>& 
+            getAttributeDescriptions() const;
+
+        void addUniform();
 
 
     private:
-        VkVertexInputBindingDescription                 bindingDescription;
+        std::vector<void*>              uniformBuffersMapped;
+        std::vector<VkBuffer>           uniformBuffers;
+        VkDescriptorSetLayoutBinding    uniformBinding;
+        std::vector<VkDeviceMemory>     uniformBuffersMemory;
+
+        std::vector<VkDescriptorSet>    descriptorSets;
+        VkDescriptorSetLayout           descriptorSetLayout;
+        VkDescriptorPool                descriptorPool;
+
+        VkVertexInputBindingDescription bindingDescription;
         std::vector <VkVertexInputAttributeDescription> attributeDescriptions;
+
+        void createUniformLayout();
+        void createUniformPool();
 
     };
 
@@ -59,10 +78,10 @@ namespace aa
 
         attrDescription.binding = 0;
         attrDescription.location = (uint32_t)attributeDescriptions.size();
-        attrDescription.format = VK_FORMAT_R32_SFLOAT;
+        attrDescription.format = VK_FORMAT_R32G32_SFLOAT;
         attrDescription.offset = bindingDescription.stride;
 
-        bindingDescription.stride += sizeof(uniformType);
+        bindingDescription.stride += 2 * sizeof(float);
 
         attributeDescriptions.push_back(attrDescription);
 

@@ -1,4 +1,5 @@
-#include "VulkanRegistrar.h"
+#include "VKPipeline.h"
+#include "VKShader.h"
 
 #include <iostream>
 #include <vector>
@@ -46,7 +47,9 @@ const std::vector<const char*> _validationLayers = {
 };
 
 const std::vector<const char*> _deviceExtensions = {
-	"VK_KHR_swapchain"
+	"VK_KHR_swapchain",
+	"VK_KHR_pipeline_library",
+	"VK_EXT_graphics_pipeline_library"
 };
 
 
@@ -753,12 +756,19 @@ VkSemaphore* aa::VulkanRegistrar::getRenderSemaphore() {
 	return &_renderFinishedSemaphores[currentFrame];
 }
 
+uint32_t aa::VulkanRegistrar::getCurrentFrame() {
+	return currentFrame;
+}
+
 
 void VulkanRegistrar::recordCommandBuffer(
 	const VkCommandBuffer& buffer, 
-	const VkPipeline&      graphicsPipeline,
-	uint32_t               imageIndex
+    VKPipeline*            pipeline,
+	uint32_t               imageIndex,
+	VkBuffer*			   vertexBuffer
 ) {
+	auto& graphicsPipeline = pipeline->vkPipeline;
+
 	VkCommandBufferBeginInfo	beginInfo		{ };
 	VkRenderPassBeginInfo		renderPassInfo	{ };
 	VkViewport					viewport		{ };
@@ -794,13 +804,88 @@ void VulkanRegistrar::recordCommandBuffer(
 	vkCmdBindPipeline	(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	vkCmdSetViewport	(buffer, 0, 1, &viewport);
 	vkCmdSetScissor		(buffer, 0, 1, &scissor);
-	vkCmdDraw			(buffer, 3, 1, 0, 0);
+
+	if (vertexBuffer) {
+		VkBuffer	 vertexBuffers[] = { *vertexBuffer };
+		VkDeviceSize offsets[]		 = { 0 };
+
+		auto& pipelineLayout = pipeline->vkPipelineLayout;
+		VkDescriptorSet descriptorSet = pipeline->vertexShader->getDescriptorSet(currentFrame);
+
+		vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
+		vkCmdBindDescriptorSets(
+			buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+			pipelineLayout, 0, 1,
+			&descriptorSet,
+			0, nullptr
+		);
+		vkCmdDraw(buffer, 3, 1, 0, 0);
+	}
+	else {
+		vkCmdDraw(buffer, 3, 1, 0, 0);
+	}
+
 	vkCmdEndRenderPass	(buffer);
 
 	if (vkEndCommandBuffer(buffer) != VK_SUCCESS) {
 		std::cout << "Failed to record command buffer!\n";
 	}
 }
+
+uint32_t aa::VulkanRegistrar::findDeviceMemoryType(
+	uint32_t typeFilter, 
+	VkMemoryPropertyFlags properties
+) {
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(_gpuWorker, &memProperties);
+
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+		if ((typeFilter & (1 << i)) 
+			&& (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+			return i;
+		}
+	}
+
+	std::cout << "Failed to find memory type!\n";
+	return 0;
+}
+
+
+void VulkanRegistrar::createBuffer(
+	VkDeviceSize size, 
+	VkBufferUsageFlags usage, 
+	VkMemoryPropertyFlags properties, 
+	VkBuffer& buffer, 
+	VkDeviceMemory& bufferMemory
+) {
+	VkBufferCreateInfo   bufferCreateInfo{ };
+	VkMemoryRequirements memoryRequirements{ };
+	VkMemoryAllocateInfo allocInfo{ };
+
+	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferCreateInfo.size = size;
+	bufferCreateInfo.usage = usage;
+	bufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(*VK_DEVICE, &bufferCreateInfo, nullptr, &buffer) != VK_SUCCESS) {
+		std::cout << "Failed to create vertex buffer!\n";
+	}
+
+	vkGetBufferMemoryRequirements(*VK_DEVICE, buffer, &memoryRequirements);
+
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memoryRequirements.size;
+	allocInfo.memoryTypeIndex = VulkanRegistrar::findDeviceMemoryType(
+		memoryRequirements.memoryTypeBits, properties
+	);
+
+	if (vkAllocateMemory(*VK_DEVICE, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+		std::cout << "Failed to allocate vertex buffer memory!\n";
+	}
+
+	vkBindBufferMemory(*VK_DEVICE, buffer, bufferMemory, 0);
+}
+
 
 void aa::VulkanRegistrar::recreateSwapChain() {
 	{	// minimizing

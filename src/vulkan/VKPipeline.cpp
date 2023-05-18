@@ -14,9 +14,10 @@ using namespace aa;
 
 VKPipeline::VKPipeline(
     const VkPipelineLayoutCreateInfo&   layoutCreateInfo,
-          VkGraphicsPipelineCreateInfo& pipelineCreateInfo
+          VkGraphicsPipelineCreateInfo& pipelineCreateInfo,
+          VKVertexShader*               vertexShader
 ) : vkPipelineLayout(createPipelineLayout(layoutCreateInfo)), 
-    vkPipeline(createPipeline(pipelineCreateInfo)) {
+    vkPipeline(createPipeline(pipelineCreateInfo)), vertexShader(vertexShader) {
 
 }
 
@@ -56,6 +57,11 @@ VkPipeline VKPipeline::createPipeline(VkGraphicsPipelineCreateInfo& pipelineCrea
     return vkPipeline;
 }
 
+void VKPipeline::updateUniform(void* value, uint32_t sizeOfValue) {
+    auto uniformBufferMap = vertexShader->getUniformBuffersMap(VK_CURRENT_FRAME);
+    memcpy(uniformBufferMap, value, sizeOfValue);
+}
+
 
 
 IVKPipelineBuilder::IVKPipelineBuilder() { }
@@ -67,7 +73,7 @@ VKPipelineBuilder::VKPipelineBuilder() : vertexShader(nullptr), fragmentShader(n
 }
 
 
-VKPipelineBuilder& VKPipelineBuilder::setVertexShader(VKShader* shader)
+VKPipelineBuilder& VKPipelineBuilder::setVertexShader(VKVertexShader* shader)
 {
     this->vertexShader = shader;
     return *this;
@@ -134,7 +140,7 @@ VKPipeline* VKPipelineBuilder::build() const
     pipelineInfo.basePipelineHandle         = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex          = -1;
 
-    VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo, pipelineInfo);
+    VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo, pipelineInfo, vertexShader);
 
     return vkPipeline;
 }
@@ -255,4 +261,9 @@ void VKPipelineBuilder::createPipelineLayout(VkPipelineLayoutCreateInfo* createI
     createInfo->sType                   = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     createInfo->setLayoutCount          = 0;
     createInfo->pushConstantRangeCount  = 0;
+
+    if (vertexShader->getBindingDescription().stride > 0) {
+        createInfo->setLayoutCount = 1;
+        createInfo->pSetLayouts = &vertexShader->getDescriptorLayout();
+    }
 }

@@ -22,6 +22,7 @@ namespace aa
     
     // forward declaration
     class VKShader;
+    class VKVertexShader;
 
 
     // wrapper over VkPipeline; build using one of the concrete builders
@@ -31,13 +32,18 @@ namespace aa
 
     public:
         VKPipeline(
-            const VkPipelineLayoutCreateInfo& layoutCreateInfo,
-                  VkGraphicsPipelineCreateInfo& pipelineCreateInfo
+            const VkPipelineLayoutCreateInfo&   layoutCreateInfo,
+                  VkGraphicsPipelineCreateInfo& pipelineCreateInfo,
+                  VKVertexShader*               vertexShader
         );
         ~VKPipeline();
 
-        const VkPipelineLayout vkPipelineLayout;
-        const VkPipeline       vkPipeline;
+        void updateUniform(void* value, uint32_t sizeOfValue);
+
+        VkPipelineLayout      vkPipelineLayout;
+        const VkPipeline      vkPipeline;
+        
+        const VKVertexShader* vertexShader;
         
         //  delete all implicit constructors 
         VKPipeline(const VKPipeline&)   = delete;
@@ -86,7 +92,7 @@ namespace aa
         VKPipelineBuilder();
 
         // lazy operation
-        VKPipelineBuilder& setVertexShader(VKShader* shader);
+        VKPipelineBuilder& setVertexShader(VKVertexShader* shader);
 
         // lazy operation
         VKPipelineBuilder& setFragmentShader(VKShader* shader);
@@ -95,7 +101,7 @@ namespace aa
 
 
     private:
-        VKShader* vertexShader;
+        VKVertexShader* vertexShader;
         VKShader* fragmentShader;
 
         void createVertexShader(

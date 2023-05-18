@@ -4,8 +4,8 @@
 #define WINDOW_WIDTH		WINDOW_WIDTH_SM
 #define	WINDOW_HEIGHT		WINDOW_HEIGHT_SM
 
-#define WINDOW_WIDTH_SM		640
-#define WINDOW_HEIGHT_SM	480
+#define WINDOW_WIDTH_SM		1080
+#define WINDOW_HEIGHT_SM	640
 
 #define WINDOW_GAME_TITLE	"Asteroids Arcade OpenGL v Vulkan"
 

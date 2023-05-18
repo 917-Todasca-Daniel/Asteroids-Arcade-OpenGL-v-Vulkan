@@ -1,13 +1,11 @@
-#include "VKTriangle.h"
+#include "VKRectangle.h"
 
 #include <iostream>
 
-#include "VulkanRegistrar.h"
-
 #include "VKPipeline.h"
+#include "VKShader.h"
 
 //	dev includes
-#include "util/UColors.h"
 #include "util/UMaths.h"
 
 #include "constants/window_constants.hpp"
@@ -16,29 +14,80 @@ using namespace aa;
 
 
 
-VKTriangle::VKTriangle(
-	LogicObject*	parent, 
-	VKPipeline*		pipeline
-)
-	: Object3d(parent, position), pipeline(pipeline)
+VKRectangle::VKRectangle(
+	LogicObject* parent,
+	Vector3d     position,
+	float        height,
+	float        width,
+	VKPipeline*  pipeline
+) :  Object3d(parent, position), 
+	height				(height), 
+	width				(width), 
+	pipeline			(pipeline),
+	vertexBuffer		(VkBuffer{}), 
+	vertexBufferMemory	(VkDeviceMemory{}),
+	dataMapper			(nullptr), 
+	uniformValue		(0.0f)
 {
 
 }
 
-VKTriangle::~VKTriangle()
+VKRectangle::~VKRectangle()
 {
-	
+	vkDestroyBuffer	(*VK_DEVICE, vertexBuffer,		 nullptr);
+	vkFreeMemory	(*VK_DEVICE, vertexBufferMemory, nullptr);
+
+	// free(dataMapper); - TODO: why this crashes?
 }
 
 
-void VKTriangle::init()
+void VKRectangle::init()
 {
 	Object3d::init();
 
+	{	// optimise by using CPU instead of a shader for calculating coords
+		vertices2d[0] = 1.0f * (position.x - width / 2) / WINDOW_UNIT;
+		vertices2d[1] = 1.0f * (position.y - height / 2) / WINDOW_UNIT;
+
+		float xx, yy;
+
+		aa::UMaths::worldRectangleBottomLeft(
+			height, width,
+			vertices2d[0], vertices2d[1],
+			vertices2d[2], vertices2d[3],
+			vertices2d[4], vertices2d[5],
+			xx, yy
+		);
+
+		aa::UMaths::worldToGLCoord(vertices2d[0], vertices2d[1]);
+		aa::UMaths::worldToGLCoord(vertices2d[2], vertices2d[3]);
+		aa::UMaths::worldToGLCoord(vertices2d[4], vertices2d[5]);
+	}
+
+
+	VulkanRegistrar::createBuffer(
+		sizeof(float) * 6,
+		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		vertexBuffer,
+		vertexBufferMemory
+	);
+
+	vkMapMemory(*VK_DEVICE, vertexBufferMemory, 0, sizeof(float) * 6, 0, &dataMapper);
+	memcpy(dataMapper, &vertices2d, sizeof(float) * 6);
+	vkUnmapMemory(*VK_DEVICE, vertexBufferMemory);
+
 }
 
 
-void VKTriangle::draw()
+void VKRectangle::loop(float lap) {
+	Object3d::loop(lap);
+
+	uniformValue += lap;
+}
+
+
+void VKRectangle::draw()
 {
 	Object3d::draw();
 
@@ -59,7 +108,14 @@ void VKTriangle::draw()
 	vkResetFences(*VK_DEVICE, 1, VK_FLIGHT_FENCE);
 
 	vkResetCommandBuffer(*VK_COMMAND_BUFFER, 0);
-	VulkanRegistrar::recordCommandBuffer(*VK_COMMAND_BUFFER, pipeline, imageIndex);
+	VulkanRegistrar::recordCommandBuffer(
+		*VK_COMMAND_BUFFER,
+		pipeline,
+		imageIndex,
+		&vertexBuffer
+	);
+
+	pipeline->updateUniform(&uniformValue, sizeof(float));
 
 	VkSubmitInfo			submitInfo			{ };
 	VkSemaphore				waitSemaphores[]	= { *VK_IMAGE_SEMAPHORE };
@@ -92,7 +148,8 @@ void VKTriangle::draw()
 	presentInfo.pResults			= nullptr; 
 
 	ret = vkQueuePresentKHR(*VK_PRESENTATION_QUEUE, &presentInfo);
+
 	if (ret == VK_ERROR_OUT_OF_DATE_KHR || ret == VK_SUBOPTIMAL_KHR) {
-		aa::VulkanRegistrar::recreateSwapChain();
+		VulkanRegistrar::recreateSwapChain();
 	}
 }

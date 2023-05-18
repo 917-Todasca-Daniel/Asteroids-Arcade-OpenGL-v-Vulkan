@@ -4,6 +4,7 @@
 #include "vulkan/VKShader.h"
 #include "vulkan/VKPipeline.h"
 #include "vulkan/VKTriangle.h"
+#include "vulkan/VKRectangle.h"
 
 //	cpp includes
 #include <iostream>
@@ -74,7 +75,13 @@ int main() {
 	auto fragmentBinaryContent = aa::UFile::readBinaryFileContent(
 		"D:/licenta/dev/app/res/vulkan/shaders/f-hardcoded_triangle.spv"
 	);
-	auto vShader = new aa::VKShader(vertexBinaryContent);
+	auto skyVertexBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/v-perlin_sky.spv"
+	);
+	auto skyFragmentBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/f-perlin_sky.spv"
+	);
+	auto vShader = new aa::VKVertexShader(vertexBinaryContent);
 	auto fShader = new aa::VKShader(fragmentBinaryContent);
 
 	// create pipeline
@@ -88,7 +95,25 @@ int main() {
 		pipeline
 	);
 
+	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
+	skyVShader->addBinding<float>();
+	skyVShader->addUniform();
+	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
+
+	auto skyPipeline = aa::VKPipelineBuilder()
+		.setVertexShader(skyVShader)
+		.setFragmentShader(skyFShader)
+		.build();
+
+	auto rect = new aa::VKRectangle(
+		AA_ROOT,
+		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0),
+		WINDOW_HEIGHT, WINDOW_WIDTH,
+		skyPipeline
+	);
+
 	tri->init();
+	rect->init();
 
 	//	main loop in while()
 
@@ -99,7 +124,9 @@ int main() {
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
-		tri->draw();
+		rect->loop(lap);
+		rect->draw();
+		// tri->draw();
 		aa::VulkanRegistrar::loop();
 
 		glfwSwapBuffers(window);
@@ -113,6 +140,10 @@ int main() {
 
 	//	cleanup tasks
 
+	delete rect;
+	delete skyPipeline;
+	delete skyVShader;
+	delete skyFShader;
 	delete tri;
 	delete pipeline;
 	delete vShader;
