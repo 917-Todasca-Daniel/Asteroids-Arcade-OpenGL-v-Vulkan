@@ -40,7 +40,7 @@ namespace aa
         float       vertices2d[8] = {
             0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
         };
-        uint16_t    indices2d[6] = { 0, 1, 2, 2, 3, 0 };
+        uint32_t    indices2d[6] = { 0, 1, 2, 2, 3, 0 };
         VKPipeline* pipeline;
 
         VkBuffer          vertexBuffer;

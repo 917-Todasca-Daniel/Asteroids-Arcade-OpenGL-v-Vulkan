@@ -5,10 +5,14 @@
 #include "vulkan/VKPipeline.h"
 #include "vulkan/VKTriangle.h"
 #include "vulkan/VKRectangle.h"
+#include "vulkan/VKMesh.h"
 
 //	cpp includes
 #include <iostream>
 #include <vector>
+
+//	assimp
+#include <assimp/Importer.hpp>
 
 //	dev code
 #include "window_constants.hpp"	// WINDOW_* macros
@@ -25,6 +29,9 @@ int main() {
 
 
 	//	init tasks
+
+	Assimp::Importer* importer = new Assimp::Importer();
+	aa::UFile::setAssimpFileReader(importer);
 	
 	GLFWwindow* window;
 
@@ -77,14 +84,33 @@ int main() {
 	);
 
 	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
-	skyVShader->addBinding<float>();
-	skyVShader->addUniform();
+	skyVShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+	skyVShader->addUniform(sizeof(float));
+	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
+
+	auto asteroidVertexBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
+	);
+	auto asteroidFragmentBinaryContent = aa::UFile::readBinaryFileContent(
+		"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
+	);
+
+	auto astVShader = new aa::VKVertexShader(asteroidVertexBinaryContent);
+	astVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	astVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	astVShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+	astVShader->addUniform(16 * sizeof(float));
+	auto astFShader = new aa::VKShader(asteroidFragmentBinaryContent);
 
 	// create pipeline
-	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
 	auto skyPipeline = aa::VKPipelineBuilder()
 		.setVertexShader(skyVShader)
 		.setFragmentShader(skyFShader)
+		.build();
+
+	auto astPipeline = aa::VKPipelineBuilder()
+		.setVertexShader(astVShader)
+		.setFragmentShader(astFShader)
 		.build();
 
 	auto rect = new aa::VKRectangle(
@@ -93,6 +119,13 @@ int main() {
 		WINDOW_HEIGHT, WINDOW_WIDTH,
 		skyPipeline
 	);
+
+	auto ast = new aa::VKMesh(
+		AA_ROOT,
+		aa::Vector3d(0.0f, 0.0f, 0.0f),
+		astPipeline
+	);
+
 
 	rect->init();
 
@@ -126,6 +159,11 @@ int main() {
 
 
 	//	cleanup tasks
+
+	delete ast;
+	delete astPipeline;
+	delete astFShader;
+	delete astVShader;
 
 	delete rect;
 	delete skyPipeline;

@@ -40,7 +40,7 @@ namespace aa
         virtual ~VKVertexShader();
 
         template <typename uniformType>
-        void addBinding();
+        void addBinding(VkFormat vkFormat, int noTuple);
 
         const VkVertexInputBindingDescription& getBindingDescription    ()           const;
         const VkDescriptorSetLayout&           getDescriptorLayout      ()           const;
@@ -50,7 +50,7 @@ namespace aa
         const std::vector <VkVertexInputAttributeDescription>& 
             getAttributeDescriptions() const;
 
-        void addUniform();
+        void addUniform(uint32_t bufferRange);
 
 
     private:
@@ -66,24 +66,24 @@ namespace aa
         VkVertexInputBindingDescription bindingDescription;
         std::vector <VkVertexInputAttributeDescription> attributeDescriptions;
 
-        void createUniformLayout();
-        void createUniformPool();
+        void createUniformLayout(uint32_t bufferRange);
+        void createUniformPool(uint32_t bufferRange);
 
     };
 
 
     template <typename uniformType>
-    void VKVertexShader::addBinding() {
-        VkVertexInputAttributeDescription attrDescription;
+    void VKVertexShader::addBinding(VkFormat vkFormat, int noTuple) {
+        VkVertexInputAttributeDescription attributeDescription { };
 
-        attrDescription.binding = 0;
-        attrDescription.location = (uint32_t)attributeDescriptions.size();
-        attrDescription.format = VK_FORMAT_R32G32_SFLOAT;
-        attrDescription.offset = bindingDescription.stride;
+        attributeDescription.binding = 0;
+        attributeDescription.location = (uint32_t)attributeDescriptions.size();
+        attributeDescription.format = vkFormat;
+        attributeDescription.offset = bindingDescription.stride;
 
-        bindingDescription.stride += 2 * sizeof(float);
+        bindingDescription.stride += noTuple * sizeof(uniformType);
 
-        attributeDescriptions.push_back(attrDescription);
+        attributeDescriptions.push_back(attributeDescription);
 
     }
 }

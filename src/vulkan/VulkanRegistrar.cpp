@@ -190,8 +190,8 @@ VkExtent2D _chooseSwapExtent(
 		glfwGetFramebufferSize(_glfwWindow, &width, &height);
 
 		VkExtent2D actualExtent = {
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)
+			(uint32_t)(width),
+			(uint32_t)(height)
 		};
 
 		actualExtent.width = std::clamp(
@@ -419,7 +419,7 @@ void _initLogicalDevice() {
 	createInfo.ppEnabledExtensionNames = _deviceExtensions.data();
 
 	if (_enableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
+		createInfo.enabledLayerCount = (uint32_t)(_validationLayers.size());
 		createInfo.ppEnabledLayerNames = _validationLayers.data();
 	}
 	else {
@@ -770,7 +770,8 @@ void VulkanRegistrar::recordCommandBuffer(
     VKPipeline*            pipeline,
 	uint32_t               imageIndex,
 	VkBuffer*			   vertexBuffer,
-	VkBuffer*			   indexBuffer
+	VkBuffer*			   indexBuffer,
+	uint32_t			   indexNo
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
 	VkViewport					viewport		{ };
@@ -797,7 +798,7 @@ void VulkanRegistrar::recordCommandBuffer(
 		VkDescriptorSet descriptorSet = pipeline->vertexShader->getDescriptorSet(currentFrame);
 
 		vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+		vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 		vkCmdBindDescriptorSets(
 			buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -806,7 +807,7 @@ void VulkanRegistrar::recordCommandBuffer(
 			0, nullptr
 		);
 		
-		vkCmdDrawIndexed(buffer, 6, 1, 0, 0, 0);
+		vkCmdDrawIndexed(buffer, indexNo, 1, 0, 0, 0);
 	}
 	else {
 		vkCmdDraw(buffer, 3, 1, 0, 0);

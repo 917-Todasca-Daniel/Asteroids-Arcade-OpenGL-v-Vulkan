@@ -53,14 +53,13 @@ VKVertexShader::~VKVertexShader() {
 }
 
 
-void VKVertexShader::addUniform() {
-    createUniformLayout();
-    createUniformPool();
+void VKVertexShader::addUniform(uint32_t bufferRange) {
+    createUniformLayout(bufferRange);
+    createUniformPool(bufferRange);
 }
 
-void VKVertexShader::createUniformLayout() {
+void VKVertexShader::createUniformLayout(uint32_t bufferRange) {
     VkDescriptorSetLayoutCreateInfo layoutInfo { };
-    VkDeviceSize bufferSize = sizeof(float);
 
     uniformBinding.binding              = 0;
     uniformBinding.descriptorType       = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -82,7 +81,7 @@ void VKVertexShader::createUniformLayout() {
     uniformBuffersMapped.resize(VK_MAX_FRAMES_IN_FLIGHT);
 
     for (size_t i = 0; i < VK_MAX_FRAMES_IN_FLIGHT; i++) {
-        VulkanRegistrar::createBuffer(bufferSize, 
+        VulkanRegistrar::createBuffer(bufferRange,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
             uniformBuffers[i], 
@@ -91,21 +90,21 @@ void VKVertexShader::createUniformLayout() {
 
         vkMapMemory(
             *VK_DEVICE, uniformBuffersMemory[i], 
-            0, bufferSize, 0, &uniformBuffersMapped[i]
+            0, bufferRange, 0, &uniformBuffersMapped[i]
         );
     }
 }
 
-void VKVertexShader::createUniformPool() {
+void VKVertexShader::createUniformPool(uint32_t bufferRange) {
     VkDescriptorPoolSize        poolSize { };
     VkDescriptorPoolCreateInfo  poolInfo { };
 
     poolSize.type               = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSize.descriptorCount    = static_cast<uint32_t>(VK_MAX_FRAMES_IN_FLIGHT);
+    poolSize.descriptorCount    = (uint32_t)(VK_MAX_FRAMES_IN_FLIGHT);
     poolInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount      = 1;
     poolInfo.pPoolSizes         = &poolSize;
-    poolInfo.maxSets            = static_cast<uint32_t>(VK_MAX_FRAMES_IN_FLIGHT);
+    poolInfo.maxSets            = (uint32_t)(VK_MAX_FRAMES_IN_FLIGHT);
 
 
     if (vkCreateDescriptorPool(
@@ -119,7 +118,7 @@ void VKVertexShader::createUniformPool() {
 
     allocInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool     = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(VK_MAX_FRAMES_IN_FLIGHT);
+    allocInfo.descriptorSetCount = (uint32_t)(VK_MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts        = layouts.data();
 
     descriptorSets.resize(VK_MAX_FRAMES_IN_FLIGHT);
@@ -133,7 +132,7 @@ void VKVertexShader::createUniformPool() {
 
         bufferInfo.buffer   = uniformBuffers[i];
         bufferInfo.offset   = 0;
-        bufferInfo.range    = sizeof(float);
+        bufferInfo.range    = bufferRange;
         descriptorWrite.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrite.dstSet           = descriptorSets[i];
         descriptorWrite.dstBinding       = 0;
