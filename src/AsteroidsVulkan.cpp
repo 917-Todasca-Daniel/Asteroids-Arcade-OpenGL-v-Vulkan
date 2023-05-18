@@ -69,37 +69,19 @@ int main() {
 
 
 	// create shader
-	auto vertexBinaryContent = aa::UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/v-hardcoded_triangle.spv"
-	);
-	auto fragmentBinaryContent = aa::UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/f-hardcoded_triangle.spv"
-	);
 	auto skyVertexBinaryContent = aa::UFile::readBinaryFileContent(
 		"D:/licenta/dev/app/res/vulkan/shaders/v-perlin_sky.spv"
 	);
 	auto skyFragmentBinaryContent = aa::UFile::readBinaryFileContent(
 		"D:/licenta/dev/app/res/vulkan/shaders/f-perlin_sky.spv"
 	);
-	auto vShader = new aa::VKVertexShader(vertexBinaryContent);
-	auto fShader = new aa::VKShader(fragmentBinaryContent);
-
-	// create pipeline
-	auto pipeline = aa::VKPipelineBuilder()
-		.setVertexShader(vShader)
-		.setFragmentShader(fShader)
-		.build();
-
-	auto tri = new aa::VKTriangle(
-		AA_ROOT,
-		pipeline
-	);
 
 	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
 	skyVShader->addBinding<float>();
 	skyVShader->addUniform();
-	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
 
+	// create pipeline
+	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
 	auto skyPipeline = aa::VKPipelineBuilder()
 		.setVertexShader(skyVShader)
 		.setFragmentShader(skyFShader)
@@ -112,7 +94,6 @@ int main() {
 		skyPipeline
 	);
 
-	tri->init();
 	rect->init();
 
 	//	main loop in while()
@@ -129,7 +110,6 @@ int main() {
 
 			rect->loop(lap);
 			rect->draw();
-			tri->draw();
 
 			aa::VulkanRegistrar::postdraw();
 		}
@@ -151,10 +131,6 @@ int main() {
 	delete skyPipeline;
 	delete skyVShader;
 	delete skyFShader;
-	delete tri;
-	delete pipeline;
-	delete vShader;
-	delete fShader;
 
 	aa::VulkanRegistrar::cleanVulkan();
 	glfwDestroyWindow(window);
