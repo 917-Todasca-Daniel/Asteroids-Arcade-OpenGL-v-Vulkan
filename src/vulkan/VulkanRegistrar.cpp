@@ -773,23 +773,8 @@ void VulkanRegistrar::recordCommandBuffer(
 	VkBuffer*			   indexBuffer
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
-
-	VkCommandBufferBeginInfo	beginInfo		{ };
-	VkRenderPassBeginInfo		renderPassInfo	{ };
 	VkViewport					viewport		{ };
 	VkRect2D					scissor			{ };
-
-	beginInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags				= 0;
-	beginInfo.pInheritanceInfo	= nullptr; 
-
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass		 = _renderPass;
-	renderPassInfo.framebuffer		 = _swapChainFramebuffers[imageIndex];
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = _swapChainExtent;
-	renderPassInfo.clearValueCount	= 1;
-	renderPassInfo.pClearValues		= &_clearColor;
 
 	viewport.x			= 0.0f;
 	viewport.y			= 0.0f;
@@ -800,12 +785,6 @@ void VulkanRegistrar::recordCommandBuffer(
 
 	scissor.offset		= { 0, 0 };
 	scissor.extent		= _swapChainExtent;
-
-	if (vkBeginCommandBuffer(buffer, &beginInfo) != VK_SUCCESS) {
-		std::cout << "Failed to begin recording command buffer!\n";
-	}
-
-	vkCmdBeginRenderPass(buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline	(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	vkCmdSetViewport	(buffer, 0, 1, &viewport);
 	vkCmdSetScissor		(buffer, 0, 1, &scissor);
@@ -831,12 +810,6 @@ void VulkanRegistrar::recordCommandBuffer(
 	}
 	else {
 		vkCmdDraw(buffer, 3, 1, 0, 0);
-	}
-
-	vkCmdEndRenderPass	(buffer);
-
-	if (vkEndCommandBuffer(buffer) != VK_SUCCESS) {
-		std::cout << "Failed to record command buffer!\n";
 	}
 }
 
@@ -969,9 +942,36 @@ void VulkanRegistrar::predraw() {
 	vkResetFences(*VK_DEVICE, 1, VK_FLIGHT_FENCE);
 
 	vkResetCommandBuffer(*VK_COMMAND_BUFFER, 0);
+
+	VkRenderPassBeginInfo		 renderPassInfo { };
+	VkCommandBufferBeginInfo	beginInfo		{ };
+
+	renderPassInfo.sType			 = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass		 = _renderPass;
+	renderPassInfo.framebuffer		 = _swapChainFramebuffers[_imageIndex];
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = _swapChainExtent;
+	renderPassInfo.clearValueCount	= 1;
+	renderPassInfo.pClearValues		= &_clearColor;
+	beginInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags				= 0;
+	beginInfo.pInheritanceInfo	= nullptr;
+
+
+	if (vkBeginCommandBuffer(*VK_COMMAND_BUFFER, &beginInfo) != VK_SUCCESS) {
+		std::cout << "Failed to begin recording command buffer!\n";
+	}
+
+	vkCmdBeginRenderPass(*VK_COMMAND_BUFFER, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 void VulkanRegistrar::postdraw() {
+	vkCmdEndRenderPass(*VK_COMMAND_BUFFER);
+
+	if (vkEndCommandBuffer(*VK_COMMAND_BUFFER) != VK_SUCCESS) {
+		std::cout << "Failed to record command buffer!\n";
+	}
+
 	VkSubmitInfo			submitInfo{ };
 	VkSemaphore				waitSemaphores[] = { *VK_IMAGE_SEMAPHORE };
 	VkSemaphore				signalSemaphores[] = { *VK_RENDER_SEMAPHORE };
