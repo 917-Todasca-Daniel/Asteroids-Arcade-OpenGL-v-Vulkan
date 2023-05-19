@@ -141,11 +141,14 @@ int main() {
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
-		{
-			aa::VulkanRegistrar::predraw();
-
+		{	// loop objects
 			ast->loop(lap);
 			rect->loop(lap);
+		}
+
+		{	// draw in vulkan
+			aa::VulkanRegistrar::predraw();
+
 			rect->draw();
 			ast->draw();
 

@@ -80,6 +80,10 @@ namespace aa
             VkBuffer&, VkDeviceMemory&
         );
 
+        VkCommandBuffer preCommand();
+        void postCommand(const VkCommandBuffer&);
+
+        // issues a copy command
         void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize);
 
         void loop();

@@ -181,6 +181,7 @@
     <ClCompile Include="src\vulkan\VKPipeline.cpp" />
     <ClCompile Include="src\vulkan\VKRectangle.cpp" />
     <ClCompile Include="src\vulkan\VKShader.cpp" />
+    <ClCompile Include="src\vulkan\VKTexture.cpp" />
     <ClCompile Include="src\vulkan\VKTriangle.cpp" />
     <ClCompile Include="src\vulkan\VulkanRegistrar.cpp" />
   </ItemGroup>
@@ -210,6 +211,7 @@
     <ClInclude Include="src\vulkan\VKPipeline.h" />
     <ClInclude Include="src\vulkan\VKRectangle.h" />
     <ClInclude Include="src\vulkan\VKShader.h" />
+    <ClInclude Include="src\vulkan\VKTexture.h" />
     <ClInclude Include="src\vulkan\VKTriangle.h" />
     <ClInclude Include="src\vulkan\VulkanRegistrar.h" />
   </ItemGroup>

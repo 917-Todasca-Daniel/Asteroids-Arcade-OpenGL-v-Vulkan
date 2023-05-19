@@ -869,12 +869,10 @@ void VulkanRegistrar::createBuffer(
 }
 
 
-void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+VkCommandBuffer VulkanRegistrar::preCommand() {
 	VkCommandBufferAllocateInfo allocInfo	  { };
 	VkCommandBuffer				commandBuffer { };
 	VkCommandBufferBeginInfo	beginInfo	  { };
-	VkBufferCopy				copyRegion	  { };
-	VkSubmitInfo				submitInfo	  { };
 
 	allocInfo.sType				 = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level				 = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -886,11 +884,12 @@ void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevic
 	vkAllocateCommandBuffers(_logicWorker, &allocInfo, &commandBuffer);
 	vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
-	copyRegion.srcOffset = 0;
-	copyRegion.dstOffset = 0; 
-	copyRegion.size		 = size;
+	return commandBuffer;
+}
 
-	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+void VulkanRegistrar::postCommand(const VkCommandBuffer& commandBuffer) {
+	VkSubmitInfo				submitInfo{ };
+
 	vkEndCommandBuffer(commandBuffer);
 
 	submitInfo.sType				= VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -901,6 +900,20 @@ void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevic
 	vkQueueWaitIdle(_graphicsQueue);
 
 	vkFreeCommandBuffers(_logicWorker, _commandPool, 1, &commandBuffer);
+}
+
+
+void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+	VkCommandBuffer				commandBuffer = preCommand();
+	VkBufferCopy				copyRegion	  { };
+
+	copyRegion.srcOffset = 0;
+	copyRegion.dstOffset = 0; 
+	copyRegion.size		 = size;
+
+	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	postCommand(commandBuffer);
 }
 
 
