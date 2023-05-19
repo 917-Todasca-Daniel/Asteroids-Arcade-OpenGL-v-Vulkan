@@ -31,6 +31,11 @@ namespace aa
     private:
         VkImage         textureImage;
         VkDeviceMemory  textureImageMemory;
+        VkImageView     textureImageView;
+        VkSampler       textureSampler;
+
+        void loadTextureImage(const char* filepath);
+        void createTextureSampler();
 
         void createImage(
             uint32_t, uint32_t, VkFormat, VkImageTiling, 

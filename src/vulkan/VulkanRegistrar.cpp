@@ -409,8 +409,9 @@ void _initLogicalDevice() {
 	}
 
 	VkPhysicalDeviceFeatures deviceFeatures { };
+	VkDeviceCreateInfo		 createInfo		{ };
 
-	VkDeviceCreateInfo createInfo { };
+	deviceFeatures.samplerAnisotropy   = VK_TRUE;
 	createInfo.sType				   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.pQueueCreateInfos	   = queueCreateInfos.data();
 	createInfo.queueCreateInfoCount    = (uint32_t) (queueCreateInfos.size());
@@ -500,26 +501,9 @@ void _initImageViews() {
 	_swapChainImageViews.resize(_swapChainImages.size());
 
 	for (size_t i = 0; i < _swapChainImages.size(); i++) {
-		VkImageViewCreateInfo createInfo { };
-		createInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image							= _swapChainImages[i];
-		createInfo.viewType							= VK_IMAGE_VIEW_TYPE_2D;
-		createInfo.format							= _swapChainImageFormat;
-		createInfo.components.r						= VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g						= VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b						= VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a						= VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.subresourceRange.aspectMask		= VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel	= 0;
-		createInfo.subresourceRange.levelCount		= 1;
-		createInfo.subresourceRange.baseArrayLayer	= 0;
-		createInfo.subresourceRange.layerCount		= 1;
-
-		if (vkCreateImageView(
-			_logicWorker, &createInfo, nullptr, &_swapChainImageViews[i]
-		) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create image views!");
-		}
+		_swapChainImageViews[i] = VulkanRegistrar::createImageView(
+			_swapChainImages[i], _swapChainImageFormat
+		);
 	}
 }
 
@@ -724,6 +708,10 @@ VkDevice* aa::VulkanRegistrar::getDevice() {
 	return &_logicWorker;
 }
 
+VkPhysicalDevice* aa::VulkanRegistrar::getPhysicalDevice() {
+	return &_gpuWorker;
+}
+
 VkRenderPass* aa::VulkanRegistrar::getRenderPass() {
 	return &_renderPass;
 }
@@ -866,6 +854,33 @@ void VulkanRegistrar::createBuffer(
 	}
 
 	vkBindBufferMemory(*VK_DEVICE, buffer, bufferMemory, 0);
+}
+
+
+VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkFormat &format) {
+	VkImageViewCreateInfo createInfo { };
+	createInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.image							= image;
+	createInfo.viewType							= VK_IMAGE_VIEW_TYPE_2D;
+	createInfo.format							= format;
+	createInfo.components.r						= VK_COMPONENT_SWIZZLE_IDENTITY;
+	createInfo.components.g						= VK_COMPONENT_SWIZZLE_IDENTITY;
+	createInfo.components.b						= VK_COMPONENT_SWIZZLE_IDENTITY;
+	createInfo.components.a						= VK_COMPONENT_SWIZZLE_IDENTITY;
+	createInfo.subresourceRange.aspectMask		= VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.baseMipLevel	= 0;
+	createInfo.subresourceRange.levelCount		= 1;
+	createInfo.subresourceRange.baseArrayLayer	= 0;
+	createInfo.subresourceRange.layerCount		= 1;
+
+	VkImageView imageView;
+	if (vkCreateImageView(
+		_logicWorker, &createInfo, nullptr, &imageView
+	) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create image views!");
+	}
+
+	return imageView;
 }
 
 

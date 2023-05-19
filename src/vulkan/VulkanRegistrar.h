@@ -6,6 +6,7 @@
 
 #define VK_INSTANCE           aa::VulkanRegistrar::getVkInstance()
 #define VK_DEVICE             aa::VulkanRegistrar::getDevice()
+#define VK_PHYSICAL_DEVICE    aa::VulkanRegistrar::getPhysicalDevice()
 #define VK_RENDER_PASS        aa::VulkanRegistrar::getRenderPass()
 #define VK_COMMAND_BUFFER     aa::VulkanRegistrar::getCommandBuffer()
 #define VK_SWAPCHAIN          aa::VulkanRegistrar::getSwapChain()
@@ -44,6 +45,8 @@ namespace aa
         // must call registerVulkan() before accessing
         VkDevice*        getDevice();
 
+        VkPhysicalDevice* getPhysicalDevice();
+
         // must call registerVulkan() before accessing
         VkRenderPass*    getRenderPass();
 
@@ -79,6 +82,8 @@ namespace aa
             VkDeviceSize, VkBufferUsageFlags, VkMemoryPropertyFlags,
             VkBuffer&, VkDeviceMemory&
         );
+
+        VkImageView createImageView(const VkImage &image, const VkFormat &format);
 
         VkCommandBuffer preCommand();
         void postCommand(const VkCommandBuffer&);

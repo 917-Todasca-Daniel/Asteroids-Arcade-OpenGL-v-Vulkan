@@ -12,6 +12,7 @@ using namespace aa;
 
 
 VKTexture::VKTexture() :
+    textureImageView    (VkImageView{}),
     textureImage        (VkImage{}),
     textureImageMemory  (VkDeviceMemory{})
 {
@@ -20,13 +21,21 @@ VKTexture::VKTexture() :
 
 VKTexture::~VKTexture()
 {
-    vkDestroyImage  (*VK_DEVICE, textureImage,       nullptr);
-    vkFreeMemory    (*VK_DEVICE, textureImageMemory, nullptr);
+    vkDestroySampler    (*VK_DEVICE, textureSampler,     nullptr);
+    vkDestroyImageView  (*VK_DEVICE, textureImageView,   nullptr);
+    vkDestroyImage      (*VK_DEVICE, textureImage,       nullptr);
+    vkFreeMemory        (*VK_DEVICE, textureImageMemory, nullptr);
 }
 
 
 void VKTexture::loadColormap(const char* filepath) 
 {
+    loadTextureImage(filepath);
+    textureImageView = VulkanRegistrar::createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+    createTextureSampler();
+}
+
+void VKTexture::loadTextureImage(const char* filepath) {
     int texWidth, texHeight, texChannels;
     stbi_uc* pixels = stbi_load(
         filepath, 
@@ -83,6 +92,35 @@ void VKTexture::loadColormap(const char* filepath)
 
     vkDestroyBuffer (*VK_DEVICE, stagingBuffer,       nullptr);
     vkFreeMemory    (*VK_DEVICE, stagingBufferMemory, nullptr);
+
+}
+
+void VKTexture::createTextureSampler() {
+    VkPhysicalDeviceProperties  properties  { };
+    VkSamplerCreateInfo         samplerInfo { };
+
+    vkGetPhysicalDeviceProperties(*VK_PHYSICAL_DEVICE, &properties);
+
+    samplerInfo.sType               = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter           = VK_FILTER_LINEAR;
+    samplerInfo.minFilter           = VK_FILTER_LINEAR;
+    samplerInfo.addressModeU        = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV        = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW        = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.anisotropyEnable    = VK_TRUE;
+    samplerInfo.maxAnisotropy       = properties.limits.maxSamplerAnisotropy;
+    samplerInfo.borderColor         = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable       = VK_FALSE;
+    samplerInfo.compareOp           = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.mipmapMode          = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias          = 0.0f;
+    samplerInfo.minLod              = 0.0f;
+    samplerInfo.maxLod              = 0.0f;
+
+    if (vkCreateSampler(*VK_DEVICE, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+        std::cout << this << ": Failed to create texture sampler!\n";
+    }
 }
 
 
