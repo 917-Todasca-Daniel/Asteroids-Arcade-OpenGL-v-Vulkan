@@ -86,7 +86,7 @@ int main() {
 	);
 
 	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
-	skyVShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+	skyVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 	skyVShader->addUniform(sizeof(float)).buildUniforms();
 	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
 
@@ -120,7 +120,7 @@ int main() {
 
 	auto rect = new aa::VKRectangle(
 		AA_ROOT,
-		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0),
+		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 1.0),
 		WINDOW_HEIGHT, WINDOW_WIDTH,
 		skyPipeline
 	);

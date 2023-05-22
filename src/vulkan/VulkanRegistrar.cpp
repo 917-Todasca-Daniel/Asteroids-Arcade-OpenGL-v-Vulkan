@@ -34,12 +34,17 @@ VkDevice						_logicWorker		= VK_NULL_HANDLE;
 float							_queuePriorities	= 1.0f;
 const char *					_engineName			= "Asteroidum";
 const char *					_appName			= "Arcade Asteroids";
-VkClearValue					_clearColor			= { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+VkClearValue					_clearColors[]		= {{{0.0f, 0.0f, 0.0f, 1.0f}}, {1.0f, 0}};
+VkFormat 						_depthFormat		= VK_FORMAT_D32_SFLOAT;
 uint32_t						_imageIndex;
 
 std::vector<VkSemaphore>		_imageAvailableSemaphores;
 std::vector<VkSemaphore>		_renderFinishedSemaphores;
 std::vector<VkFence>			_inFlightFences;
+
+VkImage							_depthImage;
+VkDeviceMemory					_depthImageMemory;
+VkImageView						_depthImageView;
 
 
 
@@ -509,10 +514,13 @@ void _initImageViews() {
 
 void _initRenderPass() {
 	VkAttachmentDescription colorAttachment		{ };
+	VkAttachmentDescription depthAttachment		{ };
 	VkAttachmentReference	colorAttachmentRef	{ };
 	VkSubpassDescription	subpass				{ };
 	VkSubpassDependency		dependency			{ };
 	VkRenderPassCreateInfo	renderPassInfo		{ };
+	VkAttachmentReference	depthAttachmentRef	{ };
+
 
 	{
 		colorAttachment.format			= _swapChainImageFormat;
@@ -539,18 +547,41 @@ void _initRenderPass() {
 	{
 		dependency.srcSubpass			= VK_SUBPASS_EXTERNAL;
 		dependency.dstSubpass			= 0;
-		dependency.srcStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.srcStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | 
+			VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		dependency.srcAccessMask		= 0;
-		dependency.dstStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstAccessMask		= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		renderPassInfo.dependencyCount	= 1;
-		renderPassInfo.pDependencies	= &dependency;
+		dependency.dstStageMask			= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | 
+			VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstAccessMask		= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | 
+			VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	}
+
+	{	// required by depth buffering
+		depthAttachment.format			= _depthFormat;
+		depthAttachment.samples			= VK_SAMPLE_COUNT_1_BIT;
+		depthAttachment.loadOp			= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		depthAttachment.storeOp			= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depthAttachment.stencilLoadOp	= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		depthAttachment.stencilStoreOp	= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depthAttachment.initialLayout	= VK_IMAGE_LAYOUT_UNDEFINED;
+		depthAttachment.finalLayout		= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		depthAttachmentRef.attachment	= 1;
+		depthAttachmentRef.layout		= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		subpass.pipelineBindPoint		= VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount	= 1;
+		subpass.pColorAttachments		= &colorAttachmentRef;
+		subpass.pDepthStencilAttachment = &depthAttachmentRef;
 	}
 
 	{	// create the render pass
+		std::vector<VkAttachmentDescription> attachments = { colorAttachment, depthAttachment };
+		renderPassInfo.dependencyCount	= 1;
+		renderPassInfo.pDependencies	= &dependency;
 		renderPassInfo.sType			= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount	= 1;
-		renderPassInfo.pAttachments		= &colorAttachment;
+		renderPassInfo.attachmentCount	= 2;
+		renderPassInfo.pAttachments		= attachments.data();
 		renderPassInfo.subpassCount		= 1;
 		renderPassInfo.pSubpasses		= &subpass;
 	}
@@ -565,13 +596,14 @@ void _initFrameBuffers() {
 
 	for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
 		VkImageView attachments[] = {
-			_swapChainImageViews[i]
+			_swapChainImageViews[i],
+			_depthImageView
 		};
 
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType			= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.renderPass		= _renderPass;
-		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.attachmentCount = 2;
 		framebufferInfo.pAttachments	= attachments;
 		framebufferInfo.width			= _swapChainExtent.width;
 		framebufferInfo.height			= _swapChainExtent.height;
@@ -642,6 +674,22 @@ void _initSyncObjects() {
 	}
 }
 
+void _initDepthBuffering() {
+	VulkanRegistrar::createImage(
+		_swapChainExtent.width, _swapChainExtent.height, 
+		_depthFormat, VK_IMAGE_TILING_OPTIMAL, 
+		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+		_depthImage, 
+		_depthImageMemory
+	);
+	_depthImageView = VulkanRegistrar::createImageView(
+		_depthImage, 
+		_depthFormat,
+		VK_IMAGE_ASPECT_DEPTH_BIT
+	);
+}
+
 
 void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initVulkanInstance();
@@ -652,6 +700,7 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 	_initSwapChain();
 	_initImageViews();
 	_initRenderPass();
+	_initDepthBuffering();
 	_initFrameBuffers();
 	_initCommandPool();
 	_initCommandBuffer();
@@ -660,6 +709,10 @@ void VulkanRegistrar::registerVulkan(GLFWwindow* window) {
 
 
 void _cleanSwapChain() {
+	vkDestroyImageView	(_logicWorker, _depthImageView,		nullptr);
+	vkDestroyImage		(_logicWorker, _depthImage,			nullptr);
+	vkFreeMemory		(_logicWorker, _depthImageMemory,	nullptr);
+
 	for (auto framebuffer : _swapChainFramebuffers) {
 		vkDestroyFramebuffer(_logicWorker, framebuffer, nullptr);
 	}
@@ -857,7 +910,7 @@ void VulkanRegistrar::createBuffer(
 }
 
 
-VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkFormat &format) {
+VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkFormat &format, VkImageAspectFlags flag) {
 	VkImageViewCreateInfo createInfo { };
 	createInfo.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	createInfo.image							= image;
@@ -867,7 +920,7 @@ VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkForma
 	createInfo.components.g						= VK_COMPONENT_SWIZZLE_IDENTITY;
 	createInfo.components.b						= VK_COMPONENT_SWIZZLE_IDENTITY;
 	createInfo.components.a						= VK_COMPONENT_SWIZZLE_IDENTITY;
-	createInfo.subresourceRange.aspectMask		= VK_IMAGE_ASPECT_COLOR_BIT;
+	createInfo.subresourceRange.aspectMask		= flag;
 	createInfo.subresourceRange.baseMipLevel	= 0;
 	createInfo.subresourceRange.levelCount		= 1;
 	createInfo.subresourceRange.baseArrayLayer	= 0;
@@ -877,10 +930,51 @@ VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkForma
 	if (vkCreateImageView(
 		_logicWorker, &createInfo, nullptr, &imageView
 	) != VK_SUCCESS) {
-		std::cout << "Failed to create image views!\n";
+		std::cout << "Registrar: Failed to create image views!\n";
 	}
 
 	return imageView;
+}
+
+void VulkanRegistrar::createImage(
+    uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, 
+    VkImageUsageFlags usage, VkMemoryPropertyFlags properties, 
+    VkImage& image, VkDeviceMemory& imageMemory
+) {
+    VkImageCreateInfo imageInfo { };
+    imageInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType     = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width  = width;
+    imageInfo.extent.height = height;
+    imageInfo.extent.depth  = 1;
+    imageInfo.mipLevels     = 1;
+    imageInfo.arrayLayers   = 1;
+    imageInfo.format        = format;
+    imageInfo.tiling        = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.usage         = usage;
+    imageInfo.samples       = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
+
+    if (vkCreateImage(*VK_DEVICE, &imageInfo, nullptr, &image) != VK_SUCCESS) {
+        std::cout << "Registrar: Failed to create image!\n";
+    }
+
+    VkMemoryRequirements memRequirements { };
+    VkMemoryAllocateInfo allocInfo       { };
+    vkGetImageMemoryRequirements(*VK_DEVICE, image, &memRequirements);
+
+    allocInfo.sType             = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize    = memRequirements.size;
+    allocInfo.memoryTypeIndex   = VulkanRegistrar::findDeviceMemoryType(
+        memRequirements.memoryTypeBits, properties
+    );
+
+    if (vkAllocateMemory(*VK_DEVICE, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
+        std::cout << "Registrar: Failed to allocate image memory!";
+    }
+
+    vkBindImageMemory(*VK_DEVICE, image, imageMemory, 0);
 }
 
 
@@ -948,6 +1042,7 @@ void aa::VulkanRegistrar::recreateSwapChain() {
 
 	_initSwapChain();
 	_initImageViews();
+	_initDepthBuffering();
 	_initFrameBuffers();
 }
 
@@ -980,8 +1075,8 @@ void VulkanRegistrar::predraw() {
 	renderPassInfo.framebuffer		 = _swapChainFramebuffers[_imageIndex];
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = _swapChainExtent;
-	renderPassInfo.clearValueCount	= 1;
-	renderPassInfo.pClearValues		= &_clearColor;
+	renderPassInfo.clearValueCount	= 2;
+	renderPassInfo.pClearValues		= _clearColors;
 	beginInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags				= 0;
 	beginInfo.pInheritanceInfo	= nullptr;

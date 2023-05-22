@@ -45,11 +45,6 @@ namespace aa
         void loadTextureImage(const char* filepath);
         void createTextureSampler();
 
-        void createImage(
-            uint32_t, uint32_t, VkFormat, VkImageTiling, 
-            VkImageUsageFlags, VkMemoryPropertyFlags, VkImage&, VkDeviceMemory&
-        );
-
         void transitionImageLayout  (VkImage,  VkFormat, VkImageLayout, VkImageLayout);
         void copyBufferToImage      (VkBuffer, VkImage,  uint32_t,      uint32_t);
 

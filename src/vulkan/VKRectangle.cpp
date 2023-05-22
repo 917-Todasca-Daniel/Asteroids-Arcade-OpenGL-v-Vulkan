@@ -54,14 +54,15 @@ void VKRectangle::init()
 		aa::UMaths::worldRectangleBottomLeft(
 			height, width,
 			vertices2d[0], vertices2d[1],
-			vertices2d[2], vertices2d[3],
-			vertices2d[4], vertices2d[5],
-			vertices2d[6], vertices2d[7]
+			vertices2d[3], vertices2d[4],
+			vertices2d[6], vertices2d[7],
+			vertices2d[9], vertices2d[10]
 		);
 
 		aa::UMaths::worldToGLCoord(vertices2d[0], vertices2d[1]);
-		aa::UMaths::worldToGLCoord(vertices2d[2], vertices2d[3]);
-		aa::UMaths::worldToGLCoord(vertices2d[4], vertices2d[5]);
+		aa::UMaths::worldToGLCoord(vertices2d[3], vertices2d[4]);
+		aa::UMaths::worldToGLCoord(vertices2d[6], vertices2d[7]);
+		aa::UMaths::worldToGLCoord(vertices2d[9], vertices2d[10]);
 	}
 
 	createVertexBuffer();
@@ -74,26 +75,26 @@ void VKRectangle::createVertexBuffer() {
 	void*			dataMapper;
 
 	VulkanRegistrar::createBuffer(
-		sizeof(float) * 8,
+		sizeof(float) * 12,
 		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 		stagingBuffer,
 		stagingBufferMemory
 	);
 
-	vkMapMemory(*VK_DEVICE, stagingBufferMemory, 0, sizeof(float) * 8, 0, &dataMapper);
-	memcpy(dataMapper, &vertices2d, sizeof(float) * 8);
+	vkMapMemory(*VK_DEVICE, stagingBufferMemory, 0, sizeof(float) * 12, 0, &dataMapper);
+	memcpy(dataMapper, &vertices2d, sizeof(float) * 12);
 	vkUnmapMemory(*VK_DEVICE, stagingBufferMemory);
 
 	VulkanRegistrar::createBuffer(
-		sizeof(float) * 8,
+		sizeof(float) * 12,
 		VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		vertexBuffer,
 		vertexBufferMemory
 	);
 
-	VulkanRegistrar::copyBuffer(stagingBuffer, vertexBuffer, sizeof(float) * 8);
+	VulkanRegistrar::copyBuffer(stagingBuffer, vertexBuffer, sizeof(float) * 12);
 
 	vkDestroyBuffer(*VK_DEVICE, stagingBuffer, nullptr);
 	vkFreeMemory(*VK_DEVICE, stagingBufferMemory, nullptr);

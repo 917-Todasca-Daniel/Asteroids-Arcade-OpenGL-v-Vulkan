@@ -105,6 +105,7 @@ VKPipeline* VKPipelineBuilder::build() const
     VkPipelineColorBlendStateCreateInfo     colorBlending       { };
     VkPipelineDynamicStateCreateInfo        dynamicState        { };
     VkPipelineLayoutCreateInfo              pipelineLayoutInfo  { };
+    VkPipelineDepthStencilStateCreateInfo   depthStencil        { };
 
     VkPipelineShaderStageCreateInfo         shaderStages[2] = {
         VkPipelineShaderStageCreateInfo{ },
@@ -123,6 +124,17 @@ VKPipeline* VKPipelineBuilder::build() const
     createDynamicState      (&dynamicState);
     createPipelineLayout    (&pipelineLayoutInfo);
 
+
+    {   // required for depth buffering
+        depthStencil.sType                  = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depthStencil.depthTestEnable        = VK_TRUE;
+        depthStencil.depthWriteEnable       = VK_TRUE;
+        depthStencil.depthCompareOp         = VK_COMPARE_OP_LESS_OR_EQUAL;
+        depthStencil.depthBoundsTestEnable  = VK_FALSE;
+        depthStencil.stencilTestEnable      = VK_FALSE;
+    }
+
+
     VkGraphicsPipelineCreateInfo pipelineInfo{ };
     pipelineInfo.sType                      = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount                 = 2;
@@ -139,6 +151,8 @@ VKPipeline* VKPipelineBuilder::build() const
     pipelineInfo.subpass                    = 0;
     pipelineInfo.basePipelineHandle         = VK_NULL_HANDLE;
     pipelineInfo.basePipelineIndex          = -1;
+    pipelineInfo.pDepthStencilState         = &depthStencil;
+
 
     VKPipeline* vkPipeline = new VKPipeline(pipelineLayoutInfo, pipelineInfo, vertexShader);
 

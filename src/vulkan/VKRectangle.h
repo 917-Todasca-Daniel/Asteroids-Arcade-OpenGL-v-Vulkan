@@ -37,8 +37,11 @@ namespace aa
     private:
         float       width;
         float       height;
-        float       vertices2d[8] = {
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+        float       vertices2d[12] = {
+            0.0f, 0.0f, 0.5f, 
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.0f, 0.5f
         };
         uint32_t    indices2d[6] = { 0, 1, 2, 2, 3, 0 };
         VKPipeline* pipeline;

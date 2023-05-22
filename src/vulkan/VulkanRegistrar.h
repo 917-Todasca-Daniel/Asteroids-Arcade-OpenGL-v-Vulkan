@@ -83,7 +83,12 @@ namespace aa
             VkBuffer&, VkDeviceMemory&
         );
 
-        VkImageView createImageView(const VkImage &image, const VkFormat &format);
+        VkImageView createImageView(const VkImage &image, const VkFormat &format, VkImageAspectFlags flag = VK_IMAGE_ASPECT_COLOR_BIT);
+
+        void createImage(
+            uint32_t, uint32_t, VkFormat, VkImageTiling,
+            VkImageUsageFlags, VkMemoryPropertyFlags, VkImage&, VkDeviceMemory&
+        );
 
         VkCommandBuffer preCommand();
         void postCommand(const VkCommandBuffer&);
