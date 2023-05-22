@@ -14,7 +14,8 @@ using namespace aa;
 VKTexture::VKTexture() :
     textureImageView    (VkImageView{}),
     textureImage        (VkImage{}),
-    textureImageMemory  (VkDeviceMemory{})
+    textureImageMemory  (VkDeviceMemory{}),
+    textureSampler      (VkSampler{})
 {
 
 }
@@ -42,7 +43,7 @@ void VKTexture::loadTextureImage(const char* filepath) {
         &texWidth, &texHeight, &texChannels, 
         STBI_rgb_alpha
     );
-    if (pixels == 0) {
+    if (!pixels) {
         std::cout << this << ": Failed to load texture image!\n";
         return;
     }
@@ -61,7 +62,7 @@ void VKTexture::loadTextureImage(const char* filepath) {
     );
 
     vkMapMemory  (*VK_DEVICE, stagingBufferMemory, 0, imageSize, 0, &data);
-    memcpy       (*VK_DEVICE, pixels, (size_t)(imageSize));
+    memcpy       (data, pixels, (size_t)(imageSize));
     vkUnmapMemory(*VK_DEVICE, stagingBufferMemory);
 
     stbi_image_free(pixels);

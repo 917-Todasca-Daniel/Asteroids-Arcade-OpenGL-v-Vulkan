@@ -6,6 +6,7 @@
 #include "vulkan/VKTriangle.h"
 #include "vulkan/VKRectangle.h"
 #include "vulkan/VKMesh.h"
+#include "vulkan/VKTexture.h"
 
 //	cpp includes
 #include <iostream>
@@ -86,7 +87,7 @@ int main() {
 
 	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
 	skyVShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
-	skyVShader->addUniform(sizeof(float));
+	skyVShader->addUniform(sizeof(float)).buildUniforms();
 	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
 
 	auto asteroidVertexBinaryContent = aa::UFile::readBinaryFileContent(
@@ -96,11 +97,14 @@ int main() {
 		"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
 	);
 
+	auto tex = new aa::VKTexture();
+	tex->loadColormap("D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader\\Rock02_BaseColor.tga");
+
 	auto astVShader = new aa::VKVertexShader(asteroidVertexBinaryContent);
 	astVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 	astVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 	astVShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
-	astVShader->addUniform(16 * sizeof(float));
+	astVShader->addUniform(16 * sizeof(float)).addTextureUniform(tex).buildUniforms();
 	auto astFShader = new aa::VKShader(asteroidFragmentBinaryContent);
 
 	// create pipeline
@@ -168,6 +172,7 @@ int main() {
 
 	//	cleanup tasks
 
+	delete tex;
 	delete ast;
 	delete astPipeline;
 	delete astFShader;

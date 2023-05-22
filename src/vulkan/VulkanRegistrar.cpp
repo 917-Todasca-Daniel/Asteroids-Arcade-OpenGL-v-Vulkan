@@ -877,7 +877,7 @@ VkImageView VulkanRegistrar::createImageView(const VkImage &image, const VkForma
 	if (vkCreateImageView(
 		_logicWorker, &createInfo, nullptr, &imageView
 	) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create image views!");
+		std::cout << "Failed to create image views!\n";
 	}
 
 	return imageView;

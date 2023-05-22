@@ -8,6 +8,9 @@
 namespace aa
 {
 
+    class VKTexture;
+
+
     // wrapper over VKShaderModule, may be used for both vertex and fragment shaders
     class VKShader
     {
@@ -18,6 +21,14 @@ namespace aa
 
         const VkShaderModule vkShaderModule;
 
+        VKShader& addUniform(uint32_t bufferRange);
+        VKShader& addTextureUniform(VKTexture* tex);
+        void buildUniforms();
+
+        const VkDescriptorSetLayout&           getDescriptorLayout      ()           const;
+              VkDescriptorSet                  getDescriptorSet         (int index)  const;
+              void*                            getUniformBuffersMap     (int index)  const;
+
         //  delete all implicit constructors 
         VKShader(const VKShader&)   = delete;
         VKShader(VKShader&&)        = delete;
@@ -26,8 +37,27 @@ namespace aa
         VKShader& operator = (VKShader&&)       = delete;
 
 
+    protected:
+        float      bufferRange;
+        VKTexture* tex;
+
+        std::vector<void*>                        uniformBuffersMapped;
+        std::vector<VkBuffer>                     uniformBuffers;
+        std::vector<VkDescriptorSetLayoutBinding> uniformBindings;
+        std::vector<VkWriteDescriptorSet>         descriptorWriteSets;
+        std::vector<VkDeviceMemory>               uniformBuffersMemory;
+
+        VkDescriptorSetLayout           descriptorSetLayout;
+        std::vector<VkDescriptorSet>    descriptorSets;
+        VkDescriptorPool                descriptorPool;
+
+
     private:
+
         VkShaderModule createShaderModule(const std::vector <char>& spirvCode);
+
+        void createUniformLayout(uint32_t bufferRange);
+        void createUniformPool(uint32_t bufferRange);
 
     };
 
@@ -42,32 +72,14 @@ namespace aa
         template <typename uniformType>
         void addBinding(VkFormat vkFormat, int noTuple);
 
-        const VkVertexInputBindingDescription& getBindingDescription    ()           const;
-        const VkDescriptorSetLayout&           getDescriptorLayout      ()           const;
-              VkDescriptorSet                  getDescriptorSet         (int index)  const;
-              void*                            getUniformBuffersMap     (int index)  const;
+        const VkVertexInputBindingDescription& getBindingDescription() const;
         
         const std::vector <VkVertexInputAttributeDescription>& 
             getAttributeDescriptions() const;
 
-        void addUniform(uint32_t bufferRange);
-
-
     private:
-        std::vector<void*>              uniformBuffersMapped;
-        std::vector<VkBuffer>           uniformBuffers;
-        VkDescriptorSetLayoutBinding    uniformBinding;
-        std::vector<VkDeviceMemory>     uniformBuffersMemory;
-
-        std::vector<VkDescriptorSet>    descriptorSets;
-        VkDescriptorSetLayout           descriptorSetLayout;
-        VkDescriptorPool                descriptorPool;
-
         VkVertexInputBindingDescription bindingDescription;
         std::vector <VkVertexInputAttributeDescription> attributeDescriptions;
-
-        void createUniformLayout(uint32_t bufferRange);
-        void createUniformPool(uint32_t bufferRange);
 
     };
 

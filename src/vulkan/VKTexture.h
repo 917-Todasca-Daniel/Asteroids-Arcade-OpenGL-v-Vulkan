@@ -27,6 +27,14 @@ namespace aa
         VKTexture& operator = (const VKTexture&) = delete;
         VKTexture& operator = (VKTexture&&) = delete;
 
+        const VkImageView& getTextureImageView() const {
+            return textureImageView;
+        }
+
+        const VkSampler& getTextureSampler() const {
+            return textureSampler;
+        }
+
 
     private:
         VkImage         textureImage;
