@@ -36,7 +36,7 @@ void Asteroid::loop(float lap)
 	Object3d::loop(lap);
 
 	position.x += lap * 1000;
-	position.y += lap * 1000;
+	position.y -= lap * 1000;
 
 	asteroidMesh->setPosition(position);
 	asteroidMesh->getRotation().w += lap;

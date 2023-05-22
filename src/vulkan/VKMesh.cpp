@@ -32,7 +32,8 @@ VKMesh::VKMesh(LogicObject* parent, Vector3d position, VKPipeline* pipeline) :
 	vertexBuffer		(VkBuffer{}), 
 	vertexBufferMemory	(VkDeviceMemory{}),
 	indexBuffer			(VkBuffer{}), 
-	indexBufferMemory	(VkDeviceMemory{})
+	indexBufferMemory	(VkDeviceMemory{}),
+	lifespan			(0.0)
 {
 
 }
@@ -51,11 +52,6 @@ VKMesh::~VKMesh()
 
 void VKMesh::loadFromFbx(const char* filepath) {
 	Mesh::loadFromFbx(filepath, ASSIMP_LOAD_FLAGS);
-
-	for (int i = 0; i < vertices.size(); i += 8) {
-		vertices[i+2] = 0.5f;
-	}
-	center.z = 0.5f;
 
 	lifespan = 0;
 }
@@ -163,11 +159,14 @@ void VKMesh::draw()
 		Matrix4d projection = Matrix4d::ViewportMatrix();
 		projection *= Matrix4d::TranslationMatrix(position);
 
-		projection.data()[12] = lifespan * 0.1;
-		projection.data()[13] = -lifespan * 0.1;
-
 		if (rotation.w > 0) {
 			projection *= Matrix4d::RotateAround(rotation, center);
+		}
+
+		for (int i = 0, j; i < 4; i++) {
+			for (j = 0; j < i; j++) {
+				std::swap(projection.data()[4 * i + j], projection.data()[4 * j + i]);
+			}
 		}
 
 		pipeline->updateUniform(projection.data(), 16 * sizeof(float));

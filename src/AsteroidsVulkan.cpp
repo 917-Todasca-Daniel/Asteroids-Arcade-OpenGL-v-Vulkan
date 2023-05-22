@@ -127,14 +127,20 @@ int main() {
 
 	auto ast = new aa::VKMesh(
 		AA_ROOT,
-		aa::Vector3d(0.0f, 0.0f, 0.0f),
+		aa::Vector3d(-5000, 1000, 0.0f),
 		astPipeline
 	);
 
-	ast->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
+	auto realAst = new aa::Asteroid(
+		AA_ROOT,
+		aa::Vector3d(-5000, 1000, 0),
+		ast
+	);
+
+	ast->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX");
 
 	rect->init();
-	ast->init();
+	realAst->init();
 
 	//	main loop in while()
 
@@ -146,7 +152,7 @@ int main() {
 		previousTime = currentTime;
 
 		{	// loop objects
-			ast->loop(lap);
+			realAst->loop(lap);
 			rect->loop(lap);
 		}
 
@@ -171,6 +177,8 @@ int main() {
 
 
 	//	cleanup tasks
+
+	delete realAst;
 
 	delete tex;
 	delete ast;
