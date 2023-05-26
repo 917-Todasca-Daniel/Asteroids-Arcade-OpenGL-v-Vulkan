@@ -60,7 +60,7 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Exit on glewInit()..." << std::endl;
@@ -104,11 +104,21 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
+	int noFrames = 0;
+	double prevFrameTimestamp = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window)) {
 		static double previousTime = glfwGetTime();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		double currentTime = glfwGetTime();
+
+		noFrames++;
+		if (currentTime - prevFrameTimestamp >= 1.0) {
+			std::cout << noFrames / (currentTime - prevFrameTimestamp) << " FPS\n";
+			noFrames = 0;
+			prevFrameTimestamp = currentTime;
+		}
+
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 

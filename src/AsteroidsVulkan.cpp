@@ -144,10 +144,21 @@ int main() {
 
 	//	main loop in while()
 
+	int noFrames = 0;
+	double prevFrameTimestamp = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window)) {
 		static double previousTime = glfwGetTime();
-
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		double currentTime = glfwGetTime();
+
+		noFrames++;
+		if (currentTime - prevFrameTimestamp >= 1.0) {
+			std::cout << noFrames / (currentTime - prevFrameTimestamp) << " FPS\n";
+			noFrames = 0;
+			prevFrameTimestamp = currentTime;
+		}
+
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
