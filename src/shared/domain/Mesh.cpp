@@ -47,6 +47,7 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags) {
 	}
 	else {
 		double centerX = 0, centerY = 0, centerZ = 0;
+		std::vector <std::tuple<double, double, double>> rollingSum;
 		unsigned int totalVertices = 0;
 
 		for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
@@ -65,7 +66,11 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags) {
 					}
 				);
 
-				center.x += pos.x, center.y += pos.y, center.z += pos.z;
+				centerX += pos.x, centerY += pos.y, centerZ += pos.z;
+				if (centerX > 2e9 || centerY > 2e9 || centerZ > 2e9) {
+					rollingSum.push_back(std::make_tuple( centerX, centerY, centerZ ));
+					centerX = 0, centerY = 0, centerZ = 0;
+				}
 				totalVertices += 1;
 			}
 
@@ -78,9 +83,12 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags) {
 			}
 		}
 
-		center.x = float(centerX / totalVertices);
-		center.y = float(centerY / totalVertices);
-		center.z = float(centerZ / totalVertices);
+		rollingSum.push_back(std::make_tuple(centerX, centerY, centerZ));
+		for (auto& tuple : rollingSum) {
+			center.x += float((double) std::get<0>(tuple) / totalVertices);
+			center.y += float((double) std::get<1>(tuple) / totalVertices);
+			center.z += float((double) std::get<2>(tuple) / totalVertices);
+		}
 	}
 
 }

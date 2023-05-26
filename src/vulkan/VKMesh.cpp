@@ -157,11 +157,9 @@ void VKMesh::draw()
 
 	{	// translation, scaling and rotation geometry
 		Matrix4d projection = Matrix4d::ViewportMatrix();
-		projection *= Matrix4d::TranslationMatrix(position);
+		//projection *= Matrix4d::TranslationMatrix(position);
 
-		if (rotation.w > 0) {
-			projection *= Matrix4d::RotateAround(rotation, center);
-		}
+		projection *= Matrix4d::RotateAround(rotation, center);
 
 		for (int i = 0, j; i < 4; i++) {
 			for (j = 0; j < i; j++) {
