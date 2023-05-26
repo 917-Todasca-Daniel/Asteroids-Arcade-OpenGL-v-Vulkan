@@ -7,8 +7,8 @@ void UMaths::worldToGLCoord(float& x, float& y) {
 	x /= WINDOW_WIDTH;
 	y /= WINDOW_HEIGHT;
 
-	x = 2.0f * x - 1.0;
-	y = 2.0f * y - 1.0;
+	x = (float) 2.0f * x - 1.0;
+	y = (float) 2.0f * y - 1.0;
 }
 
 
