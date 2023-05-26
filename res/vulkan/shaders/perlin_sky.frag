@@ -66,7 +66,7 @@ void main()
         + perlinNoise(cord * 4.) + perlinNoise(cord * 8.) / 4.;
 
     // perlin noise threshold and glow intensity
-    b = (b - 1.2) * 1.2;
+    b = (b - 1.6) * 1.0;
 
     outColor = vec4(b, b, b, 1.0);
 }

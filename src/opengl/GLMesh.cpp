@@ -121,7 +121,7 @@ void GLMesh::draw()
 
 	{	// translation, scaling and rotation geometry
 		Matrix4d projection = Matrix4d::ViewportMatrix();
-		//projection *= Matrix4d::TranslationMatrix(position);
+		projection *= Matrix4d::TranslationMatrix(position);
 
 		projection *= Matrix4d::RotateAround(rotation, center);
 

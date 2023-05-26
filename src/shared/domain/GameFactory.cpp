@@ -55,7 +55,7 @@ GameFactory* GameFactory::getFactory() {
 
 
 
-OpenGLGraphicsFactory::OpenGLGraphicsFactory() 
+OpenGLGraphicsFactory::OpenGLGraphicsFactory() : asteroidTex(nullptr)
 {
 
 }
@@ -101,8 +101,8 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 
 	shaders.push_back(meshShader);
 
-	aa::GLMesh*  obj  = new aa::GLMesh  (AA_ROOT, aa::Vector3d(300, 300, 0),	   meshShader);
-	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT, aa::Vector3d(0.0, 0.0f, 600.0f), obj);
+	aa::GLMesh*  obj  = new aa::GLMesh  (AA_ROOT, aa::Vector3d(0, 0, 0),	     meshShader);
+	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT, aa::Vector3d(0.0, 0.0f, 0.0f), obj);
 
 	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
 
@@ -145,8 +145,8 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 		buildMeshPrereq();
 	}
 
-	VKMesh*   mesh		= new VKMesh  (AA_ROOT, aa::Vector3d(-5000, 1000, 0.0f), meshPipeline);
-	Asteroid* asteroid  = new Asteroid(AA_ROOT, aa::Vector3d(-5000, 1000, 0),    mesh);
+	VKMesh*   mesh		= new VKMesh  (AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
+	Asteroid* asteroid  = new Asteroid(AA_ROOT, aa::Vector3d(0, 0, 0),    mesh);
 
 	mesh->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
 
@@ -191,7 +191,7 @@ void VulkanGraphicsFactory::buildMeshPrereq() {
 		meshVertexShader = new VKVertexShader(asteroidVertexBinaryContent);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
-		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT,    2);
 		meshVertexShader->addUniform(16 * sizeof(float)).addTextureUniform(tex).buildUniforms();
 	}
 
