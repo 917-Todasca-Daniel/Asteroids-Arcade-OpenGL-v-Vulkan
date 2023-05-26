@@ -13,12 +13,27 @@ uniform sampler2D u_Texture;
 
 void main()
 {
-    vec3 ambient = 0.1 * vec3(1.0, 1.0, 1.0);
-    vec3 diffuse = max(dot(fragNormal, -u_LightDirection), 0.0) * 
-        u_LightColor * texture(u_Texture, v_TexCoord).rgb;
-    vec3 specular = pow(max(dot(reflect(u_LightDirection, fragNormal), 
-        normalize(u_ViewPos - fragPos)), 0.0) * 0.7, 6.0) 
-        * texture(u_Texture, v_TexCoord).rgb
-        * 0.6;
-    gl_FragColor = vec4(diffuse + specular + ambient, 1.0);
+    float u_LightIntensity = 1.5;
+    float u_Shininess = 32.0;
+
+    vec3 ambientMaterial = vec3(0.1, 0.1, 0.1);
+    vec3 diffuseMaterial = vec3(1.0, 1.0, 1.0);
+    vec3 specularMaterial = vec3(0.5, 0.5, 0.5);
+
+    vec3 normalizedLightDirection = normalize(u_LightDirection);
+    vec3 normalizedViewDirection = normalize(u_ViewPos - fragPos);
+
+    // Ambient component
+    vec3 ambient = ambientMaterial;
+
+    // Diffuse component
+    vec3 diffuse = max(dot(fragNormal, normalizedLightDirection), 0.0) * diffuseMaterial;
+
+    // Specular component
+    vec3 reflectDir = reflect(-normalizedLightDirection, fragNormal);
+    float spec = pow(max(dot(fragNormal, reflectDir), 0.0), u_Shininess);
+    vec3 specular = u_LightIntensity * spec * specularMaterial;
+
+    vec3 result = (ambient + diffuse + specular) * texture(u_Texture, v_TexCoord).rgb;
+    gl_FragColor = vec4(result, 1.0);
 }

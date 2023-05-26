@@ -72,11 +72,10 @@ namespace aa
         }
 
         Quaternion(Quaternion&& other) : w(other.w), x(other.x), y(other.y), z(other.z) { }
+        Quaternion(Quaternion& other) : w(other.w), x(other.x), y(other.y), z(other.z) { }
 
-        //  delete all implicit constructors 
+        //  delete other implicit constructors 
         Quaternion()              = delete;
-
-        Quaternion& operator = (Quaternion&&) = delete;
 
 
     private:
