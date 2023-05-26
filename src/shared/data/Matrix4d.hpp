@@ -6,6 +6,9 @@
 #include "Quaternion.hpp"
 #include "Vector3d.h"
 
+#include "constants/window_constants.hpp"
+#include <iostream>
+
 
 namespace aa
 {
@@ -42,7 +45,12 @@ namespace aa
         static Matrix4d ViewportMatrix() {
             Matrix4d output = IdentityMatrix4d();
             for (size_t i = 0; i < 3; i++) {
-                output.elements[5*i] = 0.0002f;
+#ifdef IMPL_OPENGL
+                output.elements[5*i] = 0.005f;
+#endif
+#ifdef IMPL_VULKAN
+                output.elements[5 * i] = 0.005f;
+#endif
             }
             return output;
         }

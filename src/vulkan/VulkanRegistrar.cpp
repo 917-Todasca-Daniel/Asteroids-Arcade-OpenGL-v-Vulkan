@@ -76,7 +76,7 @@ struct QueueFamilyIndices {
 
 
 #ifdef NDEBUG
-	const bool _enableValidationLayers = true;
+	const bool _enableValidationLayers = false;
 #else
 	const bool _enableValidationLayers = true;
 #endif

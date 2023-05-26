@@ -7,6 +7,7 @@
 
 //	cpp includes
 #include <iostream>
+#include <cstdio>
 
 //	dev code
 #include "window_constants.hpp"	// WINDOW_* macros
@@ -29,6 +30,8 @@
 
 #ifdef IMPL_OPENGL
 int main() {
+	freopen("log.txt", "w", stdout);
+
 	std::cout << "Hello OpenGL!" << std::endl;
 
 
@@ -45,8 +48,8 @@ int main() {
 	}
 
 	window = glfwCreateWindow(
-		WINDOW_WIDTH_SM, 
-		WINDOW_HEIGHT_SM, 
+		WINDOW_WIDTH, 
+		WINDOW_HEIGHT, 
 		WINDOW_GAME_TITLE, 
 		NULL, 
 		NULL
@@ -60,7 +63,7 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Exit on glewInit()..." << std::endl;
@@ -73,8 +76,8 @@ int main() {
 	//	main loop in while()
 
 	aa::GLTexture* asteroidTex = aa::GLTextureFileBuilder(
-		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
-	)	.setColorFile("Rock02_BaseColor", "tga")
+		"D:\\licenta\\dev\\app\\res\\shared\\textures"
+	)	.setColorFile("noise", "png")
 		.build();
 
 	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
@@ -85,37 +88,43 @@ int main() {
 
 	aa::GLMesh* obj = new aa::GLMesh(
 		AA_ROOT,
-		aa::Vector3d(300, 300, 0),
+		aa::Vector3d(0, 0, 0),
 		meshShader
 	);
 
 	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT,
-		aa::Vector3d(0.0, 0.0f, 600.0f),
+		aa::Vector3d(0.0, 0.0f, 0.0f),
 		obj
 	);
-	aa::SkyRectangle* sky = new aa::SkyRectangle(
-		AA_ROOT
-	);
 
-	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
-	sky->init();
+	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/Venator.fbx");
 	ast->init();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
+
+	int noFrames = 0;
+	double prevFrameTimestamp = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
+		
 		static double previousTime = glfwGetTime();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		double currentTime = glfwGetTime();
+		noFrames++;
+		
+		if (currentTime - prevFrameTimestamp >= 1.0) {
+			std::cout << noFrames / (currentTime - prevFrameTimestamp) << " FPS\n";
+			noFrames = 0;
+			prevFrameTimestamp = currentTime;
+		}
+
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
-		sky->loop(lap);
 		ast->loop(lap);
 
-		sky->draw();
 		obj->draw();
 
 		glfwSwapBuffers(window);
@@ -129,7 +138,6 @@ int main() {
 
 	delete asteroidTex;
 	delete meshShader;
-	delete sky;
 	delete ast;
 	delete obj;
 	delete importer;

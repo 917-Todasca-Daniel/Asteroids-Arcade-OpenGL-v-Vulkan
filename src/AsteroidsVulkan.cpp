@@ -10,6 +10,7 @@
 
 //	cpp includes
 #include <iostream>
+#include <cstdio>
 #include <vector>
 
 //	assimp
@@ -27,6 +28,8 @@
 
 #ifdef IMPL_VULKAN
 int main() {
+	freopen("log.txt", "w", stdout);
+
 	std::cout << "Knock knock Vulkan!" << std::endl;
 
 
@@ -46,8 +49,8 @@ int main() {
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	window = glfwCreateWindow(
-		WINDOW_WIDTH_SM, 
-		WINDOW_HEIGHT_SM, 
+		WINDOW_WIDTH, 
+		WINDOW_HEIGHT, 
 		WINDOW_GAME_TITLE, 
 		NULL, 
 		NULL
@@ -61,7 +64,7 @@ int main() {
 	}
 
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -78,18 +81,6 @@ int main() {
 
 
 	// create shader
-	auto skyVertexBinaryContent = aa::UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/v-perlin_sky.spv"
-	);
-	auto skyFragmentBinaryContent = aa::UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/f-perlin_sky.spv"
-	);
-
-	auto skyVShader = new aa::VKVertexShader(skyVertexBinaryContent);
-	skyVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
-	skyVShader->addUniform(sizeof(float)).buildUniforms();
-	auto skyFShader = new aa::VKShader(skyFragmentBinaryContent);
-
 	auto asteroidVertexBinaryContent = aa::UFile::readBinaryFileContent(
 		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
 	);
@@ -98,7 +89,8 @@ int main() {
 	);
 
 	auto tex = new aa::VKTexture();
-	tex->loadColormap("D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader\\Rock02_BaseColor.tga");
+	tex->loadColormap("D:\\licenta\\dev\\app\\res\\shared\\textures\\noise.png");
+
 
 	auto astVShader = new aa::VKVertexShader(asteroidVertexBinaryContent);
 	astVShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
@@ -108,58 +100,56 @@ int main() {
 	auto astFShader = new aa::VKShader(asteroidFragmentBinaryContent);
 
 	// create pipeline
-	auto skyPipeline = aa::VKPipelineBuilder()
-		.setVertexShader(skyVShader)
-		.setFragmentShader(skyFShader)
-		.build();
 
 	auto astPipeline = aa::VKPipelineBuilder()
 		.setVertexShader(astVShader)
 		.setFragmentShader(astFShader)
 		.build();
 
-	auto rect = new aa::VKRectangle(
-		AA_ROOT,
-		aa::Vector3d(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 1.0),
-		WINDOW_HEIGHT, WINDOW_WIDTH,
-		skyPipeline
-	);
-
 	auto ast = new aa::VKMesh(
 		AA_ROOT,
-		aa::Vector3d(-5000, 1000, 0.0f),
+		aa::Vector3d(0, 0, 0),
 		astPipeline
 	);
 
 	auto realAst = new aa::Asteroid(
 		AA_ROOT,
-		aa::Vector3d(-5000, 1000, 0),
+		aa::Vector3d(0.0, 0.0f, 0.0f),
 		ast
 	);
 
-	ast->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX");
+	std::cout << "before load\n";
+	ast->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/Venator.fbx");
+	std::cout << "after load\n";
 
-	rect->init();
 	realAst->init();
 
 	//	main loop in while()
 
+	int noFrames = 0;
+	double prevFrameTimestamp = glfwGetTime();
 	while (!glfwWindowShouldClose(window)) {
 		static double previousTime = glfwGetTime();
-
 		double currentTime = glfwGetTime();
+		noFrames++;
+		
+		if (currentTime - prevFrameTimestamp >= 1.0) {
+			std::cout << noFrames / (currentTime - prevFrameTimestamp) << " FPS\n";
+			noFrames = 0;
+			prevFrameTimestamp = currentTime;
+		}
+
 		float lap = (float)(currentTime - previousTime);
 		previousTime = currentTime;
 
 		{	// loop objects
 			realAst->loop(lap);
-			rect->loop(lap);
 		}
 
 		{	// draw in vulkan
 			aa::VulkanRegistrar::predraw();
 
-			rect->draw();
+			// rect->draw();
 			ast->draw();
 
 			aa::VulkanRegistrar::postdraw();
@@ -185,11 +175,6 @@ int main() {
 	delete astPipeline;
 	delete astFShader;
 	delete astVShader;
-
-	delete rect;
-	delete skyPipeline;
-	delete skyVShader;
-	delete skyFShader;
 
 	aa::VulkanRegistrar::cleanVulkan();
 	glfwDestroyWindow(window);
