@@ -17,6 +17,6 @@
 
 #define WINDOW_UNIT			1
 
-#define IMPL_OPENGL
+#define IMPL_VULKAN
 
 #endif	// CONSTANTS_H

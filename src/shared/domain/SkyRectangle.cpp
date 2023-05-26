@@ -6,6 +6,7 @@
 #include "GLRectangle.h"
 
 #include "domain/RootObject.h"
+#include "domain/GameFactory.h"
 
 using namespace aa;
 
@@ -13,48 +14,30 @@ using namespace aa;
 
 SkyRectangle::SkyRectangle(LogicObject*	parent) : LogicObject(parent),
 	height(WINDOW_HEIGHT), width(WINDOW_WIDTH), lifespan(0),
-	shader(0), rectangle(0)
+	sky(0)
 {
 
 }
 
 SkyRectangle::~SkyRectangle()
 {
-	if (rectangle) {
-		delete rectangle;
+	if (sky) {
+		delete sky;
 	}
-	if (shader) {
-		delete shader;
-	}
-
 }
 
 
 void SkyRectangle::kill()
 {
-	if (rectangle) {
-		rectangle->kill();
+	if (sky) {
+		sky->kill();
 	}
 }
 
-
 void SkyRectangle::init()
 {
-	shader = GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader("v_basic_tex_position")
-		.setFragmentShader("f_perlin_sky")
-		.build();
-
-	rectangle = new GLRectangle(
-		this,
-		Vector3d(width * 0.5f, height * 0.5f, 0),
-		height, width,
-		shader
-	);
-
-	rectangle->init();
-
-	shader->addUniform1iRef("u_Time", &this->lifespan);
+	sky = FACTORY->buildSky(height, width, &this->lifespan);
+	sky->init();
 
 }
 
@@ -64,14 +47,13 @@ void SkyRectangle::loop(float lap)
 	LogicObject::loop(lap);
 
 	lifespan += lap;
-
-	rectangle->loop(lap);
+	sky->loop(lap);
 
 }
 
 
 void SkyRectangle::draw()
 {
-	rectangle->draw();
+	sky->draw();
 
 }

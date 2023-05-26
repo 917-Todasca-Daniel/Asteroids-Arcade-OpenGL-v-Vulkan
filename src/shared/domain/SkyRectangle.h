@@ -32,8 +32,7 @@ namespace aa
 
 
     private:
-        GLShader*       shader;
-        Object3d*       rectangle;
+        Object3d*       sky;
 
         const float     height;
         const float     width;

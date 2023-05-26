@@ -27,6 +27,8 @@ namespace aa
 
         virtual void loop(float lap) override;
 
+        virtual void draw();
+
 
     protected:
         Mesh* asteroidMesh;

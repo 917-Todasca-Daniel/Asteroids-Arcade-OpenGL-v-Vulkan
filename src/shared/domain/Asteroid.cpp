@@ -16,6 +16,7 @@ Asteroid::Asteroid(LogicObject* parent, Vector3d position, Mesh *mesh)
 
 Asteroid::~Asteroid()
 {
+	if (asteroidMesh) delete asteroidMesh;
 
 }
 
@@ -27,8 +28,11 @@ void Asteroid::kill()
 
 void Asteroid::init()
 {
+	Object3d::init();
+
 	asteroidMesh->init();
 	asteroidMesh->setRotation(Quaternion(1, -1, 0, 0));
+
 }
 
 void Asteroid::loop(float lap)
@@ -36,8 +40,18 @@ void Asteroid::loop(float lap)
 	Object3d::loop(lap);
 
 	asteroidMesh->setPosition(position);
-	Quaternion quat(1, 0, lap, 0);
-	quat = quat * asteroidMesh->getRotation();
-	quat.normalize();
-	asteroidMesh->setRotation(quat);
+
+	Quaternion frameRotation(1, 0, lap, 0);
+	frameRotation = frameRotation * asteroidMesh->getRotation();
+	frameRotation.normalize();
+	asteroidMesh->setRotation(frameRotation);
+
+}
+
+void Asteroid::draw() 
+{
+	Object3d::draw();
+
+	asteroidMesh->draw();
+
 }

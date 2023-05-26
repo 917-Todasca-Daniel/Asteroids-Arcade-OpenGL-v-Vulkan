@@ -14,12 +14,7 @@
 #include "shared/domain/RootObject.h"
 #include "shared/domain/Asteroid.h"
 #include "shared/domain/SkyRectangle.h"
-
-#include "opengl/GLTriangle.h"
-#include "opengl/GLRectangle.h"
-#include "opengl/GLShaders.h"
-#include "opengl/GLTexture.h"
-#include "opengl/GLMesh.h"
+#include "shared/domain/GameFactory.h"
 
 #include "util/UMaths.h"
 #include "util/UFile.h"
@@ -45,8 +40,8 @@ int main() {
 	}
 
 	window = glfwCreateWindow(
-		WINDOW_WIDTH_SM, 
-		WINDOW_HEIGHT_SM, 
+		WINDOW_WIDTH, 
+		WINDOW_HEIGHT, 
 		WINDOW_GAME_TITLE, 
 		NULL, 
 		NULL
@@ -72,34 +67,11 @@ int main() {
 
 	//	main loop in while()
 
-	aa::GLTexture* asteroidTex = aa::GLTextureFileBuilder(
-		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
-	)	.setColorFile("Rock02_BaseColor", "tga")
-		.build();
-
-	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader("v_3d_mesh")
-		.setFragmentShader("f_3d_mesh")
-		.addUniformTex("u_Texture", asteroidTex)
-		.build();
-
-	aa::GLMesh* obj = new aa::GLMesh(
-		AA_ROOT,
-		aa::Vector3d(300, 300, 0),
-		meshShader
-	);
-
-	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT,
-		aa::Vector3d(0.0, 0.0f, 600.0f),
-		obj
-	);
-	aa::SkyRectangle* sky = new aa::SkyRectangle(
-		AA_ROOT
-	);
-
-	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
-	sky->init();
+	auto ast = FACTORY->buildLargeAsteroid();
 	ast->init();
+
+	auto sky = new aa::SkyRectangle(AA_ROOT);
+	sky->init();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -126,7 +98,7 @@ int main() {
 		ast->loop(lap);
 
 		sky->draw();
-		obj->draw();
+		ast->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -137,12 +109,11 @@ int main() {
 
 	//	cleanup tasks
 
-	delete asteroidTex;
-	delete meshShader;
 	delete sky;
 	delete ast;
-	delete obj;
 	delete importer;
+
+	delete FACTORY;
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
