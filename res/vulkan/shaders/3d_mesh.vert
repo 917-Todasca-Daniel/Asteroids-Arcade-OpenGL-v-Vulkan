@@ -19,7 +19,10 @@ void main()
 	mat4 model = mat4(1.0);
 
 	coord4d = vec4(position, 1.0);
-	gl_Position = ubo.proj * coord4d;
+	coord4d = ubo.proj * coord4d;
+	coord4d.z = (1 + coord4d.z)/2;
+	coord4d.y = -coord4d.y;
+	gl_Position = coord4d;
 
 	fragPos = position;
     fragNormal = mat3(transpose(inverse(model))) * normal;
