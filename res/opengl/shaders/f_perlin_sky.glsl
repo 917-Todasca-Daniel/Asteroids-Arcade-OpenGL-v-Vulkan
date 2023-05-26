@@ -4,8 +4,6 @@
 
 uniform float u_Time;
 
-vec2 u_Resolution;
-
 in vec2 v_TexCoord;
 
 out vec4 fragColor;
@@ -13,6 +11,7 @@ out vec4 fragColor;
 vec4 permute(vec4 x) {
     return mod(((x*34.0)+1.0) * x, 289.0);
 }
+
 vec2 fade(vec2 t) {
     return t*t*t * (t*(t*6.0-15.0) + 10.0);
 }
@@ -59,9 +58,8 @@ float perlinNoise(vec2 P)
 
 void main()
 {
-    u_Resolution = vec2(1000, 680);
     vec2 offset = vec2((u_Time), 0.0) * 10;
-    vec2 cord = v_TexCoord * 100. + offset;
+    vec2 cord = v_TexCoord * 50. + offset;
 
     float b = perlinNoise(cord) + perlinNoise(cord*2.)
         + perlinNoise(cord * 4.) + perlinNoise(cord * 8.) / 4.;

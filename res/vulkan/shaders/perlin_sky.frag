@@ -59,7 +59,6 @@ float perlinNoise(vec2 P)
 
 void main()
 {
-    u_Resolution = vec2(2000, 680);
     vec2 offset = vec2((u_Time), 0.0) * 10;
     vec2 cord = v_TexCoord * 50. + offset;
 
