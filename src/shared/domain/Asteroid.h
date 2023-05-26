@@ -17,7 +17,8 @@ namespace aa
         Asteroid(
             LogicObject* parent, 
             Vector3d position,
-            Mesh* mesh
+            Mesh* mesh,
+            Vector3d acceleration = Vector3d(0, 0, 0)
         );
         virtual ~Asteroid();
 
@@ -31,7 +32,8 @@ namespace aa
 
 
     protected:
-        Mesh* asteroidMesh;
+        Mesh*    asteroidMesh;
+        Vector3d acceleration;
 
     };
 }

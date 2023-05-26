@@ -17,6 +17,12 @@ namespace aa
 
         Vector3d operator - () const;
 
+        // scalar multiplication
+        Vector3d operator * (float scalar) const;
+
+        // += operator
+        Vector3d& operator += (const Vector3d&);
+
         float x;
         float y;
         float z;

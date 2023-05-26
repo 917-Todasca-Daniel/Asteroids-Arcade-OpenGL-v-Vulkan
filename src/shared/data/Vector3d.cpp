@@ -27,6 +27,19 @@ Vector3d Vector3d::operator - () const
     return Vector3d(-x, -y, -z);
 }
 
+Vector3d Vector3d::operator * (float scalar) const
+{
+    return Vector3d(x * scalar, y * scalar, z * scalar);
+}
+
+Vector3d& Vector3d::operator += (const Vector3d& other)
+{
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+}
+
 
 std::ostream& aa::operator<<(std::ostream& os, const Vector3d& v)
 {
