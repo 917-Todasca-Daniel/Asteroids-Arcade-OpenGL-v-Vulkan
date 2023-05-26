@@ -4,8 +4,8 @@ using namespace aa;
 
 
 void UMaths::worldToGLCoord(float& x, float& y) {
-	x /= WINDOW_WIDTH_SM;
-	y /= WINDOW_HEIGHT_SM;
+	x /= WINDOW_WIDTH;
+	y /= WINDOW_HEIGHT;
 
 	x = 2.0f * x - 1.0;
 	y = 2.0f * y - 1.0;

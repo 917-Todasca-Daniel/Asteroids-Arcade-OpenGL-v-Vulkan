@@ -38,6 +38,7 @@ void VKTexture::loadColormap(const char* filepath)
 
 void VKTexture::loadTextureImage(const char* filepath) {
     int texWidth, texHeight, texChannels;
+    stbi_set_flip_vertically_on_load(1);
     stbi_uc* pixels = stbi_load(
         filepath, 
         &texWidth, &texHeight, &texChannels, 
