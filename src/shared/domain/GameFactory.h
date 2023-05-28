@@ -9,6 +9,7 @@ namespace aa
 {
 
     class Object3d;
+    class Mesh;
 
     class VKPipeline;
     class VKVertexShader;
@@ -38,6 +39,10 @@ namespace aa
 
         GameFactory& operator = (const GameFactory&) = delete;
         GameFactory& operator = (GameFactory&&)      = delete;
+
+
+    protected:
+        Object3d* buildLargeAsteroid(Mesh* mesh);
 
 
     private:

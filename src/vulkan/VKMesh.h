@@ -24,7 +24,7 @@ namespace aa
         );
         virtual ~VKMesh();
 
-        void loadFromFbx(const char* filepath);
+        void loadFromFbx(const char* filepath, float scale = 1.0f);
 
         virtual void loop(float lap);
 
@@ -36,13 +36,6 @@ namespace aa
     private:
         // this shader must be managed by a module above
         VKPipeline* pipeline;
-
-        float projectionMatrix[16] = {
-            0.0002f, 0.0f, 0.0f, 0.0f,
-            0.0f, 0.0002f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0002f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0002f
-        };
 
         VkBuffer          vertexBuffer;
         VkDeviceMemory    vertexBufferMemory;

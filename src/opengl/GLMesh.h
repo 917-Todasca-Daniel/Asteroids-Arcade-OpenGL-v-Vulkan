@@ -25,7 +25,7 @@ namespace aa
         );
         virtual ~GLMesh();
 
-        void loadFromFbx(const char* filepath);
+        void loadFromFbx(const char* filepath, float scale = 1.0f);
 
         virtual void init();
 

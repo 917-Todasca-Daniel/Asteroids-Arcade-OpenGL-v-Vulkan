@@ -165,6 +165,7 @@
     <ClCompile Include="src\opengl\GLRectangle.cpp" />
     <ClCompile Include="src\opengl\GLTexture.cpp" />
     <ClCompile Include="src\opengl\GLTriangle.cpp" />
+    <ClCompile Include="src\shared\data\Quaternion.cpp" />
     <ClCompile Include="src\shared\data\Vector3d.cpp" />
     <ClCompile Include="src\shared\data\Vector4d.cpp" />
     <ClCompile Include="src\shared\domain\Asteroid.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="src\shared\util\UColors.cpp" />
     <ClCompile Include="src\shared\util\UFile.cpp" />
     <ClCompile Include="src\shared\util\UMaths.cpp" />
+    <ClCompile Include="src\shared\util\URand.cpp" />
     <ClCompile Include="src\vulkan\VKMesh.cpp" />
     <ClCompile Include="src\vulkan\VKPipeline.cpp" />
     <ClCompile Include="src\vulkan\VKRectangle.cpp" />
@@ -207,6 +209,7 @@
     <ClInclude Include="src\shared\util\UColors.h" />
     <ClInclude Include="src\shared\util\UFile.h" />
     <ClInclude Include="src\shared\util\UMaths.h" />
+    <ClInclude Include="src\shared\util\URand.h" />
     <ClInclude Include="src\vulkan\VKMesh.h" />
     <ClInclude Include="src\vulkan\VKPipeline.h" />
     <ClInclude Include="src\vulkan\VKRectangle.h" />

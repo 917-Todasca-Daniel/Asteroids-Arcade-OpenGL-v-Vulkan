@@ -28,7 +28,7 @@ Mesh::~Mesh()
 }
 
 
-void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags) {
+void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags, float scale) {
 	if (bInit) {
 		std::cout << "Mesh::loadFromFbx should be called before ::init()!\n";
 		return;
@@ -61,12 +61,12 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags) {
 				vertices.insert(
 					vertices.end(),
 					{
-						pos.x, pos.y, pos.z, normal.x, normal.y, normal.z,
+						pos.x * scale, pos.y * scale, pos.z * scale, normal.x, normal.y, normal.z,
 						texCoord.y, texCoord.x
 					}
 				);
 
-				centerX += pos.x, centerY += pos.y, centerZ += pos.z;
+				centerX += pos.x * scale, centerY += pos.y * scale, centerZ += pos.z * scale;
 				if (centerX > 2e9 || centerY > 2e9 || centerZ > 2e9) {
 					rollingSum.push_back(std::make_tuple( centerX, centerY, centerZ ));
 					centerX = 0, centerY = 0, centerZ = 0;

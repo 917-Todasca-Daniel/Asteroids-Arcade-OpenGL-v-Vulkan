@@ -43,7 +43,7 @@ namespace aa
         // by default, the mean average of all points
         Vector3d                center;
 
-        void loadFromFbx(const char* filepath, unsigned int pFlags);
+        void loadFromFbx(const char* filepath, unsigned int pFlags, float scale);
 
     };
 }

@@ -2,6 +2,8 @@
 
 #include "Object3d.h"
 
+#include "data/Quaternion.hpp"
+
 
 namespace aa
 {
@@ -18,7 +20,9 @@ namespace aa
             LogicObject* parent, 
             Vector3d position,
             Mesh* mesh,
-            Vector3d acceleration = Vector3d(0, 0, 0)
+            Vector3d acceleration = Vector3d(1000, 1000, 0),
+            Quaternion initRotation = Quaternion(1, 0, 0, 0),
+            Quaternion frameRotation = Quaternion(1, 0, 1, 0)
         );
         virtual ~Asteroid();
 
@@ -32,8 +36,10 @@ namespace aa
 
 
     protected:
-        Mesh*    asteroidMesh;
-        Vector3d acceleration;
+        Mesh*       asteroidMesh;
+        Vector3d    acceleration;
+        Quaternion  initRotation;
+        Quaternion  frameRotation;
 
     };
 }

@@ -48,8 +48,8 @@ GLMesh::~GLMesh()
 }
 
 
-void GLMesh::loadFromFbx(const char* filepath) {
-	Mesh::loadFromFbx(filepath, ASSIMP_LOAD_FLAGS);
+void GLMesh::loadFromFbx(const char* filepath, float scale) {
+	Mesh::loadFromFbx(filepath, ASSIMP_LOAD_FLAGS, scale);
 }
 
 

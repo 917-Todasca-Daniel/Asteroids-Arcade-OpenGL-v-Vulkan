@@ -50,8 +50,8 @@ VKMesh::~VKMesh()
 }
 
 
-void VKMesh::loadFromFbx(const char* filepath) {
-	Mesh::loadFromFbx(filepath, ASSIMP_LOAD_FLAGS);
+void VKMesh::loadFromFbx(const char* filepath, float scale) {
+	Mesh::loadFromFbx(filepath, ASSIMP_LOAD_FLAGS, scale);
 
 	lifespan = 0;
 }

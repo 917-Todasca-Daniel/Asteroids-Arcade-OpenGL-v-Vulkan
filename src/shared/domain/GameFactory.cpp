@@ -22,12 +22,16 @@
 #include "domain/Asteroid.h"
 
 #include "util/UFile.h"
+#include "util/URand.h"
 
 #include "data/Vector3d.h"
 
 #include "window_constants.hpp"
 
 using namespace aa;
+
+#define SCALE_MIN 0.4f
+#define SCALE_MAX 0.7f
 
 
 #ifdef IMPL_VULKAN
@@ -51,6 +55,36 @@ GameFactory::~GameFactory()
 
 GameFactory* GameFactory::getFactory() {
 	return instance;
+}
+
+Object3d* GameFactory::buildLargeAsteroid(Mesh* mesh) {
+	Vector3d pos		= URand::randPosition();
+	Vector3d acc		= URand::randAcceleration();
+	Quaternion rot		= URand::randRotation();
+	Quaternion frameRot = URand::randTimeRotation();
+
+	float type = URand::randBetween(.0f, 4.0f);
+	if (type < 1.0f) {
+		;
+	} else
+	if (type < 2.0f) {
+		pos.y = -pos.y;
+		acc.y = -acc.y;
+	} else
+	if (type < 3.0f) {
+		pos.x = -pos.x;
+		acc.x = -acc.x;
+	} else
+	if (type < 4.0f) {
+		pos.x = -pos.x;
+		acc.x = -acc.x;
+		pos.y = -pos.y;
+		acc.y = -acc.y;
+	}
+
+	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, acc, rot, frameRot);
+
+	return asteroid;
 }
 
 
@@ -100,13 +134,13 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 		.build();
 
 	shaders.push_back(meshShader);
+	
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
-	aa::GLMesh*  obj  = new aa::GLMesh  (AA_ROOT, aa::Vector3d(0, 0, 0),	     meshShader);
-	aa::Asteroid* ast = new aa::Asteroid(AA_ROOT, aa::Vector3d(0.0, 0.0f, 0.0f), obj);
+	aa::GLMesh*  obj  = new aa::GLMesh(AA_ROOT, aa::Vector3d(0, 0, 0), meshShader);
+	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX", scale);
 
-	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
-
-	return ast;
+	return GameFactory::buildLargeAsteroid(obj);;
 }
 
 
@@ -145,12 +179,12 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 		buildMeshPrereq();
 	}
 
-	VKMesh*   mesh		= new VKMesh  (AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
-	Asteroid* asteroid  = new Asteroid(AA_ROOT, aa::Vector3d(0, 0, 0),    mesh);
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
-	mesh->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX");
+	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
+	mesh->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX", scale);
 
-	return asteroid;
+	return GameFactory::buildLargeAsteroid(mesh);;
 }
 
 

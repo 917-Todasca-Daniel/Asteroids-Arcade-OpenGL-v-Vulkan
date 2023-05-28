@@ -8,10 +8,14 @@
 using namespace aa;
 
 
-Asteroid::Asteroid(LogicObject* parent, Vector3d position, Mesh *mesh, Vector3d acceleration)
-	: Object3d(parent, position), asteroidMesh(mesh), acceleration(acceleration)
+Asteroid::Asteroid(
+	LogicObject* parent, Vector3d position, 
+	Mesh *mesh, Vector3d acceleration, Quaternion initRotation,
+	Quaternion frameRotation
+) : Object3d(parent, position), asteroidMesh(mesh), acceleration(acceleration), 
+	initRotation(initRotation), frameRotation(frameRotation)
 {
-	
+
 }
 
 Asteroid::~Asteroid()
@@ -31,7 +35,7 @@ void Asteroid::init()
 	Object3d::init();
 
 	asteroidMesh->init();
-	asteroidMesh->setRotation(Quaternion(1, -1, 0, 0));
+	asteroidMesh->setRotation(initRotation);
 
 }
 
@@ -42,10 +46,10 @@ void Asteroid::loop(float lap)
 	position += acceleration * lap;
 	asteroidMesh->setPosition(position);
 
-	Quaternion frameRotation(1, 0, lap, 0);
-	frameRotation = frameRotation * asteroidMesh->getRotation();
-	frameRotation.normalize();
-	asteroidMesh->setRotation(frameRotation);
+	Quaternion rot = frameRotation * lap;
+	rot = rot * asteroidMesh->getRotation();
+	rot.normalize();
+	asteroidMesh->setRotation(rot);
 
 }
 

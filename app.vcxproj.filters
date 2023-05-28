@@ -132,6 +132,12 @@
     <ClCompile Include="src\vulkan\VKTexture.cpp">
       <Filter>vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\shared\util\URand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shared\data\Quaternion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\shared\constants\window_constants.hpp">
@@ -217,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="src\vulkan\VKTexture.h">
       <Filter>vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shared\util\URand.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,11 @@ namespace aa
         double y;
         double z;
 
+        // scalar multiplication
+        Quaternion operator * (float scalar) const {
+            return Quaternion(w, x * scalar, y * scalar, z * scalar);
+        }
+
         static Quaternion fromYawPitchRoll(double yaw, double pitch, double roll) {
             double cy = cos(yaw * 0.5);
             double sy = sin(yaw * 0.5);
