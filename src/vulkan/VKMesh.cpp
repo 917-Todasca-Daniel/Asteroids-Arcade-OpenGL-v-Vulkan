@@ -215,9 +215,8 @@ void VKInstancedMesh::draw()
 VKMeshInstance::VKMeshInstance(
 	VKInstancedMesh* parent,
 	Vector3d         position,
-	VKPipeline*      pipeline,
 	uint32_t         instanceIndex
-) : VKMesh(parent, position, pipeline), instanceIndex(instanceIndex)
+) : Mesh(parent, position), instanceIndex(instanceIndex)
 {
 
 }

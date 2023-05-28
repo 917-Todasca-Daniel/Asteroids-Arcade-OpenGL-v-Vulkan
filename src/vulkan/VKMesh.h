@@ -77,14 +77,13 @@ namespace aa
 
 
     // a single instance of a VKInstacedMesh
-    class VKMeshInstance : public VKMesh
+    class VKMeshInstance : public Mesh
     {
         
     public:
         VKMeshInstance(
             VKInstancedMesh* parent,
             Vector3d         position,
-            VKPipeline*      pipeline,
             uint32_t         instanceIndex
         );
         virtual ~VKMeshInstance();
