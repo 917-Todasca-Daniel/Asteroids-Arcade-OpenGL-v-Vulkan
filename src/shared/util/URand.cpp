@@ -2,24 +2,25 @@
 
 #include <random>
 #include <time.h>
+#include <iostream>
 
 #include "window_constants.hpp"
 
 using namespace aa;
 
 
-#define ROT_X_MIN       800.0f
-#define ROT_X_MAX       1500.0f
+#define ROT_X_MIN       600.0f
+#define ROT_X_MAX       900.0f
 
-#define Y_SCALE_LESS    0.8f
-#define Y_SCALE_GREATER 1.3f
+#define Y_SCALE_LESS    1.5f
+#define Y_SCALE_GREATER 2.0f
 
 
 int URand::seed = time(0);
+std::mt19937 rng(time(0));
 
 
 float URand::randBetween(float x, float y) {
-    std::mt19937 rng(URand::seed);
     std::uniform_real_distribution<float> distribution(x, y);
     float randomNumber = distribution(rng);
 
@@ -31,13 +32,17 @@ Vector3d URand::randAcceleration() {
     float x = randBetween(ROT_X_MIN, ROT_X_MAX);
     float y = randBetween(x * Y_SCALE_LESS, x * Y_SCALE_GREATER);
 
-    return Vector3d(x, y, .0f);
+    float type = randBetween(.0f, 1.0f);
+    if (type < 0.5f) {
+        return Vector3d(x, y, .0f);
+    }
+    return Vector3d(y, x, .0f);
 }
 
 
 Vector3d URand::randPosition() {
-    float x =randBetween(- WINDOW_WIDTH * 2.5f, 0);
-    float y = -WINDOW_HEIGHT * 4.0f;
+    float x = randBetween(- WINDOW_WIDTH * 2.5f, WINDOW_WIDTH * 2.5f);
+    float y = randBetween(- WINDOW_HEIGHT * 4.5f, - WINDOW_HEIGHT * 4.0f);
 
     return Vector3d(x, y, 0);
 }
