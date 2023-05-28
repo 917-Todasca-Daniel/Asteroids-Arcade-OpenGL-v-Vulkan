@@ -76,8 +76,12 @@ int main() {
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
 
-	auto ast = FACTORY->buildLargeAsteroid();
-	ast->init();
+	std::vector <aa::Object3d*> asteroids;
+	for (int i = 0; i < NUM_ASTEROIDS; i++) {
+		auto ast = FACTORY->buildLargeAsteroid();
+		ast->init();
+		asteroids.push_back(ast);
+	}
 
 	//	main loop in while()
 
@@ -99,7 +103,9 @@ int main() {
 		previousTime = currentTime;
 
 		{	// loop objects
-			ast->loop(lap);
+			for (auto& ast : asteroids) {
+				ast->loop(lap);
+			}
 			sky->loop(lap);
 		}
 
@@ -107,7 +113,10 @@ int main() {
 			aa::VulkanRegistrar::predraw();
 
 			sky->draw();
-			ast->draw();
+			for (auto& ast : asteroids) {
+				ast->draw();
+			}
+			FACTORY->draw();
 
 			aa::VulkanRegistrar::postdraw();
 		}
@@ -125,7 +134,9 @@ int main() {
 
 	//	cleanup tasks
 
-	delete ast;
+	for (auto& ast : asteroids) {
+		delete ast;
+	}
 	delete sky;
 	delete importer;
 

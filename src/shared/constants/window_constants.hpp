@@ -19,4 +19,6 @@
 
 #define IMPL_VULKAN
 
+#define NUM_ASTEROIDS		75
+
 #endif	// CONSTANTS_H

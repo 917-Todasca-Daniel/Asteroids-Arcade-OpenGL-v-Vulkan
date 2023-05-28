@@ -157,7 +157,8 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 VulkanGraphicsFactory::VulkanGraphicsFactory()
 	: tex(nullptr), skyVertexShader(nullptr), meshVertexShader(nullptr),
 	skyFragmentShader(nullptr), meshFragmentShader(nullptr),
-	skyPipeline(nullptr), meshPipeline(nullptr)
+	skyPipeline(nullptr), meshPipeline(nullptr),
+	asteroidCount(0), asteroidInstance(nullptr)
 {
 
 }
@@ -171,6 +172,7 @@ VulkanGraphicsFactory::~VulkanGraphicsFactory()
 	if (meshFragmentShader) delete meshFragmentShader;
 	if (skyPipeline)		delete skyPipeline;
 	if (meshPipeline)		delete meshPipeline;
+	if (asteroidInstance)   delete asteroidInstance;
 
 }
 
@@ -190,17 +192,16 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
-	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
-
-	float type = URand::randBetween(0.0, 1.0f);
-	if (type < 0.5f) {
-		mesh->loadFromFbx(FBX_ASTEROID1, scale);
-	}
-	else {
-		mesh->loadFromFbx(FBX_ASTEROID2, scale);
-	}
+	VKMesh* mesh = new VKMeshInstance(
+		asteroidInstance, aa::Vector3d(0, 0, 0.0f), meshPipeline,
+		asteroidCount++
+	);
 
 	return GameFactory::buildLargeAsteroid(mesh);;
+}
+
+void VulkanGraphicsFactory::draw() {
+	asteroidInstance->draw();
 }
 
 
@@ -242,12 +243,17 @@ void VulkanGraphicsFactory::buildMeshPrereq() {
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT,    2);
-		meshVertexShader->addUniform(16 * sizeof(float)).addTextureUniform(tex).buildUniforms();
+		meshVertexShader->addUniform(16 * sizeof(float), NUM_ASTEROIDS)
+			.addTextureUniform(tex).buildUniforms();
 	}
 
 	meshFragmentShader = new VKShader(asteroidFragmentBinaryContent);
 
 	meshPipeline = VKPipelineBuilder()
 		.setVertexShader(meshVertexShader).setFragmentShader(meshFragmentShader).build();
+
+	asteroidInstance = new VKInstancedMesh(AA_ROOT, meshPipeline, NUM_ASTEROIDS);
+	asteroidInstance->loadFromFbx(FBX_ASTEROID1);
+	asteroidInstance->init();
 
 }

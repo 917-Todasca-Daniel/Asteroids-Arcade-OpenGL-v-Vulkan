@@ -812,7 +812,8 @@ void VulkanRegistrar::recordCommandBuffer(
 	uint32_t               imageIndex,
 	VkBuffer*			   vertexBuffer,
 	VkBuffer*			   indexBuffer,
-	uint32_t			   indexNo
+	uint32_t			   indexNo,
+	uint32_t               instanceCount
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
 	VkViewport					viewport		{ };
@@ -848,7 +849,7 @@ void VulkanRegistrar::recordCommandBuffer(
 			0, nullptr
 		);
 		
-		vkCmdDrawIndexed(buffer, indexNo, 1, 0, 0, 0);
+		vkCmdDrawIndexed(buffer, indexNo, instanceCount, 0, 0, 0);
 	}
 	else {
 		vkCmdDraw(buffer, 3, 1, 0, 0);

@@ -61,6 +61,8 @@ void VKMesh::init()
 {
 	Object3d::init();
 
+	if (vertices.empty()) return;
+
 	createVertexBuffer();
 	createIndexBuffer();
 }
@@ -168,6 +170,87 @@ void VKMesh::draw()
 		}
 
 		pipeline->updateUniform(projection.data(), 16 * sizeof(float));
+	}
+
+}
+
+
+
+VKInstancedMesh::VKInstancedMesh(
+	LogicObject* parent,
+	VKPipeline*  pipeline,
+	uint32_t     noInstances
+) : VKMesh(parent, Vector3d(0, 0, 0), pipeline), 
+	noInstances(noInstances), projectionData(16 * sizeof(float) * noInstances)
+{
+
+}
+
+VKInstancedMesh::~VKInstancedMesh()
+{
+
+}
+
+
+void VKInstancedMesh::draw()
+{
+	Object3d::draw();
+
+	if (rmPending) return;
+
+	VulkanRegistrar::recordCommandBuffer(
+		*VK_COMMAND_BUFFER,
+		pipeline,
+		VK_CURRENT_IMAGE,
+		&vertexBuffer,
+		&indexBuffer,
+		(uint32_t)indices.size(),
+		noInstances
+	);
+
+	pipeline->updateUniform(projectionData.data(), 16 * sizeof(float) * noInstances);
+}
+
+
+VKMeshInstance::VKMeshInstance(
+	VKInstancedMesh* parent,
+	Vector3d         position,
+	VKPipeline*      pipeline,
+	uint32_t         instanceIndex
+) : VKMesh(parent, position, pipeline), instanceIndex(instanceIndex)
+{
+
+}
+
+VKMeshInstance::~VKMeshInstance()
+{
+
+}
+
+
+void aa::VKMeshInstance::draw()
+{
+	Object3d::draw();
+
+	if (rmPending) return;
+
+	{	// translation, scaling and rotation geometry
+		VKInstancedMesh* instancedMesh = dynamic_cast<VKInstancedMesh*> (parent);
+
+		Matrix4d projection = Matrix4d::ViewportMatrix();
+		projection *= Matrix4d::TranslationMatrix(position);
+
+		projection *= Matrix4d::RotateAround(rotation, center);
+
+		for (int i = 0, j; i < 4; i++) {
+			for (j = 0; j < i; j++) {
+				std::swap(projection.data()[4 * i + j], projection.data()[4 * j + i]);
+			}
+		}
+
+		for (int i = 0; i < 16; i++) {
+			instancedMesh->projectionData[instanceIndex * 16 + i] = projection.data()[i];
+		}
 	}
 
 }

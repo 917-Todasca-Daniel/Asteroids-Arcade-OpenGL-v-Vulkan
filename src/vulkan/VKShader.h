@@ -21,9 +21,13 @@ namespace aa
 
         const VkShaderModule vkShaderModule;
 
-        VKShader& addUniform(uint32_t bufferRange);
+        VKShader& addUniform(uint32_t bufferRange, uint32_t instanceCount = 1);
         VKShader& addTextureUniform(VKTexture* tex);
         void buildUniforms();
+
+        uint32_t getInstanceCount() const {
+            return instanceCount;
+        }
 
         const VkDescriptorSetLayout&           getDescriptorLayout      ()           const;
               VkDescriptorSet                  getDescriptorSet         (int index)  const;
@@ -40,6 +44,7 @@ namespace aa
     protected:
         float      bufferRange;
         VKTexture* tex;
+        uint32_t   instanceCount;
 
         std::vector<void*>                        uniformBuffersMapped;
         std::vector<VkBuffer>                     uniformBuffers;

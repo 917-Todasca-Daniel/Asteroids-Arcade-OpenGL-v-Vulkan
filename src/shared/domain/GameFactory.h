@@ -15,6 +15,7 @@ namespace aa
     class VKVertexShader;
     class VKShader;
     class VKTexture;
+    class VKInstancedMesh;
 
     class GLTexture;
     class GLShader;
@@ -32,6 +33,10 @@ namespace aa
         virtual Object3d* buildLargeAsteroid()                             = 0;
 
         static GameFactory* getFactory();
+
+        virtual void draw() {
+
+        }
 
         //  delete all implicit constructors 
         GameFactory(const GameFactory&) = delete;
@@ -81,8 +86,12 @@ namespace aa
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
 
+        virtual void draw() override;
+
 
     private:
+        VKInstancedMesh* asteroidInstance;
+
         VKTexture*      tex;
 
         VKVertexShader* skyVertexShader;
@@ -96,6 +105,8 @@ namespace aa
 
         void buildSkyPrereq();
         void buildMeshPrereq();
+
+        int asteroidCount;
 
     };
 
