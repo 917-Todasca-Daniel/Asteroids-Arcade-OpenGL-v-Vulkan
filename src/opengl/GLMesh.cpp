@@ -57,6 +57,8 @@ void GLMesh::init()
 {
 	Object3d::init();
 
+	if (vertices.empty()) return;
+
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(
@@ -134,5 +136,115 @@ void GLMesh::draw()
 	shader->bind();
 
 	glDrawElements(GL_TRIANGLES, (unsigned int) indices.size(), GL_UNSIGNED_INT, 0);
+
+}
+
+
+
+GLInstancedMesh::GLInstancedMesh(
+	LogicObject* parent,
+	GLShader*	 shader,
+	uint32_t     noInstances
+) : GLMesh(parent, Vector3d(0, 0, 0), shader),
+	noInstances(noInstances), projectionData(16 * sizeof(float) * noInstances)
+{
+
+}
+
+GLInstancedMesh::~GLInstancedMesh()
+{
+
+}
+
+
+void GLInstancedMesh::draw()
+{
+	Object3d::draw();
+
+	if (rmPending) return;
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(
+		0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+		0
+	);
+	glVertexAttribPointer(
+		1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+		(void*)(3 * sizeof(float))
+	);
+	glVertexAttribPointer(
+		2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+		(void*)(6 * sizeof(float))
+	);
+
+	{	// fixed lightning and camera perspective
+		shader->addUniform3f(
+			"u_LightColor",
+			Vector3d(1.0f, 1.0f, 1.0f)
+		);
+		shader->addUniform3f(
+			"u_LightDirection",
+			Vector3d(-1.0f, -1.0f, -1.0f)
+		);
+		shader->addUniform3f(
+			"u_ViewPos",
+			Vector3d(0.0f, 0.0f, 100.0)
+		);
+	}
+
+	{	// translation, scaling and rotation geometry
+		shader->addUniformMat4fv(
+			"u_Projection",
+			projectionData.data(),
+			noInstances
+		);
+	}
+
+	shader->bind(); 
+	
+	glDrawElementsInstanced(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0, noInstances);
+
+}
+
+
+GLMeshInstance::GLMeshInstance(
+	GLInstancedMesh* parent,
+	Vector3d         position,
+	uint32_t         instanceIndex
+) : Mesh(parent, position), instanceIndex(instanceIndex)
+{
+
+}
+
+GLMeshInstance::~GLMeshInstance()
+{
+
+}
+
+
+void GLMeshInstance::draw()
+{
+	Object3d::draw();
+
+	if (rmPending) return;
+
+	{	// translation, scaling and rotation geometry
+		GLInstancedMesh* instancedMesh = dynamic_cast<GLInstancedMesh*> (parent);
+
+		Matrix4d projection = Matrix4d::ViewportMatrix();
+		projection *= Matrix4d::TranslationMatrix(position);
+
+		projection *= Matrix4d::RotateAround(rotation, center);
+
+		for (int i = 0; i < 16; i++) {
+			instancedMesh->projectionData[instanceIndex * 16 + i] = projection.data()[i];
+		}
+	}
 
 }

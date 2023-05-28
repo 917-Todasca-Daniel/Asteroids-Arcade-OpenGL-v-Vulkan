@@ -19,6 +19,7 @@ namespace aa
 
     class GLTexture;
     class GLShader;
+    class GLInstancedMesh;
 
 
     // interface for object factories
@@ -67,10 +68,15 @@ namespace aa
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
 
+        virtual void draw() override;
+
 
     private:
+        GLInstancedMesh*        asteroid;
         std::vector <GLShader*> shaders;
-        GLTexture* asteroidTex;
+        GLTexture*              asteroidTex;
+
+        uint32_t                asteroidIndex = 0;
 
     };
 

@@ -92,7 +92,7 @@ Object3d* GameFactory::buildLargeAsteroid(Mesh* mesh) {
 
 
 
-OpenGLGraphicsFactory::OpenGLGraphicsFactory() : asteroidTex(nullptr)
+OpenGLGraphicsFactory::OpenGLGraphicsFactory() : asteroidTex(nullptr), asteroid(nullptr)
 {
 
 }
@@ -103,7 +103,16 @@ OpenGLGraphicsFactory::~OpenGLGraphicsFactory()
 		delete shader;
 	}
 
+	if (asteroid) delete asteroid;
+
 	if (asteroidTex) delete asteroidTex;
+
+}
+
+
+void OpenGLGraphicsFactory::draw()
+{
+	asteroid->draw();
 
 }
 
@@ -128,26 +137,23 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 			"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
 		).setColorFile("Rock02_BaseColor", "tga")
 			.build();
+
+		GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+			.setVertexShader	("v_3d_mesh")
+			.setFragmentShader	("f_3d_mesh")
+			.addUniformTex		("u_Texture", asteroidTex)
+			.build();
+
+		shaders.push_back(meshShader);
+
+		asteroid = new GLInstancedMesh(AA_ROOT, meshShader, NUM_ASTEROIDS);
+		asteroid->loadFromFbx(FBX_ASTEROID1);
+		asteroid->init();
 	}
-
-	aa::GLShader* meshShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader	("v_3d_mesh")
-		.setFragmentShader	("f_3d_mesh")
-		.addUniformTex		("u_Texture", asteroidTex)
-		.build();
-
-	shaders.push_back(meshShader);
 	
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
-	aa::GLMesh*  obj  = new aa::GLMesh(AA_ROOT, aa::Vector3d(0, 0, 0), meshShader);
-	float type = URand::randBetween(0.0, 1.0f);
-	if (type < 0.5f) {
-		obj->loadFromFbx(FBX_ASTEROID1, scale);
-	}
-	else {
-		obj->loadFromFbx(FBX_ASTEROID2, scale);
-	}
+	Mesh* obj = new GLMeshInstance(asteroid, Vector3d(0, 0, 0), asteroidIndex++);
 
 	return GameFactory::buildLargeAsteroid(obj);;
 }
@@ -192,8 +198,8 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
-	VKMesh* mesh = new VKMeshInstance(
-		asteroidInstance, aa::Vector3d(0, 0, 0.0f), meshPipeline,
+	Mesh* mesh = new VKMeshInstance(
+		asteroidInstance, aa::Vector3d(0, 0, 0.0f), 
 		asteroidCount++
 	);
 

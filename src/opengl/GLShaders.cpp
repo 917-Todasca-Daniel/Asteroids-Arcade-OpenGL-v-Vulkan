@@ -98,6 +98,15 @@ void GLShader::bind()
 			mat4f.value.data()
 		);
 	}
+
+	for (auto& mat4fv : uniformsMat4fv) {
+		glUniformMatrix4fv(
+			glGetUniformLocation(shaderProgram, mat4fv.uniformKey.c_str()),
+			mat4fv.noInstances,
+			GL_TRUE,
+			mat4fv.value
+		);
+	}
 }
 
 
@@ -153,6 +162,21 @@ void GLShader::addUniformMat4f(
 		this->uniformsMat4f,
 		{ uniformKey, value }
 	);
+}
+
+void GLShader::addUniformMat4fv(
+	const std::string& uniformKey,
+	float*             value,
+	uint32_t		   noInstances
+) {
+	for (auto& obj : uniformsMat4fv) {
+		if (obj.uniformKey == uniformKey) {
+			obj.value = value;
+			obj.noInstances = noInstances;
+			return;
+		}
+	}
+	uniformsMat4fv.push_back({uniformKey, value, noInstances});
 }
 
 void GLShader::addUniform1iRef(
