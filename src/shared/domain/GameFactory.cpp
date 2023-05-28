@@ -33,6 +33,9 @@ using namespace aa;
 #define SCALE_MIN 0.4f
 #define SCALE_MAX 0.7f
 
+#define FBX_ASTEROID1 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX"
+#define FBX_ASTEROID2 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX"
+
 
 #ifdef IMPL_VULKAN
 	GameFactory* GameFactory::instance = new VulkanGraphicsFactory();
@@ -138,7 +141,13 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
 	aa::GLMesh*  obj  = new aa::GLMesh(AA_ROOT, aa::Vector3d(0, 0, 0), meshShader);
-	obj->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX", scale);
+	float type = URand::randBetween(0.0, 1.0f);
+	if (type < 0.5f) {
+		obj->loadFromFbx(FBX_ASTEROID1, scale);
+	}
+	else {
+		obj->loadFromFbx(FBX_ASTEROID2, scale);
+	}
 
 	return GameFactory::buildLargeAsteroid(obj);;
 }
@@ -182,7 +191,14 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
 	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
-	mesh->loadFromFbx("D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX", scale);
+
+	float type = URand::randBetween(0.0, 1.0f);
+	if (type < 0.5f) {
+		mesh->loadFromFbx(FBX_ASTEROID1, scale);
+	}
+	else {
+		mesh->loadFromFbx(FBX_ASTEROID2, scale);
+	}
 
 	return GameFactory::buildLargeAsteroid(mesh);;
 }

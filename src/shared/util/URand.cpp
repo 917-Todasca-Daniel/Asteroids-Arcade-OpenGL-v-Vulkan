@@ -36,7 +36,7 @@ Vector3d URand::randAcceleration() {
 
 
 Vector3d URand::randPosition() {
-    float x = -WINDOW_WIDTH * 2.5f;
+    float x =randBetween(- WINDOW_WIDTH * 2.5f, 0);
     float y = -WINDOW_HEIGHT * 4.0f;
 
     return Vector3d(x, y, 0);
