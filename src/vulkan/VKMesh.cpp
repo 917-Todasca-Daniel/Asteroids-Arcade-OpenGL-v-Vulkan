@@ -280,9 +280,9 @@ void aa::VKMeshInstance::draw()
 		projection *= Matrix4d::TranslationMatrix(position);
 		projection *= Matrix4d::ScalingMatrix(scale);
 		projection *= Matrix4d::RotateAround(rotation, center);
-
+		
 		for (int i = 0, j; i < 4; i++) {
-			for (j = 0; j < i; j++) {
+			for (j = 0; j < 4; j++) {
 				instancedMesh->projectionData[instanceIndex * 16 + 4*i + j]
 					= projection.data()[4*j + i];
 			}
