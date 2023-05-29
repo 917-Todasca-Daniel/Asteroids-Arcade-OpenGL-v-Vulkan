@@ -125,7 +125,6 @@ int main() {
 
 			aa::VulkanRegistrar::postdraw();
 		}
-		std::cout << "stop frame\n";
 
 		aa::VulkanRegistrar::loop();
 
