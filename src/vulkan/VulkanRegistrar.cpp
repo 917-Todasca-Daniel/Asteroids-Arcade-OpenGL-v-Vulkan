@@ -813,7 +813,8 @@ void VulkanRegistrar::recordCommandBuffer(
 	VkBuffer*			   vertexBuffer,
 	VkBuffer*			   indexBuffer,
 	uint32_t			   indexNo,
-	uint32_t               instanceCount
+	uint32_t               instanceCount,
+	VkBuffer*			   instanceBuffer
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
 	VkViewport					viewport		{ };
@@ -833,14 +834,23 @@ void VulkanRegistrar::recordCommandBuffer(
 	vkCmdSetScissor		(buffer, 0, 1, &scissor);
 
 	if (indexBuffer) {
-		VkBuffer	 vertexBuffers[] = { *vertexBuffer };
-		VkDeviceSize offsets[]		 = { 0 };
+		if (instanceBuffer) {
+			VkBuffer	 vertexBuffers[] = { *vertexBuffer, *instanceBuffer };
+			VkDeviceSize offsets[]		 = { 0, 0 };
+
+			vkCmdBindVertexBuffers(buffer, 0, 2, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		}
+		else {
+			VkBuffer	 vertexBuffers[] = { *vertexBuffer };
+			VkDeviceSize offsets[]		 = { 0 };
+			
+			vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		}
 
 		auto& pipelineLayout = pipeline->vkPipelineLayout;
 		VkDescriptorSet descriptorSet = pipeline->vertexShader->getDescriptorSet(currentFrame);
-
-		vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 		vkCmdBindDescriptorSets(
 			buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,

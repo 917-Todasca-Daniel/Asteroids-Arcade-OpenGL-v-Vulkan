@@ -42,6 +42,10 @@ namespace aa
         VkBuffer          indexBuffer;
         VkDeviceMemory    indexBufferMemory;
 
+        VkBuffer		  instanceStagingBuffer;
+        VkDeviceMemory	  instanceStagingBufferMemory;
+        void*             instanceDataMapper;
+
         float lifespan;
 
     private:
@@ -66,10 +70,15 @@ namespace aa
         // must be called after all instances' draws
         virtual void draw() override;
 
+        virtual void init() override;
+
 
     private:
         std::vector <float> projectionData;
         uint32_t            noInstances;
+
+        VkBuffer            instanceBuffer;
+        VkDeviceMemory      instanceBufferMemory;
         
         friend class VKMeshInstance;
 

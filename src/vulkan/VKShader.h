@@ -77,10 +77,15 @@ namespace aa
         template <typename uniformType>
         void addBinding(VkFormat vkFormat, int noTuple);
 
+        template <typename uniformType>
+        void addInstanceBinding(VkFormat vkFormat, int noTuple);
+
         const VkVertexInputBindingDescription& getBindingDescription() const;
         
         const std::vector <VkVertexInputAttributeDescription>& 
             getAttributeDescriptions() const;
+
+        VkVertexInputBindingDescription instanceBindingDescription;
 
     private:
         VkVertexInputBindingDescription bindingDescription;
@@ -99,6 +104,22 @@ namespace aa
         attributeDescription.offset = bindingDescription.stride;
 
         bindingDescription.stride += noTuple * sizeof(uniformType);
+
+        attributeDescriptions.push_back(attributeDescription);
+
+    }
+
+
+    template <typename uniformType>
+    void VKVertexShader::addInstanceBinding(VkFormat vkFormat, int noTuple) {
+        VkVertexInputAttributeDescription attributeDescription { };
+
+        attributeDescription.binding = 1;
+        attributeDescription.location = (uint32_t)attributeDescriptions.size();
+        attributeDescription.format = vkFormat;
+        attributeDescription.offset = instanceBindingDescription.stride;
+
+        instanceBindingDescription.stride += noTuple * sizeof(uniformType);
 
         attributeDescriptions.push_back(attributeDescription);
 

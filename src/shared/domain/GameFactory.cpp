@@ -502,7 +502,11 @@ void VulkanInstacedGraphicsFactory::buildMeshPrereq(
 		meshVertexShader = new VKVertexShader(asteroidVertexBinaryContent);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
-		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT,    2);
+		meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
+		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
+		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
+		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
 		meshVertexShader->addUniform(16 * sizeof(float), NUM_ASTEROIDS)
 			.addTextureUniform(asteroidTex).buildUniforms();
 	}

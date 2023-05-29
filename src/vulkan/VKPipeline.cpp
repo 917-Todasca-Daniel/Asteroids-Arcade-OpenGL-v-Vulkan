@@ -188,10 +188,22 @@ void VKPipelineBuilder::createVertexInputInfo(VkPipelineVertexInputStateCreateIn
         auto& attributeDesc = vertexShader->getAttributeDescriptions();
         auto& bindDesc = vertexShader->getBindingDescription();
 
-        createInfo->vertexBindingDescriptionCount   = 1;
-        createInfo->vertexAttributeDescriptionCount = (uint32_t)(attributeDesc.size());
-        createInfo->pVertexBindingDescriptions      = &bindDesc;
-        createInfo->pVertexAttributeDescriptions    = attributeDesc.data();
+        if (vertexShader->instanceBindingDescription.stride > 0) {
+            auto& instDesc = vertexShader->instanceBindingDescription;
+            VkVertexInputBindingDescription bindings[] = { bindDesc, instDesc };
+            createInfo->vertexBindingDescriptionCount   = 2;
+            createInfo->pVertexBindingDescriptions      = bindings;
+            createInfo->vertexAttributeDescriptionCount = 
+                (uint32_t)(attributeDesc.size());
+            createInfo->pVertexAttributeDescriptions    = attributeDesc.data();
+        }
+        else {
+            createInfo->vertexBindingDescriptionCount   = 1;
+            createInfo->pVertexBindingDescriptions      = &bindDesc;
+            createInfo->vertexAttributeDescriptionCount = 
+                (uint32_t)(attributeDesc.size());
+            createInfo->pVertexAttributeDescriptions    = attributeDesc.data();
+        }
     }
 }
 

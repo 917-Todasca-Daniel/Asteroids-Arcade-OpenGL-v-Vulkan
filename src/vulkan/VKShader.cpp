@@ -237,6 +237,9 @@ VKVertexShader::VKVertexShader(const std::vector <char>& spirvCode) :
     bindingDescription.binding      = 0;
     bindingDescription.stride       = 0;
     bindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_VERTEX;
+    instanceBindingDescription.binding      = 1;
+    instanceBindingDescription.stride       = 0;
+    instanceBindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_INSTANCE;
 }
 
 VKVertexShader::~VKVertexShader() {

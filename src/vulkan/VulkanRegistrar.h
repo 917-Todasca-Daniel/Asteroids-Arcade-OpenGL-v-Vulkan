@@ -72,7 +72,8 @@ namespace aa
             VkBuffer*              vertexBuffer = nullptr,
             VkBuffer*              indexBuffer  = nullptr,
             uint32_t               indexNo = 0,
-            uint32_t               instanceCount = 1
+            uint32_t               instanceCount = 1,
+            VkBuffer*              instanceBuffer = nullptr
         );
 
         uint32_t findDeviceMemoryType(uint32_t, VkMemoryPropertyFlags);
