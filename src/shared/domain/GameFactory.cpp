@@ -36,6 +36,16 @@ using namespace aa;
 #define FBX_ASTEROID1 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX"
 #define FBX_ASTEROID2 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX"
 
+#define VK_VERTEX_SHADER		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
+#define VK_FRAG_SHADER			"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
+#define VK_VERTEX_SHADER_INST	"D:/licenta/dev/app/res/vulkan/shaders/v-instanced_3d_mesh.spv"
+#define VK_FRAG_SHADER_INST		"D:/licenta/dev/app/res/vulkan/shaders/f-instanced_3d_mesh.spv"
+
+#define GL_VERTEX_SHADER		"v_3d_mesh"
+#define GL_FRAG_SHADER			"f_3d_mesh"
+#define GL_VERTEX_SHADER_INST	"v_instanced_3d_mesh"
+#define GL_FRAG_SHADER_INST		"f_instanced_3d_mesh"
+
 
 #ifdef IMPL_VULKAN
 	GameFactory* GameFactory::instance = MESH_INSTANCING_ON ?
@@ -64,7 +74,7 @@ GameFactory* GameFactory::getFactory() {
 	return instance;
 }
 
-Object3d* GameFactory::buildLargeAsteroid(Mesh* mesh) {
+Object3d* GameFactory::buildAsteroid(Mesh* mesh) {
 	Vector3d pos		= URand::randPosition();
 	Vector3d acc		= URand::randAcceleration();
 	Quaternion rot		= URand::randRotation();
@@ -138,23 +148,36 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 	}
 
 	GLShader* meshShader = GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader	("v_3d_mesh")
-		.setFragmentShader	("f_3d_mesh")
+		.setVertexShader	(GL_VERTEX_SHADER)
+		.setFragmentShader	(GL_FRAG_SHADER)
 		.addUniformTex		("u_Texture", asteroidTex)
 		.build();
 	shaders.push_back(meshShader);
 
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
-	float type = URand::randBetween(0.0, 1.0f);
-	if (type < 0.5f) {
-		obj->loadFromFbx(FBX_ASTEROID1, scale);
-	}
-	else {
-		obj->loadFromFbx(FBX_ASTEROID2, scale);
+	obj->loadFromFbx(FBX_ASTEROID1, scale);
+
+	return GameFactory::buildAsteroid(obj);
+}
+
+Object3d* OpenGLGraphicsFactory::buildSmallAsteroid() {
+	if (asteroidTex == nullptr) {
+		buildMeshPrereq();
 	}
 
-	return GameFactory::buildLargeAsteroid(obj);
+	GLShader* meshShader = GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+		.setVertexShader	(GL_VERTEX_SHADER)
+		.setFragmentShader	(GL_FRAG_SHADER)
+		.addUniformTex		("u_Texture", asteroidTex)
+		.build();
+	shaders.push_back(meshShader);
+
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
+	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
+	obj->loadFromFbx(FBX_ASTEROID2, scale);
+
+	return GameFactory::buildAsteroid(obj);
 }
 
 
@@ -168,15 +191,18 @@ void OpenGLGraphicsFactory::buildMeshPrereq() {
 
 
 OpenGLInstancedGraphicsFactory::OpenGLInstancedGraphicsFactory() 
-	: asteroidTex(nullptr), asteroidShader(nullptr), asteroidInstance(nullptr), skyShader(nullptr)
+	: asteroidTex(nullptr), skyShader(nullptr)
 {
 
 }
 
 OpenGLInstancedGraphicsFactory::~OpenGLInstancedGraphicsFactory()
 {
-	if (asteroidInstance)	delete asteroidInstance;
-	if (asteroidShader)		delete asteroidShader;
+	for (int i = 0; i < 2; i++) {
+		if (asteroidInstance[i])	delete asteroidInstance[i];
+		if (asteroidShader[i])		delete asteroidShader[i];
+	}
+
 	if (asteroidTex)		delete asteroidTex;
 	if (skyShader)			delete skyShader;
 
@@ -185,8 +211,11 @@ OpenGLInstancedGraphicsFactory::~OpenGLInstancedGraphicsFactory()
 
 void OpenGLInstancedGraphicsFactory::draw()
 {
-	if (asteroidInstance) {
-		asteroidInstance->draw();
+	if (asteroidInstance[0]) {
+		asteroidInstance[0]->draw();
+	}
+	if (asteroidInstance[1]) {
+		asteroidInstance[1]->draw();
 	}
 
 }
@@ -213,10 +242,23 @@ Object3d* OpenGLInstancedGraphicsFactory::buildLargeAsteroid() {
 
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	Mesh* obj = new GLMeshInstance(
-		asteroidInstance, Vector3d(0, 0, 0), 
-		asteroidsIndex ++, scale
+		asteroidInstance[0], Vector3d(0, 0, 0),
+		asteroidsLargeIndex ++, scale
 	);
-	return GameFactory::buildLargeAsteroid(obj);
+	return GameFactory::buildAsteroid(obj);
+}
+
+Object3d* OpenGLInstancedGraphicsFactory::buildSmallAsteroid() {
+	if (asteroidTex == nullptr) {
+		buildMeshPrereq();
+	}
+
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
+	Mesh* obj = new GLMeshInstance(
+		asteroidInstance[1], Vector3d(0, 0, 0),
+		asteroidsSmallIndex ++, scale
+	);
+	return GameFactory::buildAsteroid(obj);
 }
 
 
@@ -226,15 +268,22 @@ void OpenGLInstancedGraphicsFactory::buildMeshPrereq() {
 	).setColorFile("Rock02_BaseColor", "tga")
 		.build();
 
-	asteroidShader = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
-		.setVertexShader	("v_3d_mesh")
-		.setFragmentShader	("f_3d_mesh")
-		.addUniformTex		("u_Texture", asteroidTex)
-		.build();
+	for (int i = 0; i < 2; i++) {
+		asteroidShader[i] = aa::GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+			.setVertexShader	(GL_VERTEX_SHADER_INST)
+			.setFragmentShader	(GL_FRAG_SHADER_INST)
+			.addUniformTex		("u_Texture", asteroidTex)
+			.build();
 
-	asteroidInstance = new GLInstancedMesh(AA_ROOT, asteroidShader, NUM_ASTEROIDS);
-	asteroidInstance->loadFromFbx(FBX_ASTEROID1);
-	asteroidInstance->init();
+		asteroidInstance[i] = new GLInstancedMesh(AA_ROOT, asteroidShader[i], NUM_ASTEROIDS);
+		if (i == 0) {
+			asteroidInstance[i]->loadFromFbx(FBX_ASTEROID1);
+		}
+		else {
+			asteroidInstance[i]->loadFromFbx(FBX_ASTEROID2);
+		}
+		asteroidInstance[i]->init();
+	}
 }
 
 
@@ -283,16 +332,24 @@ Object3d* VulkanGraphicsFactory::buildSky(float height, float width, float* time
 	return new VKRectangle(AA_ROOT, Vector3d(width*0.5f, height*0.5f, 0), height, width, skyPipeline);
 }
 
+
 Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
+	return buildAsteroid(FBX_ASTEROID1);
+}
+Object3d* VulkanGraphicsFactory::buildSmallAsteroid() {
+	return buildAsteroid(FBX_ASTEROID2);
+}
+
+Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath) {
 	if (asteroidTex == nullptr) {
 		buildMeshPrereq();
 	}
 
 	auto asteroidVertexBinaryContent	= UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
+		VK_VERTEX_SHADER
 	);
 	auto asteroidFragmentBinaryContent	= UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
+		VK_FRAG_SHADER
 	);
 
 	// bind vertex shader data
@@ -311,19 +368,13 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 
 	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
-	float type = URand::randBetween(0.0, 1.0f);
-	if (type < 0.5f) {
-		mesh->loadFromFbx(FBX_ASTEROID1, scale);
-	}
-	else {
-		mesh->loadFromFbx(FBX_ASTEROID2, scale);
-	}
+	mesh->loadFromFbx(fbxPath, scale);
 
 	shaders.push_back(meshFragmentShader);
 	shaders.push_back(meshVertexShader);
 	pipelines.push_back(meshPipeline);
 
-	return GameFactory::buildLargeAsteroid(mesh);
+	return GameFactory::buildAsteroid(mesh);
 
 }
 
@@ -342,10 +393,9 @@ void VulkanGraphicsFactory::buildMeshPrereq() {
 
 
 VulkanInstacedGraphicsFactory::VulkanInstacedGraphicsFactory()
-	: asteroidTex(nullptr), skyVertexShader(nullptr), meshVertexShader(nullptr),
-	skyFragmentShader(nullptr), meshFragmentShader(nullptr),
-	skyPipeline(nullptr), meshPipeline(nullptr),
-	asteroidInstance(nullptr)
+	: asteroidTex(nullptr), skyVertexShader(nullptr),
+	skyFragmentShader(nullptr),
+	skyPipeline(nullptr)
 {
 
 }
@@ -354,12 +404,15 @@ VulkanInstacedGraphicsFactory::~VulkanInstacedGraphicsFactory()
 {
 	if (asteroidTex)		delete asteroidTex;
 	if (skyVertexShader)	delete skyVertexShader;
-	if (meshVertexShader)	delete meshVertexShader;
 	if (skyFragmentShader)	delete skyFragmentShader;
-	if (meshFragmentShader) delete meshFragmentShader;
 	if (skyPipeline)		delete skyPipeline;
-	if (meshPipeline)		delete meshPipeline;
-	if (asteroidInstance)   delete asteroidInstance;
+
+	for (int i = 0; i < 2; i++) {
+		if (meshPipeline[i])		delete meshPipeline[i];
+		if (asteroidInstance[i])    delete asteroidInstance[i];
+		if (meshFragmentShader[i])  delete meshFragmentShader[i];
+		if (meshVertexShader[i])	delete meshVertexShader[i];
+	}
 
 }
 
@@ -374,33 +427,75 @@ Object3d* VulkanInstacedGraphicsFactory::buildSky(float height, float width, flo
 
 Object3d* VulkanInstacedGraphicsFactory::buildLargeAsteroid() {
 	if (asteroidTex == nullptr) {
-		buildMeshPrereq();
+		buildAsteroidPrereq();
 	}
 
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	Mesh* mesh = new VKMeshInstance(
-		asteroidInstance, aa::Vector3d(0, 0, 0.0f), 
-		asteroidsCount ++, scale
+		asteroidInstance[0], aa::Vector3d(0, 0, 0.0f),
+		asteroidsLargeCount ++, scale
 	);
-	return GameFactory::buildLargeAsteroid(mesh);
+
+	return GameFactory::buildAsteroid(mesh);
+
+}
+
+Object3d* VulkanInstacedGraphicsFactory::buildSmallAsteroid() {
+	if (asteroidTex == nullptr) {
+		buildAsteroidPrereq();
+	}
+
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
+	Mesh* mesh = new VKMeshInstance(
+		asteroidInstance[1], aa::Vector3d(0, 0, 0.0f),
+		asteroidsSmallCount++, scale
+	);
+
+	return GameFactory::buildAsteroid(mesh);
 
 }
 
 void VulkanInstacedGraphicsFactory::draw()
 {
-	asteroidInstance->draw();
+	if (asteroidInstance[0]) {
+		asteroidInstance[0]->draw();
+	}
+	if (asteroidInstance[1]) {
+		asteroidInstance[1]->draw();
+	}
+
 }
 
 
-void VulkanInstacedGraphicsFactory::buildMeshPrereq() {
+void VulkanInstacedGraphicsFactory::buildAsteroidPrereq() {
 	asteroidTex = new VKTexture();
-	asteroidTex->loadColormap("D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader\\Rock02_BaseColor.tga");
+	asteroidTex->loadColormap(
+		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader\\Rock02_BaseColor.tga"
+	);
+	buildMeshPrereq(
+		meshPipeline[0], asteroidInstance[0],
+		meshVertexShader[0], meshFragmentShader[0],
+		FBX_ASTEROID1
+	);
+	buildMeshPrereq(
+		meshPipeline[1], asteroidInstance[1],
+		meshVertexShader[1], meshFragmentShader[1],
+		FBX_ASTEROID2
+	);
+}
 
+void VulkanInstacedGraphicsFactory::buildMeshPrereq(
+	VKPipeline*&		meshPipeline,
+	VKInstancedMesh*&	asteroidInstance,
+	VKVertexShader*&	meshVertexShader,
+	VKShader*&			meshFragmentShader,
+	const char*			fbxPath
+) {
 	auto asteroidVertexBinaryContent	= UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
+		VK_VERTEX_SHADER_INST
 	);
 	auto asteroidFragmentBinaryContent	= UFile::readBinaryFileContent(
-		"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
+		VK_FRAG_SHADER_INST
 	);
 
 	{	// bind vertex shader data
@@ -417,7 +512,7 @@ void VulkanInstacedGraphicsFactory::buildMeshPrereq() {
 		.setVertexShader(meshVertexShader).setFragmentShader(meshFragmentShader).build();
 
 	asteroidInstance = new VKInstancedMesh(AA_ROOT, meshPipeline, NUM_ASTEROIDS);
-	asteroidInstance->loadFromFbx(FBX_ASTEROID1);
+	asteroidInstance->loadFromFbx(fbxPath);
 	asteroidInstance->init();
 
 }

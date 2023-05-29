@@ -31,6 +31,7 @@ namespace aa
         virtual ~GameFactory();
 
         virtual Object3d* buildSky(float height, float width, float *time) = 0;
+        virtual Object3d* buildSmallAsteroid()                             = 0;
         virtual Object3d* buildLargeAsteroid()                             = 0;
 
         static GameFactory* getFactory();
@@ -48,7 +49,7 @@ namespace aa
 
 
     protected:
-        Object3d* buildLargeAsteroid(Mesh* mesh);
+        Object3d* buildAsteroid(Mesh* mesh);
 
 
     private:
@@ -67,6 +68,7 @@ namespace aa
 
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
+        Object3d* buildSmallAsteroid();
 
         virtual void draw() override;
 
@@ -92,16 +94,18 @@ namespace aa
 
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
+        Object3d* buildSmallAsteroid();
 
         virtual void draw() override;
 
 
     private:
-        GLInstancedMesh*    asteroidInstance;
-        GLShader*           asteroidShader;
+        GLInstancedMesh*    asteroidInstance[2] = {nullptr, nullptr};
+        GLShader*           asteroidShader[2]   = {nullptr, nullptr};
         GLShader*           skyShader;
         GLTexture*          asteroidTex;
-        uint32_t            asteroidsIndex = 0;
+        uint32_t            asteroidsLargeIndex = 0;
+        uint32_t            asteroidsSmallIndex = 0;
 
         void buildMeshPrereq();
 
@@ -118,6 +122,7 @@ namespace aa
 
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
+        Object3d* buildSmallAsteroid();
 
         virtual void draw() override;
 
@@ -128,6 +133,8 @@ namespace aa
         std::vector <VKPipeline*> pipelines;
 
         void buildMeshPrereq();
+
+        Object3d* buildAsteroid(const char* fbxPath);
 
     };
 
@@ -142,27 +149,30 @@ namespace aa
 
         Object3d* buildSky(float, float, float*);
         Object3d* buildLargeAsteroid();
+        Object3d* buildSmallAsteroid();
 
         virtual void draw() override;
 
 
     private:
-        VKInstancedMesh* asteroidInstance;
         VKTexture*       asteroidTex;
 
-        VKVertexShader*  skyVertexShader;
-        VKVertexShader*  meshVertexShader;
+        VKPipeline*      meshPipeline[2]         = {nullptr, nullptr};
+        VKInstancedMesh* asteroidInstance[2]     = {nullptr, nullptr};
+        VKVertexShader*  meshVertexShader[2]     = {nullptr, nullptr};
+        VKShader*        meshFragmentShader[2]   = {nullptr, nullptr};
                          
         VKShader*        skyFragmentShader;
-        VKShader*        meshFragmentShader;
+        VKVertexShader*  skyVertexShader;
                          
         VKPipeline*      skyPipeline;
-        VKPipeline*      meshPipeline;
 
-        uint32_t         asteroidsCount = 0;
+        uint32_t         asteroidsLargeCount = 0;
+        uint32_t         asteroidsSmallCount = 0;
 
         void buildSkyPrereq();
-        void buildMeshPrereq();
+        void buildAsteroidPrereq();
+        void buildMeshPrereq(VKPipeline*&, VKInstancedMesh*&, VKVertexShader*&, VKShader*&, const char*);
 
     };
 

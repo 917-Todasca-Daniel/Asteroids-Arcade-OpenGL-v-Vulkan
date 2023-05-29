@@ -82,6 +82,11 @@ int main() {
 		ast->init();
 		asteroids.push_back(ast);
 	}
+	for (int i = 0; i < NUM_ASTEROIDS; i++) {
+		auto ast = FACTORY->buildSmallAsteroid();
+		ast->init();
+		asteroids.push_back(ast);
+	}
 
 	//	main loop in while()
 
@@ -120,6 +125,7 @@ int main() {
 
 			aa::VulkanRegistrar::postdraw();
 		}
+		std::cout << "stop frame\n";
 
 		aa::VulkanRegistrar::loop();
 

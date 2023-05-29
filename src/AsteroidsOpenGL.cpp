@@ -73,6 +73,11 @@ int main() {
 		ast->init();
 		asteroids.push_back(ast);
 	}
+	for (int i = 0; i < NUM_ASTEROIDS; i++) {
+		auto ast = FACTORY->buildSmallAsteroid();
+		ast->init();
+		asteroids.push_back(ast);
+	}
 
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
