@@ -211,7 +211,11 @@ Object3d* OpenGLInstancedGraphicsFactory::buildLargeAsteroid() {
 		buildMeshPrereq();
 	}
 
-	Mesh* obj = new GLMeshInstance(asteroidInstance, Vector3d(0, 0, 0), asteroidsIndex ++);
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
+	Mesh* obj = new GLMeshInstance(
+		asteroidInstance, Vector3d(0, 0, 0), 
+		asteroidsIndex ++, scale
+	);
 	return GameFactory::buildLargeAsteroid(obj);
 }
 
@@ -296,7 +300,7 @@ Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
 	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
 	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT,    2);
-	meshVertexShader->addUniform(16 * sizeof(float), NUM_ASTEROIDS)
+	meshVertexShader->addUniform(16 * sizeof(float))
 		.addTextureUniform(asteroidTex).buildUniforms();
 
 	auto meshFragmentShader = new VKShader(asteroidFragmentBinaryContent);
@@ -372,10 +376,11 @@ Object3d* VulkanInstacedGraphicsFactory::buildLargeAsteroid() {
 	if (asteroidTex == nullptr) {
 		buildMeshPrereq();
 	}
-	
+
+	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	Mesh* mesh = new VKMeshInstance(
 		asteroidInstance, aa::Vector3d(0, 0, 0.0f), 
-		asteroidsCount ++
+		asteroidsCount ++, scale
 	);
 	return GameFactory::buildLargeAsteroid(mesh);
 

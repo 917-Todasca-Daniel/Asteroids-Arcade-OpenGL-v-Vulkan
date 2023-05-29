@@ -84,7 +84,8 @@ namespace aa
         VKMeshInstance(
             VKInstancedMesh* parent,
             Vector3d         position,
-            uint32_t         instanceIndex
+            uint32_t         instanceIndex,
+            float            scale = 1.0f
         );
         virtual ~VKMeshInstance();
 
@@ -93,6 +94,7 @@ namespace aa
 
     private:
         uint32_t instanceIndex;
+        float    scale;
 
     };
 }

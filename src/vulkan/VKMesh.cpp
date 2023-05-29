@@ -215,8 +215,9 @@ void VKInstancedMesh::draw()
 VKMeshInstance::VKMeshInstance(
 	VKInstancedMesh* parent,
 	Vector3d         position,
-	uint32_t         instanceIndex
-) : Mesh(parent, position), instanceIndex(instanceIndex)
+	uint32_t         instanceIndex,
+	float			 scale
+) : Mesh(parent, position), instanceIndex(instanceIndex), scale(scale)
 {
 
 }
@@ -238,6 +239,7 @@ void aa::VKMeshInstance::draw()
 
 		Matrix4d projection = Matrix4d::ViewportMatrix();
 		projection *= Matrix4d::TranslationMatrix(position);
+		projection *= Matrix4d::ScalingMatrix(scale);
 
 		projection *= Matrix4d::RotateAround(rotation, center);
 

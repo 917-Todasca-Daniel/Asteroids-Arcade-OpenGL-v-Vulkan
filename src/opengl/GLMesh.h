@@ -77,7 +77,8 @@ namespace aa
         GLMeshInstance(
             GLInstancedMesh* parent,
             Vector3d         position,
-            uint32_t         instanceIndex
+            uint32_t         instanceIndex,
+            float            scale
         );
         virtual ~GLMeshInstance();
 
@@ -86,6 +87,7 @@ namespace aa
 
     private:
         uint32_t instanceIndex;
+        float    scale;
 
     };
 

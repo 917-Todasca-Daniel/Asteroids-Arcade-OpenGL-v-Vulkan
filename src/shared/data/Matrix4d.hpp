@@ -32,6 +32,14 @@ namespace aa
             return output;
         }
 
+        static Matrix4d ScalingMatrix(float scale) {
+            Matrix4d output = IdentityMatrix4d();
+            output.elements[0] = scale;
+            output.elements[5] = scale;
+            output.elements[10] = scale;
+            return output;
+        }
+
         static Matrix4d RotateAround(const Quaternion &q, const Vector3d &point) {
             Matrix4d output = TranslationMatrix(point);
             output *= Matrix4d(q);

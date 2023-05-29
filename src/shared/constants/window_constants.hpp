@@ -17,7 +17,7 @@
 
 #define WINDOW_UNIT			1
 
-#define IMPL_VULKAN
+#define IMPL_OPENGL
 
 #define NUM_ASTEROIDS		75
 
