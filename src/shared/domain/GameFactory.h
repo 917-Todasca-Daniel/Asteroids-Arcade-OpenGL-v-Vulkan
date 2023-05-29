@@ -78,6 +78,33 @@ namespace aa
 
         uint32_t                asteroidIndex = 0;
 
+        void buildMeshPrereq();
+
+    };
+
+
+    // concrete implementation for openGL Graphics, uses instancing for building asteroids
+    // built object must not call init
+    class OpenGLInstancedGraphicsFactory final : public GameFactory {
+    public:
+        OpenGLInstancedGraphicsFactory();
+        virtual ~OpenGLInstancedGraphicsFactory();
+
+        Object3d* buildSky(float, float, float*);
+        Object3d* buildLargeAsteroid();
+
+        virtual void draw() override;
+
+
+    private:
+        GLInstancedMesh*    asteroidInstance;
+        GLShader*           asteroidShader;
+        GLShader*           skyShader;
+        GLTexture*          asteroidTex;
+        uint32_t            asteroidsIndex = 0;
+
+        void buildMeshPrereq();
+
     };
 
 
@@ -96,23 +123,46 @@ namespace aa
 
 
     private:
+        VKTexture*                asteroidTex;
+        std::vector <VKShader*>   shaders;
+        std::vector <VKPipeline*> pipelines;
+
+        void buildMeshPrereq();
+
+    };
+
+
+    // concrete implementation for Vulkan Graphics using instancing
+    // built object must not call init
+    // vulkan-related resources are lazy loaded and freed on delete
+    class VulkanInstacedGraphicsFactory final : public GameFactory {
+    public:
+        VulkanInstacedGraphicsFactory();
+        virtual ~VulkanInstacedGraphicsFactory();
+
+        Object3d* buildSky(float, float, float*);
+        Object3d* buildLargeAsteroid();
+
+        virtual void draw() override;
+
+
+    private:
         VKInstancedMesh* asteroidInstance;
+        VKTexture*       asteroidTex;
 
-        VKTexture*      tex;
+        VKVertexShader*  skyVertexShader;
+        VKVertexShader*  meshVertexShader;
+                         
+        VKShader*        skyFragmentShader;
+        VKShader*        meshFragmentShader;
+                         
+        VKPipeline*      skyPipeline;
+        VKPipeline*      meshPipeline;
 
-        VKVertexShader* skyVertexShader;
-        VKVertexShader* meshVertexShader;
-
-        VKShader*       skyFragmentShader;
-        VKShader*       meshFragmentShader;
-
-        VKPipeline*     skyPipeline;
-        VKPipeline*     meshPipeline;
+        uint32_t         asteroidsCount = 0;
 
         void buildSkyPrereq();
         void buildMeshPrereq();
-
-        int asteroidCount;
 
     };
 

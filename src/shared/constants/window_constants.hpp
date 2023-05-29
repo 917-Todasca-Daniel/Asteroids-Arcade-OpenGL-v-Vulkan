@@ -21,4 +21,6 @@
 
 #define NUM_ASTEROIDS		75
 
+#define MESH_INSTANCING_ON  true
+
 #endif	// CONSTANTS_H
