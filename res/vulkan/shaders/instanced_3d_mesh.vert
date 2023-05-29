@@ -5,7 +5,7 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;
 
 layout(binding = 0) uniform UniformBufferObject {
-    mat4 proj[750];
+    mat4 proj[1500];
 } ubo;
 
 layout (location = 0) out vec3 fragPos;

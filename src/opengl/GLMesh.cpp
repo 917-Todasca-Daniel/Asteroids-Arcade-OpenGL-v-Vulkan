@@ -45,6 +45,8 @@ GLMesh::GLMesh(
 GLMesh::~GLMesh()
 {
 	// make sure shader deletion is handled in a module above GLObject3d
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ibo);
 }
 
 
@@ -146,16 +148,32 @@ GLInstancedMesh::GLInstancedMesh(
 	GLShader*	 shader,
 	uint32_t     noInstances
 ) : GLMesh(parent, Vector3d(0, 0, 0), shader),
-	noInstances(noInstances), projectionData(16 * sizeof(float) * noInstances)
+	noInstances(noInstances), 
+	projectionData(16 * sizeof(float) * noInstances),
+	instanceVBO(0)
 {
 
 }
 
 GLInstancedMesh::~GLInstancedMesh()
 {
-
+	glDeleteBuffers(1, &instanceVBO);
 }
 
+
+
+void GLInstancedMesh::init()
+{
+	GLMesh::init();
+	glGenBuffers(1, &instanceVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER, 
+		16 * sizeof(float) * noInstances, 
+		projectionData.data(), 
+		GL_STREAM_DRAW
+	);
+
+}
 
 void GLInstancedMesh::draw()
 {
@@ -198,13 +216,19 @@ void GLInstancedMesh::draw()
 		);
 	}
 
-	{	// translation, scaling and rotation geometry
-		shader->addUniformMat4fv(
-			"u_Projection",
-			projectionData.data(),
-			noInstances
-		);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER,
+		16 * sizeof(float) * noInstances,
+		projectionData.data(),
+		GL_STREAM_DRAW
+	);
+	for (int i = 0; i < 4; i++) {
+		glEnableVertexAttribArray(3 + i);
+		glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float),
+			(void*)(4 * sizeof(float) * i));
+		glVertexAttribDivisor(3 + i, 1);
 	}
+
 
 	shader->bind(); 
 	
@@ -244,8 +268,16 @@ void GLMeshInstance::draw()
 
 		projection *= Matrix4d::RotateAround(rotation, center);
 
+		for (int i = 0, j; i < 4; i++) {
+			for (j = 0; j < i; j++) {
+				std::swap(projection.data()[4 * i + j], 
+					projection.data()[4 * j + i]);
+			}
+		}
+
 		for (int i = 0; i < 16; i++) {
-			instancedMesh->projectionData[instanceIndex * 16 + i] = projection.data()[i];
+			instancedMesh->projectionData[instanceIndex * 16 + i] 
+				= projection.data()[i];
 		}
 	}
 

@@ -59,10 +59,14 @@ namespace aa
         // must be called after all instances' draws
         virtual void draw() override;
 
+        virtual void init() override;
+
 
     private:
         std::vector <float> projectionData;
         uint32_t            noInstances;
+
+        unsigned int        instanceVBO;
 
         friend class GLMeshInstance;
 
