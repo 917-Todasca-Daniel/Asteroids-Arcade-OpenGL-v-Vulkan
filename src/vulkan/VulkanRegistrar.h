@@ -96,7 +96,7 @@ namespace aa
         void postCommand(const VkCommandBuffer&);
 
         // issues a copy command
-        void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize);
+        void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize, uint32_t offset = 0);
 
         void loop();
 

@@ -77,7 +77,7 @@ struct QueueFamilyIndices {
 
 
 #ifdef NDEBUG
-	const bool _enableValidationLayers = true;
+	const bool _enableValidationLayers = false;
 #else
 	const bool _enableValidationLayers = true;
 #endif
@@ -1024,12 +1024,15 @@ void VulkanRegistrar::postCommand(const VkCommandBuffer& commandBuffer) {
 }
 
 
-void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void VulkanRegistrar::copyBuffer(
+	VkBuffer srcBuffer, VkBuffer dstBuffer, 
+	VkDeviceSize size, uint32_t offset)
+{
 	VkCommandBuffer				commandBuffer = preCommand();
 	VkBufferCopy				copyRegion	  { };
 
-	copyRegion.srcOffset = 0;
-	copyRegion.dstOffset = 0; 
+	copyRegion.srcOffset = offset;
+	copyRegion.dstOffset = offset;
 	copyRegion.size		 = size;
 
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
