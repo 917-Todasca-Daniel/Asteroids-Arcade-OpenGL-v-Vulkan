@@ -422,7 +422,13 @@ Object3d* VulkanInstacedGraphicsFactory::buildSky(float height, float width, flo
 		buildSkyPrereq();
 	}
 
-	return new VKRectangle(AA_ROOT, Vector3d(width*0.5f, height*0.5f, 0), height, width, skyPipeline);
+	return new VKRectangle(
+		AA_ROOT, 
+		Vector3d(width*0.5f, height*0.5f, 0), 
+		height, 
+		width, 
+		skyPipeline
+	);
 }
 
 Object3d* VulkanInstacedGraphicsFactory::buildLargeAsteroid() {
@@ -507,7 +513,7 @@ void VulkanInstacedGraphicsFactory::buildMeshPrereq(
 		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
 		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
 		meshVertexShader->addInstanceBinding<float>(VK_FORMAT_R32G32B32A32_SFLOAT, 4);
-		meshVertexShader->addUniform(16 * sizeof(float), NUM_ASTEROIDS)
+		meshVertexShader->addUniform(1 * sizeof(float), 1)
 			.addTextureUniform(asteroidTex).buildUniforms();
 	}
 

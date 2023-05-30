@@ -11,6 +11,8 @@
 
 using namespace aa;
 
+VkVertexInputBindingDescription bindings[2];
+
 
 VKPipeline::VKPipeline(
     const VkPipelineLayoutCreateInfo&   layoutCreateInfo,
@@ -190,7 +192,8 @@ void VKPipelineBuilder::createVertexInputInfo(VkPipelineVertexInputStateCreateIn
 
         if (vertexShader->instanceBindingDescription.stride > 0) {
             auto& instDesc = vertexShader->instanceBindingDescription;
-            VkVertexInputBindingDescription bindings[] = { bindDesc, instDesc };
+            bindings[0] = bindDesc;
+            bindings[1] = instDesc;
             createInfo->vertexBindingDescriptionCount   = 2;
             createInfo->pVertexBindingDescriptions      = bindings;
             createInfo->vertexAttributeDescriptionCount = 

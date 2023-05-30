@@ -16,8 +16,7 @@ using namespace aa;
 #define Y_SCALE_GREATER 2.0f
 
 
-int URand::seed = time(0);
-std::mt19937 rng(time(0));
+std::mt19937 rng(42);
 
 
 float URand::randBetween(float x, float y) {

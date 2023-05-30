@@ -149,7 +149,7 @@ GLInstancedMesh::GLInstancedMesh(
 	uint32_t     noInstances
 ) : GLMesh(parent, Vector3d(0, 0, 0), shader),
 	noInstances(noInstances), 
-	projectionData(16 * sizeof(float) * noInstances),
+	projectionData(16 * noInstances),
 	instanceVBO(0)
 {
 
