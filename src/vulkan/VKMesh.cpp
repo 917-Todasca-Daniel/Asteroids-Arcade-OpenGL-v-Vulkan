@@ -182,7 +182,8 @@ VKInstancedMesh::VKInstancedMesh(
 	uint32_t     noInstances
 ) : VKMesh(parent, Vector3d(0, 0, 0), pipeline), 
 	noInstances(noInstances), projectionData(16 * sizeof(float) * noInstances),
-	instanceBuffer(0), instanceBufferMemory(0)
+	instanceBuffer(0), instanceBufferMemory(0),
+	instanceStagingBuffer(0), instanceStagingBufferMemory(0), instanceDataMapper(0)
 {
 
 }
@@ -232,9 +233,6 @@ void VKInstancedMesh::draw()
 	if (rmPending) return;
 
 	VkDeviceSize bufferSize = sizeof(float) * projectionData.size();
-	
-	memcpy(instanceDataMapper, projectionData.data(), bufferSize);
-
 	VulkanRegistrar::copyBuffer(instanceStagingBuffer, instanceBuffer, bufferSize);
 
 	VulkanRegistrar::recordCommandBuffer(
@@ -280,13 +278,19 @@ void aa::VKMeshInstance::draw()
 		projection *= Matrix4d::TranslationMatrix(position);
 		projection *= Matrix4d::ScalingMatrix(scale);
 		projection *= Matrix4d::RotateAround(rotation, center);
-		
+
 		for (int i = 0, j; i < 4; i++) {
-			for (j = 0; j < 4; j++) {
-				instancedMesh->projectionData[instanceIndex * 16 + 4*i + j]
-					= projection.data()[4*j + i];
+			for (j = 0; j < i; j++) {
+				std::swap(projection.data()[4 * i + j], projection.data()[4 * j + i]);
 			}
 		}
+
+		VkDeviceSize offset = instanceIndex * sizeof(float) * 16;
+
+		float* sourcePtr = projection.data();
+		float* destinationPtr = static_cast<float*>(instancedMesh->instanceDataMapper) + offset;
+
+		memcpy(destinationPtr, sourcePtr, sizeof(float) * 16);
 	}
 
 }

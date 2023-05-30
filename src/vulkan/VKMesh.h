@@ -42,10 +42,6 @@ namespace aa
         VkBuffer          indexBuffer;
         VkDeviceMemory    indexBufferMemory;
 
-        VkBuffer		  instanceStagingBuffer;
-        VkDeviceMemory	  instanceStagingBufferMemory;
-        void*             instanceDataMapper;
-
         float lifespan;
 
     private:
@@ -79,6 +75,10 @@ namespace aa
 
         VkBuffer            instanceBuffer;
         VkDeviceMemory      instanceBufferMemory;
+
+        VkBuffer		    instanceStagingBuffer;
+        VkDeviceMemory	    instanceStagingBufferMemory;
+        void*               instanceDataMapper;
         
         friend class VKMeshInstance;
 

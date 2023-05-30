@@ -55,7 +55,8 @@ const std::vector<const char*> _validationLayers = {
 const std::vector<const char*> _deviceExtensions = {
 	"VK_KHR_swapchain",
 	"VK_KHR_pipeline_library",
-	"VK_EXT_graphics_pipeline_library"
+	"VK_EXT_graphics_pipeline_library",
+	"VK_KHR_push_descriptor"
 };
 
 
