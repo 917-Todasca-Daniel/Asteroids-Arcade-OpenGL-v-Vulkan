@@ -22,7 +22,6 @@ namespace aa
 
 
     private:
-        static int seed;
 
     };
 

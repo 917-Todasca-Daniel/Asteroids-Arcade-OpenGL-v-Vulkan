@@ -13,6 +13,7 @@ using namespace aa;
 VKShader::VKShader(const std::vector <char>& spirvCode) : 
     vkShaderModule(createShaderModule(spirvCode)),
     bufferRange(0.0),
+    instanceCount(1),
     descriptorSetLayout(VkDescriptorSetLayout{}) { }
 
 VKShader::~VKShader() {
@@ -43,8 +44,9 @@ VkShaderModule VKShader::createShaderModule(const std::vector <char>& spirvCode)
 }
 
 
-VKShader& VKShader::addUniform(uint32_t bufferRange) {
+VKShader& VKShader::addUniform(uint32_t bufferRange, uint32_t instanceCount) {
     this->bufferRange = bufferRange;
+    this->instanceCount = instanceCount;
 
     {   // add uniform binding
         VkDescriptorSetLayoutBinding uniformBinding{ };
@@ -124,7 +126,7 @@ void VKShader::createUniformLayout(uint32_t bufferRange) {
         uniformBuffersMapped.resize(VK_MAX_FRAMES_IN_FLIGHT);
 
         for (size_t i = 0; i < VK_MAX_FRAMES_IN_FLIGHT; i++) {
-            VulkanRegistrar::createBuffer(bufferRange,
+            VulkanRegistrar::createBuffer(bufferRange * instanceCount,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 uniformBuffers[i],
@@ -133,7 +135,7 @@ void VKShader::createUniformLayout(uint32_t bufferRange) {
 
             vkMapMemory(
                 *VK_DEVICE, uniformBuffersMemory[i],
-                0, bufferRange, 0, &uniformBuffersMapped[i]
+                0, bufferRange * instanceCount, 0, &uniformBuffersMapped[i]
             );
         }
     }
@@ -201,7 +203,7 @@ void VKShader::createUniformPool(uint32_t bufferRange) {
             if (dw.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
                 bufferInfo.buffer = uniformBuffers[i];
                 bufferInfo.offset = 0;
-                bufferInfo.range  = bufferRange;
+                bufferInfo.range  = bufferRange * instanceCount;
 
                 dw.pBufferInfo    = &bufferInfo;
             }
@@ -235,6 +237,9 @@ VKVertexShader::VKVertexShader(const std::vector <char>& spirvCode) :
     bindingDescription.binding      = 0;
     bindingDescription.stride       = 0;
     bindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_VERTEX;
+    instanceBindingDescription.binding      = 1;
+    instanceBindingDescription.stride       = 0;
+    instanceBindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_INSTANCE;
 }
 
 VKVertexShader::~VKVertexShader() {

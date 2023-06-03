@@ -71,7 +71,9 @@ namespace aa
             uint32_t               imageIndex,
             VkBuffer*              vertexBuffer = nullptr,
             VkBuffer*              indexBuffer  = nullptr,
-            uint32_t               indexNo = 0
+            uint32_t               indexNo = 0,
+            uint32_t               instanceCount = 1,
+            VkBuffer*              instanceBuffer = nullptr
         );
 
         uint32_t findDeviceMemoryType(uint32_t, VkMemoryPropertyFlags);
@@ -94,7 +96,7 @@ namespace aa
         void postCommand(const VkCommandBuffer&);
 
         // issues a copy command
-        void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize);
+        void copyBuffer(VkBuffer, VkBuffer, VkDeviceSize, uint32_t offset = 0);
 
         void loop();
 

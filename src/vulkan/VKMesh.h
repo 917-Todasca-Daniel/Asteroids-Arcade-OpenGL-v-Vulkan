@@ -33,7 +33,7 @@ namespace aa
         virtual void draw();
 
 
-    private:
+    protected:
         // this shader must be managed by a module above
         VKPipeline* pipeline;
 
@@ -44,8 +44,66 @@ namespace aa
 
         float lifespan;
 
+    private:
         void createVertexBuffer();
         void createIndexBuffer();
+
+    };
+
+
+    // implements instancing in vulkan through uniform arrays
+    class VKInstancedMesh : public VKMesh 
+    {
+    
+    public:
+        VKInstancedMesh(
+            LogicObject* parent,
+            VKPipeline*  pipeline,
+            uint32_t     noInstances
+        );
+        virtual ~VKInstancedMesh();
+
+        // must be called after all instances' draws
+        virtual void draw() override;
+
+        virtual void init() override;
+
+
+    private:
+        std::vector <float> projectionData;
+        uint32_t            noInstances;
+
+        VkBuffer            instanceBuffer;
+        VkDeviceMemory      instanceBufferMemory;
+
+        VkBuffer		    instanceStagingBuffer;
+        VkDeviceMemory	    instanceStagingBufferMemory;
+        void*               instanceDataMapper;
+        
+        friend class VKMeshInstance;
+
+    };
+
+
+    // a single instance of a VKInstacedMesh
+    class VKMeshInstance : public Mesh
+    {
+        
+    public:
+        VKMeshInstance(
+            VKInstancedMesh* parent,
+            Vector3d         position,
+            uint32_t         instanceIndex,
+            float            scale = 1.0f
+        );
+        virtual ~VKMeshInstance();
+
+        virtual void draw() override;
+
+
+    private:
+        uint32_t instanceIndex;
+        float    scale;
 
     };
 }

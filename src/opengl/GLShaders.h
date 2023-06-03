@@ -51,6 +51,13 @@ namespace aa
             Matrix4d           value
         );
 
+        // lazy operation until shader is bound
+        void addUniformMat4fv(
+            const std::string& uniformKey,
+            float*             value,
+            uint32_t           noInstances
+        );
+
         void addUniform1iRef(
             const std::string& uniformKey,
             const void*        value
@@ -85,6 +92,11 @@ namespace aa
             std::string     uniformKey;
              Matrix4d       value;
         };
+        struct UniformMat4fv {
+            std::string     uniformKey;
+            float*          value;
+            uint32_t        noInstances;
+        };
         struct Uniform1iRef {
             std::string     uniformKey;
             const void*     value;
@@ -94,6 +106,7 @@ namespace aa
         std::vector <Uniform4f>     uniforms4f;
         std::vector <Uniform3f>     uniforms3f;
         std::vector <UniformMat4f>  uniformsMat4f;
+        std::vector <UniformMat4fv> uniformsMat4fv;
         std::vector <Uniform1iRef>  uniforms1iRef;
 
         static unsigned int compileShader(

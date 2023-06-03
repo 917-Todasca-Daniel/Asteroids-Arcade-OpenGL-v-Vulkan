@@ -43,4 +43,56 @@ namespace aa
 
     };
 
+
+    // implements instancing in opengl through uniform arrays
+    class GLInstancedMesh : public GLMesh
+    {
+
+    public:
+        GLInstancedMesh(
+            LogicObject* parent,
+            GLShader*    shader,
+            uint32_t     noInstances
+        );
+        virtual ~GLInstancedMesh();
+
+        // must be called after all instances' draws
+        virtual void draw() override;
+
+        virtual void init() override;
+
+
+    private:
+        std::vector <float> projectionData;
+        uint32_t            noInstances;
+
+        unsigned int        instanceVBO;
+
+        friend class GLMeshInstance;
+
+    };
+
+
+    // a single instance of a GLInstancedMesh
+    class GLMeshInstance : public Mesh
+    {
+
+    public:
+        GLMeshInstance(
+            GLInstancedMesh* parent,
+            Vector3d         position,
+            uint32_t         instanceIndex,
+            float            scale
+        );
+        virtual ~GLMeshInstance();
+
+        virtual void draw() override;
+
+
+    private:
+        uint32_t instanceIndex;
+        float    scale;
+
+    };
+
 }

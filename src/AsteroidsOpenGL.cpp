@@ -67,8 +67,17 @@ int main() {
 
 	//	main loop in while()
 
-	auto ast = FACTORY->buildLargeAsteroid();
-	ast->init();
+	std::vector <aa::Object3d*> asteroids;
+	for (int i = 0; i < NUM_ASTEROIDS; i++) {
+		auto ast = FACTORY->buildLargeAsteroid();
+		ast->init();
+		asteroids.push_back(ast);
+	}
+	for (int i = 0; i < NUM_ASTEROIDS; i++) {
+		auto ast = FACTORY->buildSmallAsteroid();
+		ast->init();
+		asteroids.push_back(ast);
+	}
 
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
@@ -95,10 +104,16 @@ int main() {
 		previousTime = currentTime;
 
 		sky->loop(lap);
-		ast->loop(lap);
+		for (auto& ast : asteroids) {
+			ast->loop(lap);
+		}
 
 		sky->draw();
-		ast->draw();
+		for (auto& ast : asteroids) {
+			ast->draw();
+		}
+
+		FACTORY->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -110,7 +125,9 @@ int main() {
 	//	cleanup tasks
 
 	delete sky;
-	delete ast;
+	for (auto& ast : asteroids) {
+		delete ast;
+	}
 	delete importer;
 
 	delete FACTORY;

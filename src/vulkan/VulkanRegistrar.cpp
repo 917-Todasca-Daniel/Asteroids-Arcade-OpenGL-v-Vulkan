@@ -55,7 +55,8 @@ const std::vector<const char*> _validationLayers = {
 const std::vector<const char*> _deviceExtensions = {
 	"VK_KHR_swapchain",
 	"VK_KHR_pipeline_library",
-	"VK_EXT_graphics_pipeline_library"
+	"VK_EXT_graphics_pipeline_library",
+	"VK_KHR_push_descriptor"
 };
 
 
@@ -76,7 +77,7 @@ struct QueueFamilyIndices {
 
 
 #ifdef NDEBUG
-	const bool _enableValidationLayers = true;
+	const bool _enableValidationLayers = false;
 #else
 	const bool _enableValidationLayers = true;
 #endif
@@ -812,7 +813,9 @@ void VulkanRegistrar::recordCommandBuffer(
 	uint32_t               imageIndex,
 	VkBuffer*			   vertexBuffer,
 	VkBuffer*			   indexBuffer,
-	uint32_t			   indexNo
+	uint32_t			   indexNo,
+	uint32_t               instanceCount,
+	VkBuffer*			   instanceBuffer
 ) {
 	auto& graphicsPipeline = pipeline->vkPipeline;
 	VkViewport					viewport		{ };
@@ -832,14 +835,23 @@ void VulkanRegistrar::recordCommandBuffer(
 	vkCmdSetScissor		(buffer, 0, 1, &scissor);
 
 	if (indexBuffer) {
-		VkBuffer	 vertexBuffers[] = { *vertexBuffer };
-		VkDeviceSize offsets[]		 = { 0 };
+		if (instanceBuffer) {
+			VkBuffer	 vertexBuffers[] = { *vertexBuffer, *instanceBuffer };
+			VkDeviceSize offsets[]		 = { 0, 0 };
+
+			vkCmdBindVertexBuffers(buffer, 0, 2, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		}
+		else {
+			VkBuffer	 vertexBuffers[] = { *vertexBuffer };
+			VkDeviceSize offsets[]		 = { 0 };
+			
+			vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
+			vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		}
 
 		auto& pipelineLayout = pipeline->vkPipelineLayout;
 		VkDescriptorSet descriptorSet = pipeline->vertexShader->getDescriptorSet(currentFrame);
-
-		vkCmdBindVertexBuffers(buffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(buffer, *indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 		vkCmdBindDescriptorSets(
 			buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -848,7 +860,7 @@ void VulkanRegistrar::recordCommandBuffer(
 			0, nullptr
 		);
 		
-		vkCmdDrawIndexed(buffer, indexNo, 1, 0, 0, 0);
+		vkCmdDrawIndexed(buffer, indexNo, instanceCount, 0, 0, 0);
 	}
 	else {
 		vkCmdDraw(buffer, 3, 1, 0, 0);
@@ -1012,12 +1024,15 @@ void VulkanRegistrar::postCommand(const VkCommandBuffer& commandBuffer) {
 }
 
 
-void VulkanRegistrar::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void VulkanRegistrar::copyBuffer(
+	VkBuffer srcBuffer, VkBuffer dstBuffer, 
+	VkDeviceSize size, uint32_t offset)
+{
 	VkCommandBuffer				commandBuffer = preCommand();
 	VkBufferCopy				copyRegion	  { };
 
-	copyRegion.srcOffset = 0;
-	copyRegion.dstOffset = 0; 
+	copyRegion.srcOffset = offset;
+	copyRegion.dstOffset = offset;
 	copyRegion.size		 = size;
 
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
