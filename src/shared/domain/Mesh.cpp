@@ -17,7 +17,7 @@ using namespace aa;
 
 Mesh::Mesh(LogicObject* parent, Vector3d position)
 	: Object3d(parent, position), rotation(0, 0, 0, 0),
-	center(0, 0, 0)
+	center(0, 0, 0), radius(0)
 {
 
 }
@@ -65,6 +65,8 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags, float scale) {
 						texCoord.y, texCoord.x
 					}
 				);
+
+				radius = std::max(std::max(std::max(radius, abs(pos.x)), abs(pos.y)), abs(pos.z));
 
 				centerX += pos.x * scale, centerY += pos.y * scale, centerZ += pos.z * scale;
 				if (centerX > 2e9 || centerY > 2e9 || centerZ > 2e9) {

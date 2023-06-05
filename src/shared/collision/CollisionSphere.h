@@ -18,7 +18,7 @@ namespace aa
         );
         virtual ~CollisionSphere();
 
-        virtual bool collidesWith(CollisionShape* other) = 0;
+        virtual bool collidesWith(CollisionShape* other);
 
         virtual float getRadius() const {
             return radius;

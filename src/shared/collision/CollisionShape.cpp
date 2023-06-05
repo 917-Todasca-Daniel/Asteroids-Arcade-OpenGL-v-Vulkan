@@ -1,5 +1,7 @@
 #include "CollisionShape.h"
 
+#include "domain/Mesh.h"
+
 #include <iostream>
 
 using namespace aa;

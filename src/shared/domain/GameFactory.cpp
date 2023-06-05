@@ -21,6 +21,9 @@
 #include "domain/RootObject.h"
 #include "domain/Asteroid.h"
 
+#include "collision/CollisionShape.h"
+#include "collision/CollisionSphere.h"
+
 #include "util/UFile.h"
 #include "util/URand.h"
 
@@ -99,9 +102,29 @@ Object3d* GameFactory::buildAsteroid(Mesh* mesh) {
 		acc.y = -acc.y;
 	}
 
-	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, acc, rot, frameRot);
+	CollisionSphere* collision = new CollisionSphere(
+		nullptr,
+		COLLISION_ASTEROID,
+		COLLISION_ASTEROID,
+		mesh->getRadius() * 0.5f
+	);
+	collisions.push_back(collision);
+
+	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, collision, acc, rot, frameRot);
 
 	return asteroid;
+}
+
+
+void GameFactory::draw() 
+{
+	for (auto& c1 : collisions) {
+		for (auto& c2 : collisions) {
+			if (c1 == c2) continue;
+
+			c1->collidesWith(c2);
+		}
+	}
 }
 
 
@@ -124,6 +147,7 @@ OpenGLGraphicsFactory::~OpenGLGraphicsFactory()
 
 void OpenGLGraphicsFactory::draw()
 {
+	GameFactory::draw();
 
 }
 
@@ -211,6 +235,8 @@ OpenGLInstancedGraphicsFactory::~OpenGLInstancedGraphicsFactory()
 
 void OpenGLInstancedGraphicsFactory::draw()
 {
+	GameFactory::draw();
+
 	if (asteroidInstance[0]) {
 		asteroidInstance[0]->draw();
 	}
@@ -380,6 +406,7 @@ Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath) {
 
 void VulkanGraphicsFactory::draw() 
 {
+	GameFactory::draw();
 
 }
 
@@ -463,6 +490,8 @@ Object3d* VulkanInstacedGraphicsFactory::buildSmallAsteroid() {
 
 void VulkanInstacedGraphicsFactory::draw()
 {
+	GameFactory::draw();
+
 	if (asteroidInstance[0]) {
 		asteroidInstance[0]->draw();
 	}

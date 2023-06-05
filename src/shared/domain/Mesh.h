@@ -31,6 +31,11 @@ namespace aa
         Vector3d getCenter() const {
             return center;
         }
+        
+        // O(1) complexity, gets maximum value for vetices coordinates
+        float getRadius() const {
+            return radius;
+        }
 
 
     protected:
@@ -39,6 +44,8 @@ namespace aa
         // contains vertex position, vertex normals, tex coord (for reflecting light)
         std::vector <float>     vertices;
         std::vector <uint32_t>  indices;
+
+        float                   radius;
 
         // by default, the mean average of all points
         Vector3d                center;

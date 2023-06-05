@@ -21,6 +21,8 @@ namespace aa
     class GLShader;
     class GLInstancedMesh;
 
+    class CollisionShape;
+
 
     // interface for object factories
     class GameFactory
@@ -36,9 +38,7 @@ namespace aa
 
         static GameFactory* getFactory();
 
-        virtual void draw() {
-
-        }
+        virtual void draw();
 
         //  delete all implicit constructors 
         GameFactory(const GameFactory&) = delete;
@@ -50,6 +50,7 @@ namespace aa
 
     protected:
         Object3d* buildAsteroid(Mesh* mesh);
+        std::vector <CollisionShape*> collisions;
 
 
     private:
@@ -176,4 +177,4 @@ namespace aa
 
     };
 
-}
+};

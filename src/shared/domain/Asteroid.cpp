@@ -6,16 +6,19 @@
 
 // dev code
 #include "GLMesh.h"
+#include "collision/CollisionShape.h"
 
 using namespace aa;
 
 
 Asteroid::Asteroid(
 	LogicObject* parent, Vector3d position, 
-	Mesh *mesh, Vector3d acceleration, Quaternion initRotation,
+	Mesh* mesh, CollisionShape* collision,
+	Vector3d acceleration, Quaternion initRotation,
 	Quaternion frameRotation
 ) : Object3d(parent, position), asteroidMesh(mesh), acceleration(acceleration), 
-	initRotation(initRotation), frameRotation(frameRotation)
+	initRotation(initRotation), frameRotation(frameRotation),
+	collisionShape(collision)
 {
 
 }
@@ -23,6 +26,7 @@ Asteroid::Asteroid(
 Asteroid::~Asteroid()
 {
 	if (asteroidMesh) delete asteroidMesh;
+	if (collisionShape) delete collisionShape;
 
 }
 
@@ -57,7 +61,11 @@ void Asteroid::loop(float lap)
 	Quaternion rot = frameRotation * lap;
 	rot = rot * asteroidMesh->getRotation();
 	rot.normalize();
+
 	asteroidMesh->setRotation(rot);
+
+	collisionShape->setPosition(position);
+	collisionShape->setRotation(rot);
 
 }
 
