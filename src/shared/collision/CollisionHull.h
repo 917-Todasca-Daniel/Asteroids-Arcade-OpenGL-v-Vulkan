@@ -23,9 +23,12 @@ namespace aa
 
         virtual bool collidesWith(CollisionShape* other);
 
+        virtual void updateAfterLoop() override;
 
-    private:
+
+    protected:
         std::vector <Vector3d> points;
+        std::vector <Vector3d> framePoints;
 
     };
 }

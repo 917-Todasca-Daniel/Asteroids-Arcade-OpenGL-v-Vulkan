@@ -1,6 +1,10 @@
 #pragma once
 
+#include "data/Vector3d.h"
+
 #include "window_constants.hpp"
+
+#include <vector>
 
 
 namespace aa
@@ -28,6 +32,13 @@ namespace aa
 			float& bx, float& by,
 			float& cx, float& cy,
 			float& dx, float& dy
+		);
+
+		// heuristic algorithm for checking the interesection of two distinct
+		// 3d convex objects
+		static bool GJK(
+			const std::vector<Vector3d> &first, 
+			const std::vector<Vector3d> &second
 		);
 
 	private:

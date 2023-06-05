@@ -51,9 +51,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\AsteroidsOpenGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\shared\data\Vector3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
     <ClCompile Include="src\shared\util\URand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\shared\data\Quaternion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\shared\collision\CollisionShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -145,6 +139,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\shared\collision\CollisionHull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AsteroidsOpenGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

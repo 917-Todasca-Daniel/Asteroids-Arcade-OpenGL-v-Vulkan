@@ -30,6 +30,10 @@ namespace aa
 
         virtual bool collidesWith(CollisionShape* other) = 0;
 
+        virtual void updateAfterLoop() {
+
+        }
+
         void setPosition(Vector3d position) {
             this->position = position;
         }

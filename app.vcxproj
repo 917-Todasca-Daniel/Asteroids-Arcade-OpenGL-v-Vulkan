@@ -168,7 +168,6 @@
     <ClCompile Include="src\shared\collision\CollisionHull.cpp" />
     <ClCompile Include="src\shared\collision\CollisionShape.cpp" />
     <ClCompile Include="src\shared\collision\CollisionSphere.cpp" />
-    <ClCompile Include="src\shared\data\Quaternion.cpp" />
     <ClCompile Include="src\shared\data\Vector3d.cpp" />
     <ClCompile Include="src\shared\data\Vector4d.cpp" />
     <ClCompile Include="src\shared\domain\Asteroid.cpp" />

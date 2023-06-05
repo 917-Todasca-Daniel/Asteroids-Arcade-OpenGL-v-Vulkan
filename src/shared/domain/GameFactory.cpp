@@ -141,6 +141,10 @@ CollisionShape* GameFactory::createSmallAsteroidCollision(float scale)
 
 void GameFactory::draw() 
 {
+	for (auto& coll : collisions) {
+		coll->updateAfterLoop();
+	}
+
 	for (auto& c1 : collisions) {
 		for (auto& c2 : collisions) {
 			if (c1 == c2) continue;

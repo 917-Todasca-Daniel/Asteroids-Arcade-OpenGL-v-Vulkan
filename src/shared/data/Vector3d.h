@@ -31,7 +31,6 @@ namespace aa
 
         //  delete all implicit constructors 
         Vector3d()                        = delete;
-        Vector3d& operator = (Vector3d&&) = delete;
 
     };
 

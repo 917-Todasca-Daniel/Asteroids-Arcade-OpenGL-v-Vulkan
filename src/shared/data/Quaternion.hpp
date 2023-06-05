@@ -21,6 +21,14 @@ namespace aa
             return Quaternion(w, x * scalar, y * scalar, z * scalar);
         }
 
+        Vector3d rotatePoint(const Vector3d& point) {
+            Quaternion pointQ(0.0, point.x, point.y, point.z);
+            Quaternion conjugate = Quaternion(w, -x, -y, -z);
+            Quaternion resultQ = *this * pointQ * conjugate;
+
+            return Vector3d((float)resultQ.x, (float)resultQ.y, (float)resultQ.z);
+        }
+
         static Quaternion fromYawPitchRoll(double yaw, double pitch, double roll) {
             double cy = cos(yaw * 0.5);
             double sy = sin(yaw * 0.5);
