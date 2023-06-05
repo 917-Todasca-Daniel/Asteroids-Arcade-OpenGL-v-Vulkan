@@ -17,6 +17,8 @@ namespace aa
 
         Vector3d operator - () const;
 
+        Vector3d operator - (const Vector3d&) const;
+
         // scalar multiplication
         Vector3d operator * (float scalar) const;
 
