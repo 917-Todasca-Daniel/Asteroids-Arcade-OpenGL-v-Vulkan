@@ -37,6 +37,10 @@ namespace aa
             return radius;
         }
 
+        float getScale() const {
+            return scale;
+        }
+
 
     protected:
         Quaternion              rotation;
@@ -49,6 +53,9 @@ namespace aa
 
         // by default, the mean average of all points
         Vector3d                center;
+
+        // may be used to increase/decrease mesh size, default is 1.0
+        float                   scale;
 
         void loadFromFbx(const char* filepath, unsigned int pFlags, float scale);
 

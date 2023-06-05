@@ -30,9 +30,8 @@ namespace aa
         float z;
 
         //  delete all implicit constructors 
-        Vector3d()                  = delete;
-        Vector3d(Vector3d&&)        = delete;
-        Vector3d& operator = (Vector3d&&)       = delete;
+        Vector3d()                        = delete;
+        Vector3d& operator = (Vector3d&&) = delete;
 
     };
 

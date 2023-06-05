@@ -21,7 +21,7 @@
 #include "domain/RootObject.h"
 #include "domain/Asteroid.h"
 
-#include "collision/CollisionShape.h"
+#include "collision/CollisionHull.h"
 #include "collision/CollisionSphere.h"
 
 #include "util/UFile.h"
@@ -38,6 +38,9 @@ using namespace aa;
 
 #define FBX_ASTEROID1 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX"
 #define FBX_ASTEROID2 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX"
+
+#define HULL_ASTEROID1 "D:/licenta/dev/Convex-hull-master/data/mesh-1.out"
+#define HULL_ASTEROID2 "D:/licenta/dev/Convex-hull-master/data/mesh-2.out"
 
 #define VK_VERTEX_SHADER		"D:/licenta/dev/app/res/vulkan/shaders/v-3d_mesh.spv"
 #define VK_FRAG_SHADER			"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
@@ -77,7 +80,7 @@ GameFactory* GameFactory::getFactory() {
 	return instance;
 }
 
-Object3d* GameFactory::buildAsteroid(Mesh* mesh) {
+Object3d* GameFactory::buildAsteroid(Mesh* mesh, CollisionShape *collision) {
 	Vector3d pos		= URand::randPosition();
 	Vector3d acc		= URand::randAcceleration();
 	Quaternion rot		= URand::randRotation();
@@ -102,17 +105,37 @@ Object3d* GameFactory::buildAsteroid(Mesh* mesh) {
 		acc.y = -acc.y;
 	}
 
-	CollisionSphere* collision = new CollisionSphere(
-		nullptr,
-		COLLISION_ASTEROID,
-		COLLISION_ASTEROID,
-		mesh->getRadius() * 0.5f
-	);
-	collisions.push_back(collision);
+	if (collision) {
+		collisions.push_back(collision);
+	}
 
 	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, collision, acc, rot, frameRot);
 
 	return asteroid;
+}
+
+CollisionShape* GameFactory::createLargeAsteroidCollision(float scale)
+{
+	std::vector <Vector3d> points = UFile::readHull(
+		HULL_ASTEROID1
+	);
+	CollisionHull* collisionHull = new CollisionHull(
+		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		points, scale
+	);
+	return collisionHull;
+}
+
+CollisionShape* GameFactory::createSmallAsteroidCollision(float scale)
+{
+	std::vector <Vector3d> points = UFile::readHull(
+		HULL_ASTEROID2
+	);
+	CollisionHull* collisionHull = new CollisionHull(
+		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		points, scale
+	);
+	return collisionHull;
 }
 
 
@@ -178,11 +201,12 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 		.build();
 	shaders.push_back(meshShader);
 
+
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
 	obj->loadFromFbx(FBX_ASTEROID1, scale);
 
-	return GameFactory::buildAsteroid(obj);
+	return GameFactory::buildAsteroid(obj, createLargeAsteroidCollision(scale));
 }
 
 Object3d* OpenGLGraphicsFactory::buildSmallAsteroid() {
@@ -201,7 +225,7 @@ Object3d* OpenGLGraphicsFactory::buildSmallAsteroid() {
 	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
 	obj->loadFromFbx(FBX_ASTEROID2, scale);
 
-	return GameFactory::buildAsteroid(obj);
+	return GameFactory::buildAsteroid(obj, createSmallAsteroidCollision(scale));
 }
 
 
@@ -271,7 +295,8 @@ Object3d* OpenGLInstancedGraphicsFactory::buildLargeAsteroid() {
 		asteroidInstance[0], Vector3d(0, 0, 0),
 		asteroidsLargeIndex ++, scale
 	);
-	return GameFactory::buildAsteroid(obj);
+
+	return GameFactory::buildAsteroid(obj, createLargeAsteroidCollision(scale));
 }
 
 Object3d* OpenGLInstancedGraphicsFactory::buildSmallAsteroid() {
@@ -284,7 +309,8 @@ Object3d* OpenGLInstancedGraphicsFactory::buildSmallAsteroid() {
 		asteroidInstance[1], Vector3d(0, 0, 0),
 		asteroidsSmallIndex ++, scale
 	);
-	return GameFactory::buildAsteroid(obj);
+
+	return GameFactory::buildAsteroid(obj, createSmallAsteroidCollision(scale));
 }
 
 
@@ -360,13 +386,13 @@ Object3d* VulkanGraphicsFactory::buildSky(float height, float width, float* time
 
 
 Object3d* VulkanGraphicsFactory::buildLargeAsteroid() {
-	return buildAsteroid(FBX_ASTEROID1);
+	return buildAsteroid(FBX_ASTEROID1, HULL_ASTEROID1);
 }
 Object3d* VulkanGraphicsFactory::buildSmallAsteroid() {
-	return buildAsteroid(FBX_ASTEROID2);
+	return buildAsteroid(FBX_ASTEROID2, HULL_ASTEROID2);
 }
 
-Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath) {
+Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath, const char* hullPath) {
 	if (asteroidTex == nullptr) {
 		buildMeshPrereq();
 	}
@@ -400,7 +426,15 @@ Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath) {
 	shaders.push_back(meshVertexShader);
 	pipelines.push_back(meshPipeline);
 
-	return GameFactory::buildAsteroid(mesh);
+	std::vector <Vector3d> points = UFile::readHull(
+		hullPath
+	);
+	CollisionHull* collisionHull = new CollisionHull(
+		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		points, scale
+	);
+
+	return GameFactory::buildAsteroid(mesh, collisionHull);
 
 }
 
@@ -469,7 +503,7 @@ Object3d* VulkanInstacedGraphicsFactory::buildLargeAsteroid() {
 		asteroidsLargeCount ++, scale
 	);
 
-	return GameFactory::buildAsteroid(mesh);
+	return GameFactory::buildAsteroid(mesh, createLargeAsteroidCollision(scale));
 
 }
 
@@ -484,7 +518,7 @@ Object3d* VulkanInstacedGraphicsFactory::buildSmallAsteroid() {
 		asteroidsSmallCount++, scale
 	);
 
-	return GameFactory::buildAsteroid(mesh);
+	return GameFactory::buildAsteroid(mesh, createSmallAsteroidCollision(scale));
 
 }
 

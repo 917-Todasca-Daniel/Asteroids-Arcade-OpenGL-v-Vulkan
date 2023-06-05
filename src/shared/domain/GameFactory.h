@@ -49,8 +49,11 @@ namespace aa
 
 
     protected:
-        Object3d* buildAsteroid(Mesh* mesh);
+        Object3d* buildAsteroid(Mesh* mesh, CollisionShape* collision = nullptr);
         std::vector <CollisionShape*> collisions;
+
+        CollisionShape* createLargeAsteroidCollision(float scale = 1.0f);
+        CollisionShape* createSmallAsteroidCollision(float scale = 1.0f);
 
 
     private:
@@ -135,7 +138,7 @@ namespace aa
 
         void buildMeshPrereq();
 
-        Object3d* buildAsteroid(const char* fbxPath);
+        Object3d* buildAsteroid(const char* fbxPath, const char* hullPath);
 
     };
 

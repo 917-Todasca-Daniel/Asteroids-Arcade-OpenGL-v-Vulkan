@@ -17,7 +17,7 @@ using namespace aa;
 
 Mesh::Mesh(LogicObject* parent, Vector3d position)
 	: Object3d(parent, position), rotation(0, 0, 0, 0),
-	center(0, 0, 0), radius(0)
+	center(0, 0, 0), radius(0), scale(1.0)
 {
 
 }
@@ -37,6 +37,8 @@ void Mesh::loadFromFbx(const char* filepath, unsigned int pFlags, float scale) {
 		std::cout << "Trying to load an already loaded mesh!\n";
 		return;
 	}
+
+	this->scale = scale;
 
 	Assimp::Importer* importer = UFile::getAssimpFileReader();
 

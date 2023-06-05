@@ -165,6 +165,7 @@
     <ClCompile Include="src\opengl\GLRectangle.cpp" />
     <ClCompile Include="src\opengl\GLTexture.cpp" />
     <ClCompile Include="src\opengl\GLTriangle.cpp" />
+    <ClCompile Include="src\shared\collision\CollisionHull.cpp" />
     <ClCompile Include="src\shared\collision\CollisionShape.cpp" />
     <ClCompile Include="src\shared\collision\CollisionSphere.cpp" />
     <ClCompile Include="src\shared\data\Quaternion.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\opengl\GLRectangle.h" />
     <ClInclude Include="src\opengl\GLTexture.h" />
     <ClInclude Include="src\opengl\GLTriangle.h" />
+    <ClInclude Include="src\shared\collision\CollisionHull.h" />
     <ClInclude Include="src\shared\collision\CollisionShape.h" />
     <ClInclude Include="src\shared\collision\CollisionSphere.h" />
     <ClInclude Include="src\shared\constants\window_constants.hpp" />

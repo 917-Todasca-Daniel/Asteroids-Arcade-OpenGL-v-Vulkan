@@ -1,6 +1,7 @@
 #include "UFile.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include <assimp/Importer.hpp>
 
@@ -21,7 +22,32 @@ std::string UFile::readFileContent(const std::string& filename) {
     std::string contents;
     std::getline(file, contents, '\0');
 
+    file.close();
+
     return contents;
+}
+
+
+std::vector <Vector3d> UFile::readHull(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        return std::vector<Vector3d>();
+    }
+
+    std::vector<Vector3d> points;
+
+    int numPoints;
+    file >> numPoints;
+
+    float x, y, z;
+    for (int i = 0; i < numPoints; i++) {
+        file >> x >> y >> z;
+        points.emplace_back(x, y, z);
+    }
+
+    file.close();
+
+    return points;
 }
 
 
@@ -29,7 +55,7 @@ std::vector <char> UFile::readBinaryFileContent(const std::string& filename) {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {
-        throw std::runtime_error("failed to open file!");
+        std::cout << "Failed to open file!\n";
     }
 
     size_t fileSize = (size_t)file.tellg();
