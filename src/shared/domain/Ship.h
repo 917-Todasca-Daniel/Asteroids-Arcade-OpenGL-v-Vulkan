@@ -49,6 +49,8 @@ namespace aa
         );
         virtual ~Spaceship();
 
+        void onAsteroidCollision();
+
         virtual void kill() override;
 
         virtual void init();
@@ -65,6 +67,8 @@ namespace aa
         SpaceshipPhysics    physics;
 
         float               sideacc = .0f;
+        bool                hasBeenDestroyed = false;
+        float               timeDestroyed = -2.0f;
 
     };
 

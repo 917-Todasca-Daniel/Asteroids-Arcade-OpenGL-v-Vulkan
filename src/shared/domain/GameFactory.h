@@ -46,7 +46,7 @@ namespace aa
 
 
     protected:
-        Object3d* buildSpaceship(Mesh* mesh, CollisionShape* collision = nullptr);
+        Object3d* buildSpaceship(Mesh* mesh);
 
 
     private:
@@ -54,6 +54,8 @@ namespace aa
         CollisionShape* shipCollision;
 
         static SpaceshipFactory* instance;
+
+        friend class GameFactory;
 
     };
 

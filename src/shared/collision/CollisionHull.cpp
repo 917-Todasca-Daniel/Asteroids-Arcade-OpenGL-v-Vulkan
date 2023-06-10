@@ -55,7 +55,21 @@ bool CollisionHull::collidesWith(CollisionShape* other)
 		auto sphere_cast = dynamic_cast<CollisionSphere*> (other);
 
 		if (sphere_cast) {
-			ret = false;
+			auto boundingDistance = position.getDistanceTo(sphere_cast->getPosition());
+			
+			if (boundingDistance > 8e6) {
+				ret = false;
+			}
+			else {
+				float distanceToCenter = 2e9;
+				for (auto& point : framePoints) {
+					auto v = point - sphere_cast->getPosition();
+					distanceToCenter = std::min(distanceToCenter, point.getSquaredDistanceTo(sphere_cast->getPosition()));
+				}
+				if (distanceToCenter < sphere_cast->getRadius()) {
+					ret = true;
+				}
+			}
 		}
 
 		auto hull_cast = dynamic_cast<CollisionHull*> (other);

@@ -13,11 +13,16 @@ namespace aa
         Vector3d(float x, float y, float z);
         Vector3d(const Vector3d& other);
 
+        float getDistanceTo       (const Vector3d& other) const;
+        float getSquaredDistanceTo(const Vector3d& other) const;
+
         Vector3d& operator = (const Vector3d&);
 
         Vector3d operator - () const;
 
         Vector3d operator - (const Vector3d&) const;
+
+        Vector3d operator + (const Vector3d&) const;
 
         // scalar multiplication
         Vector3d operator * (float scalar) const;

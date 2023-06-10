@@ -32,6 +32,8 @@
 
 #include "window_constants.hpp"
 
+#include <iostream>
+
 using namespace aa;
 
 #define SCALE_MIN 0.4f
@@ -72,7 +74,6 @@ SpaceshipFactory::SpaceshipFactory() : spaceship(nullptr), shipCollision(nullptr
 
 }
 SpaceshipFactory::~SpaceshipFactory() {
-	if (spaceship) delete spaceship;
 	if (shipCollision) delete shipCollision;
 }
 
@@ -81,13 +82,19 @@ SpaceshipFactory* SpaceshipFactory::getFactory() {
 }
 
 
-Object3d* SpaceshipFactory::buildSpaceship(Mesh* mesh, CollisionShape* collision)
+Object3d* SpaceshipFactory::buildSpaceship(Mesh* mesh)
 {
-	return new Spaceship(
+	CollisionShape* collisionSphere = new CollisionSphere(
+		(Object3d*) nullptr, COLLISION_SHIP, COLLISION_ASTEROID,
+		mesh->getRadius() * 0.5f
+	);
+	shipCollision = collisionSphere;
+
+	return spaceship = new Spaceship(
 		AA_ROOT, 
 		Vector3d(0, 0, 0), 
 		mesh, 
-		collision
+		collisionSphere
 	);
 }
 
@@ -174,7 +181,7 @@ Object3d* VulkanSpaceshipFactory::buildSpaceship()
 	shaders.push_back(meshVertexShader);
 	pipelines.push_back(meshPipeline);
 
-	return SpaceshipFactory::buildSpaceship(mesh, nullptr);
+	return SpaceshipFactory::buildSpaceship(mesh);
 }
 
 
@@ -245,7 +252,7 @@ CollisionShape* GameFactory::createLargeAsteroidCollision(float scale)
 		HULL_ASTEROID1
 	);
 	CollisionHull* collisionHull = new CollisionHull(
-		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		nullptr, COLLISION_ASTEROID, COLLISION_SHIP,
 		points, scale
 	);
 	return collisionHull;
@@ -257,7 +264,7 @@ CollisionShape* GameFactory::createSmallAsteroidCollision(float scale)
 		HULL_ASTEROID2
 	);
 	CollisionHull* collisionHull = new CollisionHull(
-		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		nullptr, COLLISION_ASTEROID, COLLISION_SHIP,
 		points, scale
 	);
 	return collisionHull;
@@ -266,15 +273,18 @@ CollisionShape* GameFactory::createSmallAsteroidCollision(float scale)
 
 void GameFactory::draw() 
 {
+	if (SHIP_FACTORY->shipCollision) {
+		SHIP_FACTORY->shipCollision->updateAfterLoop();
+	}
 	for (auto& coll : collisions) {
 		coll->updateAfterLoop();
 	}
 
 	for (auto& c1 : collisions) {
-		for (auto& c2 : collisions) {
-			if (c1 == c2) continue;
-
-			c1->collidesWith(c2);
+		if (SHIP_FACTORY->shipCollision) {
+			if (c1->collidesWith(SHIP_FACTORY->shipCollision)) {
+				((Spaceship*) SHIP_FACTORY->spaceship)->onAsteroidCollision();
+			}
 		}
 	}
 }
@@ -334,6 +344,7 @@ Object3d* OpenGLGraphicsFactory::buildLargeAsteroid() {
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
 	obj->loadFromFbx(FBX_ASTEROID1, scale);
+	std::cout << obj->getRadius();
 
 	return GameFactory::buildAsteroid(obj, createLargeAsteroidCollision(scale));
 }
@@ -353,6 +364,7 @@ Object3d* OpenGLGraphicsFactory::buildSmallAsteroid() {
 	float scale = URand::randBetween(SCALE_MIN, SCALE_MAX);
 	GLMesh* obj  = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
 	obj->loadFromFbx(FBX_ASTEROID2, scale);
+	std::cout << obj->getRadius();
 
 	return GameFactory::buildAsteroid(obj, createSmallAsteroidCollision(scale));
 }

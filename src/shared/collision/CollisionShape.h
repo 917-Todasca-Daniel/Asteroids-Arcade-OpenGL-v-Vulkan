@@ -46,6 +46,10 @@ namespace aa
             return objectLayer;
         }
 
+        Vector3d getPosition() const {
+            return this->position;
+        }
+
         //  delete all implicit constructors 
         CollisionShape()                  = delete;
         CollisionShape(const CollisionShape&)   = delete;

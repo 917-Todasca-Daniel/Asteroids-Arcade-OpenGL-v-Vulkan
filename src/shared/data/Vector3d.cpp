@@ -14,6 +14,16 @@ Vector3d::Vector3d(const Vector3d& other) : x(other.x), y(other.y), z(other.z)
 }
 
 
+float Vector3d::getDistanceTo(const Vector3d& other) const {
+    auto dist = *this - other;
+    return dist.x*dist.x + dist.y*dist.y + dist.z*dist.z;
+}
+
+float Vector3d::getSquaredDistanceTo(const Vector3d& other) const {
+    return sqrt(other.getDistanceTo(*this));
+}
+
+
 Vector3d& Vector3d::operator = (const Vector3d& other)
 {
     this->x = other.x;
@@ -30,6 +40,11 @@ Vector3d Vector3d::operator - () const
 Vector3d Vector3d::operator - (const Vector3d& other) const
 {
     return Vector3d(x-other.x, y-other.y, z-other.z);
+}
+
+Vector3d Vector3d::operator + (const Vector3d& other) const
+{
+    return Vector3d(x + other.x, y + other.y, z + other.z);
 }
 
 Vector3d Vector3d::operator * (float scalar) const

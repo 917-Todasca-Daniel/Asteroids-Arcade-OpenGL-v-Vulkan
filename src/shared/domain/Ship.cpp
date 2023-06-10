@@ -43,6 +43,27 @@ Spaceship::~Spaceship()
 }
 
 
+void Spaceship::onAsteroidCollision() 
+{
+	physics = {
+		Vector3d(.0f, -40.0f, .0f),
+		Vector3d(.0f, .0f, .0f),
+		Vector3d(.0f, .0f, .0f),
+		Vector3d(.0f, .0f, .0f),
+		Quaternion(1.0f, 0.0f, .0f, .0f),
+		Quaternion(1.0f, .0f, 0.0f, 2.0f),
+		Quaternion(1.0f, 1.0f, .0f, .0f),
+		Quaternion(1.0f, .0f, .0f, 2.0f)
+	};
+
+	position = Vector3d(.0f, .0f, .0f);
+	if (timeDestroyed < -1.5f || !hasBeenDestroyed) {
+		timeDestroyed = 1.5f;
+	}
+	hasBeenDestroyed = true;
+}
+
+
 void Spaceship::kill()
 {
 	shipMesh->kill();
@@ -65,6 +86,16 @@ void Spaceship::init()
 void Spaceship::loop(float lap)
 {
 	Object3d::loop(lap);
+
+	timeDestroyed -= lap;
+	if (hasBeenDestroyed) {
+		if (timeDestroyed <= .0f) {
+			hasBeenDestroyed = false;
+		}
+		else {
+			return;
+		}
+	}
 
 	{	// handling input - changing direction (left/right)
 		int rotationDirection = (UInput::isLeftKeyPressed() ? 1 : 0) + (UInput::isRightKeyPressed() ? -1 : 0);
@@ -148,12 +179,20 @@ void Spaceship::loop(float lap)
 	if (position.y > 5300) position.y = -5300;
 	if (position.y < -5300) position.y = 5300;
 
+	if (collisionShape) {
+		collisionShape->setPosition(position);
+		collisionShape->setRotation(physics.meshRotation);
+	}
+
 }
 
 void Spaceship::draw()
 {
 	Object3d::draw();
+	
+	if (!hasBeenDestroyed) {
+		shipMesh->draw();
+	}
 
-	shipMesh->draw();
 
 }
