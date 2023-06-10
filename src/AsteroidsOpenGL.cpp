@@ -82,6 +82,9 @@ int main() {
 		asteroids.push_back(ast);
 	}
 
+	auto ship = SHIP_FACTORY->buildSpaceship();
+	ship->init();
+
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
 
@@ -110,11 +113,13 @@ int main() {
 		for (auto& ast : asteroids) {
 			ast->loop(lap);
 		}
+		ship->loop(lap);
 
 		sky->draw();
 		for (auto& ast : asteroids) {
 			ast->draw();
 		}
+		ship->draw();
 
 		FACTORY->draw();
 
@@ -126,7 +131,8 @@ int main() {
 
 
 	//	cleanup tasks
-
+	
+	delete ship;
 	delete sky;
 	for (auto& ast : asteroids) {
 		delete ast;

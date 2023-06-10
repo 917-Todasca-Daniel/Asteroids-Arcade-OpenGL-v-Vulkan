@@ -148,6 +148,7 @@ int main() {
 
 	//	cleanup tasks
 
+	delete ship;
 	for (auto& ast : asteroids) {
 		delete ast;
 	}
