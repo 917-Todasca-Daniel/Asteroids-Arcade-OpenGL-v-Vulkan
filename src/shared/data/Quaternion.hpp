@@ -21,6 +21,19 @@ namespace aa
             return Quaternion(w, x * scalar, y * scalar, z * scalar);
         }
 
+        Vector3d operator * (const Vector3d& direction) {
+            Quaternion p(0, direction.x, direction.y, direction.z);
+
+            p = *this * p;
+            p = p * !*this;
+
+            double x2 = p.x;
+            double y2 = p.y;
+            double z2 = p.z;
+
+            return Vector3d((float)x2, (float)y2, (float)z2);
+        }
+
         Vector3d rotatePoint(const Vector3d& point) {
             Quaternion pointQ(0.0, point.x, point.y, point.z);
             Quaternion conjugate = Quaternion(w, -x, -y, -z);

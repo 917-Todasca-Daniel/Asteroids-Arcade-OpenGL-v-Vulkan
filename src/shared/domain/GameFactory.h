@@ -2,7 +2,8 @@
 
 #include <vector>
 
-#define FACTORY aa::GameFactory::getFactory()
+#define FACTORY         aa::GameFactory     ::getFactory()
+#define SHIP_FACTORY    aa::SpaceshipFactory::getFactory()
 
 
 namespace aa
@@ -22,6 +23,74 @@ namespace aa
     class GLInstancedMesh;
 
     class CollisionShape;
+
+
+    // interface for ship factories
+    class SpaceshipFactory
+    {
+
+    public:
+        SpaceshipFactory();
+        virtual ~SpaceshipFactory();
+
+        virtual Object3d* buildSpaceship() = 0;
+
+        static SpaceshipFactory* getFactory();
+
+        //  delete all implicit constructors 
+        SpaceshipFactory(const SpaceshipFactory&) = delete;
+        SpaceshipFactory(SpaceshipFactory&&)      = delete;
+
+        SpaceshipFactory& operator = (const SpaceshipFactory&) = delete;
+        SpaceshipFactory& operator = (SpaceshipFactory&&)      = delete;
+
+
+    protected:
+        Object3d* buildSpaceship(Mesh* mesh, CollisionShape* collision = nullptr);
+
+
+    private:
+        Object3d*       spaceship;
+        CollisionShape* shipCollision;
+
+        static SpaceshipFactory* instance;
+
+    };
+
+    // concrete OpenGL factory implementation
+    class OpenGLSpaceshipFactory final : public SpaceshipFactory
+    {
+
+    public:
+        OpenGLSpaceshipFactory();
+        virtual ~OpenGLSpaceshipFactory();
+
+        virtual Object3d* buildSpaceship();
+
+
+    private:
+        std::vector <GLShader*> shaders;
+        GLTexture* shipTex;
+
+    };
+
+    // concrete Vulkan factory implementation
+    class VulkanSpaceshipFactory final : public SpaceshipFactory
+    {
+
+    public:
+        VulkanSpaceshipFactory();
+        virtual ~VulkanSpaceshipFactory();
+
+        virtual Object3d* buildSpaceship();
+
+
+    private:
+        VKTexture* shipTex;
+        std::vector <VKShader*>   shaders;
+        std::vector <VKPipeline*> pipelines;
+
+    };
 
 
     // interface for object factories

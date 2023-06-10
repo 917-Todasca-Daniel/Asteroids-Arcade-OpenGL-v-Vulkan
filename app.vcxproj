@@ -176,9 +176,11 @@
     <ClCompile Include="src\shared\domain\GameFactory.cpp" />
     <ClCompile Include="src\shared\domain\Object3d.cpp" />
     <ClCompile Include="src\shared\domain\RootObject.cpp" />
+    <ClCompile Include="src\shared\domain\Ship.cpp" />
     <ClCompile Include="src\shared\domain\SkyRectangle.cpp" />
     <ClCompile Include="src\shared\util\UColors.cpp" />
     <ClCompile Include="src\shared\util\UFile.cpp" />
+    <ClCompile Include="src\shared\util\UInput.cpp" />
     <ClCompile Include="src\shared\util\UMaths.cpp" />
     <ClCompile Include="src\shared\util\URand.cpp" />
     <ClCompile Include="src\vulkan\VKMesh.cpp" />
@@ -210,9 +212,11 @@
     <ClInclude Include="src\shared\domain\GameFactory.h" />
     <ClInclude Include="src\shared\domain\Object3d.h" />
     <ClInclude Include="src\shared\domain\RootObject.h" />
+    <ClInclude Include="src\shared\domain\Ship.h" />
     <ClInclude Include="src\shared\domain\SkyRectangle.h" />
     <ClInclude Include="src\shared\util\UColors.h" />
     <ClInclude Include="src\shared\util\UFile.h" />
+    <ClInclude Include="src\shared\util\UInput.h" />
     <ClInclude Include="src\shared\util\UMaths.h" />
     <ClInclude Include="src\shared\util\URand.h" />
     <ClInclude Include="src\vulkan\VKMesh.h" />

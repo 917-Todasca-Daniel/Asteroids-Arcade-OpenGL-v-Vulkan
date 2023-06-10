@@ -18,6 +18,7 @@
 #include "shared/domain/Asteroid.h"
 
 #include "util/UFile.h"
+#include "util/UInput.h"
 
 
 
@@ -59,6 +60,8 @@ int main() {
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
 
+	glfwSetKeyCallback(window, aa::UInput::glfwKeyCallback);
+
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 	std::vector<VkExtensionProperties> vkExtensions(extensionCount);
@@ -72,6 +75,8 @@ int main() {
 
 	aa::VulkanRegistrar::registerVulkan(window);
 
+	auto ship = SHIP_FACTORY->buildSpaceship();
+	ship->init();
 
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
@@ -112,6 +117,8 @@ int main() {
 				ast->loop(lap);
 			}
 			sky->loop(lap);
+
+			ship->loop(lap);
 		}
 
 		{	// draw in vulkan
@@ -121,6 +128,8 @@ int main() {
 			for (auto& ast : asteroids) {
 				ast->draw();
 			}
+
+			ship->draw();
 			FACTORY->draw();
 
 			aa::VulkanRegistrar::postdraw();

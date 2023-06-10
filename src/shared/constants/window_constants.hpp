@@ -19,7 +19,7 @@
 
 #define IMPL_OPENGL
 
-#define NUM_ASTEROIDS		75
+#define NUM_ASTEROIDS		4
 
 #define MESH_INSTANCING_ON  true
 

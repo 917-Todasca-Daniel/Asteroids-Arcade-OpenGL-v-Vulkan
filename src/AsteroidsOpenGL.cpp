@@ -19,6 +19,7 @@
 #include "util/UMaths.h"
 #include "util/UFile.h"
 #include "util/UColors.h"
+#include "util/UInput.h"
 
 
 
@@ -56,6 +57,8 @@ int main() {
 
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
+
+	glfwSetKeyCallback(window, aa::UInput::glfwKeyCallback);
 
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Exit on glewInit()..." << std::endl;

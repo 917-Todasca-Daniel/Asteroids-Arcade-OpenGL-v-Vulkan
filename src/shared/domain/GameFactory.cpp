@@ -20,6 +20,7 @@
 // dev includes
 #include "domain/RootObject.h"
 #include "domain/Asteroid.h"
+#include "domain/Ship.h"
 
 #include "collision/CollisionHull.h"
 #include "collision/CollisionSphere.h"
@@ -38,6 +39,7 @@ using namespace aa;
 
 #define FBX_ASTEROID1 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock01.FBX"
 #define FBX_ASTEROID2 "D:/licenta/dev/app/res/shared/fbx/cgtrader/rock02.FBX"
+#define FBX_SHIP	  "D:/licenta/dev/app/res/shared/fbx/cgtrader/ship3.fbx"
 
 #define HULL_ASTEROID1 "D:/licenta/dev/Convex-hull-master/data/mesh-1.out"
 #define HULL_ASTEROID2 "D:/licenta/dev/Convex-hull-master/data/mesh-2.out"
@@ -51,6 +53,129 @@ using namespace aa;
 #define GL_FRAG_SHADER			"f_3d_mesh"
 #define GL_VERTEX_SHADER_INST	"v_instanced_3d_mesh"
 #define GL_FRAG_SHADER_INST		"f_instanced_3d_mesh"
+
+#define SHIP_SCALE				0.25f
+
+
+
+#ifdef IMPL_VULKAN
+	SpaceshipFactory* SpaceshipFactory::instance = (SpaceshipFactory*) new VulkanSpaceshipFactory();
+#endif
+#ifdef IMPL_OPENGL
+	SpaceshipFactory* SpaceshipFactory::instance = (SpaceshipFactory*) new OpenGLSpaceshipFactory();
+#endif
+
+
+
+SpaceshipFactory::SpaceshipFactory() : spaceship(nullptr), shipCollision(nullptr)
+{
+
+}
+SpaceshipFactory::~SpaceshipFactory() {
+	if (spaceship) delete spaceship;
+	if (shipCollision) delete shipCollision;
+}
+
+SpaceshipFactory* SpaceshipFactory::getFactory() {
+	return instance;
+}
+
+
+Object3d* SpaceshipFactory::buildSpaceship(Mesh* mesh, CollisionShape* collision)
+{
+	return new Spaceship(
+		AA_ROOT, 
+		Vector3d(0, 0, 0), 
+		mesh, 
+		collision
+	);
+}
+
+
+OpenGLSpaceshipFactory::OpenGLSpaceshipFactory() : shipTex(nullptr)
+{
+
+}
+OpenGLSpaceshipFactory::~OpenGLSpaceshipFactory() {
+	if (shipTex) delete shipTex;
+	for (auto& shader : shaders) {
+		delete shader;
+	}
+}
+
+Object3d* OpenGLSpaceshipFactory::buildSpaceship() 
+{
+	shipTex = GLTextureFileBuilder(
+		"D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader"
+	)	.setColorFile("Ship_BaseColor2", "jpg")
+		.build();
+
+	GLShader* meshShader = GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+		.setVertexShader(GL_VERTEX_SHADER)
+		.setFragmentShader(GL_FRAG_SHADER)
+		.addUniformTex("u_Texture", shipTex)
+		.build();
+	shaders.push_back(meshShader);
+
+
+	float scale = SHIP_SCALE;
+	GLMesh* obj = new GLMesh(AA_ROOT, Vector3d(0, 0, 0), meshShader);
+	obj->loadFromFbx(FBX_SHIP, scale);
+
+	return SpaceshipFactory::buildSpaceship(obj);
+}
+
+
+VulkanSpaceshipFactory:: VulkanSpaceshipFactory() : shipTex(nullptr)
+{
+
+}
+VulkanSpaceshipFactory::~VulkanSpaceshipFactory() 
+{
+	if (shipTex) delete shipTex;
+	for (auto& shader : shaders) {
+		delete shader;
+	}
+	for (auto& pipeline : pipelines) {
+		delete pipeline;
+	}
+}
+
+Object3d* VulkanSpaceshipFactory::buildSpaceship()
+{
+	shipTex = new VKTexture();
+	shipTex->loadColormap("D:\\licenta\\dev\\app\\res\\shared\\textures\\cgtrader\\Ship_BaseColor2.jpg");
+
+	auto shipVertexBinaryContent = UFile::readBinaryFileContent(
+		VK_VERTEX_SHADER
+	);
+	auto shipFragmentBinaryContent = UFile::readBinaryFileContent(
+		VK_FRAG_SHADER
+	);
+
+	// bind vertex shader data
+	auto meshVertexShader = new VKVertexShader(shipVertexBinaryContent);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+	meshVertexShader->addUniform(16 * sizeof(float))
+		.addTextureUniform(shipTex).buildUniforms();
+
+	auto meshFragmentShader = new VKShader(shipFragmentBinaryContent);
+
+	auto meshPipeline = VKPipelineBuilder()
+		.setVertexShader(meshVertexShader).setFragmentShader(meshFragmentShader).build();
+
+	float scale = SHIP_SCALE;
+	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
+	mesh->loadFromFbx(FBX_SHIP, scale);
+
+	shaders.push_back(meshFragmentShader);
+	shaders.push_back(meshVertexShader);
+	pipelines.push_back(meshPipeline);
+
+	return SpaceshipFactory::buildSpaceship(mesh, nullptr);
+}
 
 
 #ifdef IMPL_VULKAN
