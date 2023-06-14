@@ -34,6 +34,14 @@ namespace aa
 
         }
 
+        Object3d* getParent() const {
+            return parent;
+        }
+
+        void setParent(Object3d* parent) {
+            this->parent = parent;
+        }
+
         void setPosition(Vector3d position) {
             this->position = position;
         }

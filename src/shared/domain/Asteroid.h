@@ -36,6 +36,12 @@ namespace aa
 
         virtual void draw();
 
+        void despawn();
+
+        bool activity() {
+            return isActive;
+        }
+
 
     protected:
         Mesh*           asteroidMesh;
@@ -43,6 +49,8 @@ namespace aa
         Quaternion      initRotation;
         Quaternion      frameRotation;
         CollisionShape* collisionShape;
+
+        bool            isActive = true;
 
     };
 }

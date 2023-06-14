@@ -4,10 +4,13 @@
 
 #define FACTORY         aa::GameFactory     ::getFactory()
 #define SHIP_FACTORY    aa::SpaceshipFactory::getFactory()
+#define LASER_FACTORY   aa::LaserFactory    ::getInstance()
 
 
 namespace aa
 {
+
+    class Laser;
 
     class Object3d;
     class Mesh;
@@ -91,6 +94,71 @@ namespace aa
         VKTexture* shipTex;
         std::vector <VKShader*>   shaders;
         std::vector <VKPipeline*> pipelines;
+
+    };
+
+
+    // interface for laser factories
+    class LaserFactory
+    {
+
+    public:
+        LaserFactory();
+        ~LaserFactory();
+
+        std::vector<Laser*> buildLasers();
+
+        static LaserFactory* getInstance();
+
+        void draw();
+
+        //  delete all implicit constructors 
+        LaserFactory(const LaserFactory&) = delete;
+        LaserFactory(LaserFactory&&) = delete;
+
+        LaserFactory& operator = (const LaserFactory&) = delete;
+        LaserFactory& operator = (LaserFactory&&) = delete;
+
+
+    protected:
+        std::vector <Laser*> lasers;
+
+        static LaserFactory* instance;
+
+        virtual Mesh* createMesh() = 0;
+
+        friend class GameFactory;
+
+    };
+
+    class OpenGLLaserFactory : LaserFactory
+    {
+
+    public:
+        OpenGLLaserFactory();
+        ~OpenGLLaserFactory();
+
+
+    protected:
+        virtual Mesh* createMesh();
+
+        std::vector <GLShader*> shaders;
+
+    };
+
+    class VulkanLaserFactory : LaserFactory
+    {
+
+    public:
+        VulkanLaserFactory();
+        ~VulkanLaserFactory();
+
+
+    protected:
+        virtual Mesh* createMesh();
+
+        std::vector <VKShader*>     shaders;
+        std::vector <VKPipeline*>   pipelines;
 
     };
 

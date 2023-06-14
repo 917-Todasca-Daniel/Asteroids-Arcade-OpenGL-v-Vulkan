@@ -59,5 +59,7 @@ namespace aa
 
         void loadFromFbx(const char* filepath, unsigned int pFlags, float scale);
 
+        friend class LaserFactory;
+
     };
 }

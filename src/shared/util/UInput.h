@@ -26,6 +26,8 @@ namespace aa
 
         static bool isUpKeyPressed();
 
+        static bool isSpaceBarPressed();
+
     };
 
 }

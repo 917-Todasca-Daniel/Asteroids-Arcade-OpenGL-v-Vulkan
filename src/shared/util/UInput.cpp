@@ -9,7 +9,7 @@ using namespace aa;
 
 
 enum USER_KEYS {
-    LEFT_KEY = 0, RIGHT_KEY, UP_KEY, DOWN_KEY, USER_KEYS_COUNT
+    LEFT_KEY = 0, RIGHT_KEY, UP_KEY, DOWN_KEY, SPACE_KEY, USER_KEYS_COUNT
 };
 
 
@@ -32,6 +32,9 @@ void UInput::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int acti
             case GLFW_KEY_DOWN:
                 isKeyPressed[DOWN_KEY]  = true;
                 break;
+            case GLFW_KEY_SPACE:
+                isKeyPressed[SPACE_KEY] = true;
+                break;
         }
     } else if(action == GLFW_RELEASE) {
         switch(key) {
@@ -46,6 +49,9 @@ void UInput::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int acti
                 break;
             case GLFW_KEY_DOWN:
                 isKeyPressed[DOWN_KEY]  = false;
+                break;
+            case GLFW_KEY_SPACE:
+                isKeyPressed[SPACE_KEY] = false;
                 break;
         }
     }
@@ -65,4 +71,8 @@ bool UInput::isUpKeyPressed() {
 
 bool UInput::isDownKeyPressed() {
     return isKeyPressed[DOWN_KEY];
+}
+
+bool UInput::isSpaceBarPressed() {
+    return isKeyPressed[SPACE_KEY];
 }

@@ -49,23 +49,25 @@ void Asteroid::loop(float lap)
 {
 	Object3d::loop(lap);
 
-	position += acceleration * lap * 2;
-	asteroidMesh->setPosition(position);
+	if (isActive) {
+		position += acceleration * lap * 2;
+		asteroidMesh->setPosition(position);
 
-	if (position.x > 6100) position.x = -6100;
-	if (position.x < -6100) position.x = 6100;
+		if (position.x > 6100) position.x = -6100;
+		if (position.x < -6100) position.x = 6100;
 
-	if (position.y > 6100) position.y = -6100;
-	if (position.y < -6100) position.y = 6100;
+		if (position.y > 6100) position.y = -6100;
+		if (position.y < -6100) position.y = 6100;
 
-	Quaternion rot = frameRotation * lap;
-	rot = rot * asteroidMesh->getRotation();
-	rot.normalize();
+		Quaternion rot = frameRotation * lap;
+		rot = rot * asteroidMesh->getRotation();
+		rot.normalize();
 
-	asteroidMesh->setRotation(rot);
+		asteroidMesh->setRotation(rot);
 
-	collisionShape->setPosition(position);
-	collisionShape->setRotation(rot);
+		collisionShape->setPosition(position);
+		collisionShape->setRotation(rot);
+	}
 
 }
 
@@ -73,6 +75,14 @@ void Asteroid::draw()
 {
 	Object3d::draw();
 
-	asteroidMesh->draw();
+	if (isActive) {
+		asteroidMesh->draw();
+	}
 
+}
+
+
+void Asteroid::despawn()
+{
+	isActive = false;
 }

@@ -21,6 +21,7 @@
 #include "domain/RootObject.h"
 #include "domain/Asteroid.h"
 #include "domain/Ship.h"
+#include "domain/Laser.h"
 
 #include "collision/CollisionHull.h"
 #include "collision/CollisionSphere.h"
@@ -50,13 +51,18 @@ using namespace aa;
 #define VK_FRAG_SHADER			"D:/licenta/dev/app/res/vulkan/shaders/f-3d_mesh.spv"
 #define VK_VERTEX_SHADER_INST	"D:/licenta/dev/app/res/vulkan/shaders/v-instanced_3d_mesh.spv"
 #define VK_FRAG_SHADER_INST		"D:/licenta/dev/app/res/vulkan/shaders/f-instanced_3d_mesh.spv"
+#define VK_FRAG_SHADER_LASER	"D:/licenta/dev/app/res/vulkan/shaders/f-3d_laser.spv"
 
 #define GL_VERTEX_SHADER		"v_3d_mesh"
 #define GL_FRAG_SHADER			"f_3d_mesh"
 #define GL_VERTEX_SHADER_INST	"v_instanced_3d_mesh"
 #define GL_FRAG_SHADER_INST		"f_instanced_3d_mesh"
 
+#define GL_FRAG_SHADER_LASER	"f_laser"
+
 #define SHIP_SCALE				0.25f
+
+#define COUNT_LASERS			100
 
 
 
@@ -66,6 +72,136 @@ using namespace aa;
 #ifdef IMPL_OPENGL
 	SpaceshipFactory* SpaceshipFactory::instance = (SpaceshipFactory*) new OpenGLSpaceshipFactory();
 #endif
+
+
+
+#ifdef IMPL_VULKAN
+	LaserFactory* LaserFactory::instance = (LaserFactory*) new VulkanLaserFactory();
+#endif
+#ifdef IMPL_OPENGL
+	LaserFactory* LaserFactory::instance = (LaserFactory*) new OpenGLLaserFactory();
+#endif
+
+
+
+LaserFactory::LaserFactory() {
+
+}
+
+LaserFactory::~LaserFactory() {
+	for (auto& laser : lasers) {
+		delete laser;
+	}
+
+}
+
+LaserFactory* LaserFactory::getInstance() {
+	return instance;
+}
+
+std::vector<Laser*> LaserFactory::buildLasers() {
+	for (int i = 0; i < COUNT_LASERS; i++) {
+		auto mesh = createMesh();
+		CollisionShape* collision = new CollisionSphere(
+			nullptr,
+			COLLISION_GUN, COLLISION_ASTEROID,
+			1000.0f
+		);
+		mesh->vertices.insert(
+			mesh->vertices.end(),
+			{ 
+				 3,  100, 0.5f, 0, 0, 0, 0, 0,
+				 3, -100, 0.5f, 0, 0, 0, 0, 0,
+				-3, -100, 0.5f, 0, 0, 0, 0, 0,
+				-3,  100, 0.5f, 0, 0, 0, 0, 0
+			}
+		);
+		mesh->indices.insert(
+			mesh->indices.end(),
+			{ 
+				0, 1, 2, 2, 3, 0
+			}
+		);
+		mesh->init();
+		auto laser = new Laser(AA_ROOT, Vector3d(0, 0, 0), mesh, collision);
+		lasers.push_back(laser);
+	}
+
+	return lasers;
+}
+
+void LaserFactory::draw() {
+
+}
+
+
+
+OpenGLLaserFactory::OpenGLLaserFactory() : LaserFactory() {
+
+}
+
+OpenGLLaserFactory::~OpenGLLaserFactory() {
+	for (auto& shader : shaders) {
+		delete shader;
+	}
+
+}
+
+Mesh* OpenGLLaserFactory::createMesh() {
+	auto shader = GLShaderFileBuilder("D:/licenta/dev/app/res/opengl/shaders")
+		.setVertexShader(GL_VERTEX_SHADER)
+		.setFragmentShader(GL_FRAG_SHADER_LASER)
+		.build();
+	shaders.push_back(shader);
+
+	return new GLMesh(AA_ROOT, Vector3d(0, 0, 0), shader);
+}
+
+
+
+VulkanLaserFactory::VulkanLaserFactory() : LaserFactory() {
+
+}
+
+VulkanLaserFactory::~VulkanLaserFactory() {
+	for (auto& shader : shaders) {
+		delete shader;
+	}
+	for (auto& pipeline : pipelines) {
+		delete pipeline;
+	}
+
+}
+
+Mesh* VulkanLaserFactory::createMesh() {
+	auto vertexBinaryContent = UFile::readBinaryFileContent(
+		VK_VERTEX_SHADER
+	);
+	auto fragmentBinaryContent = UFile::readBinaryFileContent(
+		VK_FRAG_SHADER_LASER
+	);
+
+	// bind vertex shader data
+	auto meshVertexShader = new VKVertexShader(vertexBinaryContent);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32B32_SFLOAT, 3);
+	meshVertexShader->addBinding<float>(VK_FORMAT_R32G32_SFLOAT, 2);
+	meshVertexShader->addUniform(16 * sizeof(float)).buildUniforms();
+
+	auto meshFragmentShader = new VKShader(fragmentBinaryContent);
+
+	auto meshPipeline = VKPipelineBuilder()
+		.setVertexShader(meshVertexShader).setFragmentShader(meshFragmentShader).build();
+
+
+	VKMesh* mesh = new VKMesh(AA_ROOT, aa::Vector3d(0, 0, 0.0f), meshPipeline);
+
+	shaders.push_back(meshFragmentShader);
+	shaders.push_back(meshVertexShader);
+	pipelines.push_back(meshPipeline);
+
+	return mesh;
+}
 
 
 
@@ -237,11 +373,12 @@ Object3d* GameFactory::buildAsteroid(Mesh* mesh, CollisionShape *collision) {
 		acc.y = -acc.y;
 	}
 
+	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, collision, acc, rot, frameRot);
+
 	if (collision) {
 		collisions.push_back(collision);
+		collision->setParent(asteroid);
 	}
-
-	Asteroid* asteroid = new Asteroid(AA_ROOT, pos, mesh, collision, acc, rot, frameRot);
 
 	return asteroid;
 }
@@ -252,7 +389,7 @@ CollisionShape* GameFactory::createLargeAsteroidCollision(float scale)
 		HULL_ASTEROID1
 	);
 	CollisionHull* collisionHull = new CollisionHull(
-		nullptr, COLLISION_ASTEROID, COLLISION_SHIP,
+		nullptr, COLLISION_ASTEROID, COLLISION_SHIP | COLLISION_GUN,
 		points, scale
 	);
 	return collisionHull;
@@ -281,9 +418,18 @@ void GameFactory::draw()
 	}
 
 	for (auto& c1 : collisions) {
+		auto asteroid = (Asteroid*) c1->getParent();
+		if (!asteroid->activity()) continue;
+
 		if (SHIP_FACTORY->shipCollision) {
 			if (c1->collidesWith(SHIP_FACTORY->shipCollision)) {
 				((Spaceship*) SHIP_FACTORY->spaceship)->onAsteroidCollision();
+			}
+		}
+		for (auto& laser : LASER_FACTORY->lasers) {
+			if (!laser->activity()) continue;
+			if (c1->collidesWith(laser->getCollision())) {
+				laser->onAsteroidCollision(asteroid);
 			}
 		}
 	}

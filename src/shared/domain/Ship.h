@@ -59,6 +59,10 @@ namespace aa
 
         virtual void draw();
 
+        void setLasers(std::vector <class Laser*> lasers) {
+            this->lasers = lasers;
+        }
+
 
     protected:
         Mesh*               shipMesh;
@@ -69,6 +73,16 @@ namespace aa
         float               sideacc = .0f;
         bool                hasBeenDestroyed = false;
         float               timeDestroyed = -2.0f;
+        float               shooterTimer = 0.0f;
+
+
+    private:
+        void handleRotation(float);
+        void handleShooting(float);
+        void moveForward(float);
+
+        std::vector <Laser*> lasers;
+        int laserIdx = 0;
 
     };
 

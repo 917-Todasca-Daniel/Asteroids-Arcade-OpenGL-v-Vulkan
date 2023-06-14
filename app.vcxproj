@@ -171,6 +171,7 @@
     <ClCompile Include="src\shared\data\Vector3d.cpp" />
     <ClCompile Include="src\shared\data\Vector4d.cpp" />
     <ClCompile Include="src\shared\domain\Asteroid.cpp" />
+    <ClCompile Include="src\shared\domain\Laser.cpp" />
     <ClCompile Include="src\shared\domain\LogicObject.cpp" />
     <ClCompile Include="src\shared\domain\Mesh.cpp" />
     <ClCompile Include="src\shared\domain\GameFactory.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="src\shared\data\Vector3d.h" />
     <ClInclude Include="src\shared\data\Vector4d.h" />
     <ClInclude Include="src\shared\domain\Asteroid.h" />
+    <ClInclude Include="src\shared\domain\Laser.h" />
     <ClInclude Include="src\shared\domain\LogicObject.h" />
     <ClInclude Include="src\shared\domain\Mesh.h" />
     <ClInclude Include="src\shared\domain\GameFactory.h" />

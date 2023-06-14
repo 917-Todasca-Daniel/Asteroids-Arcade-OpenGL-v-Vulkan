@@ -15,6 +15,8 @@
 #include "shared/domain/Asteroid.h"
 #include "shared/domain/SkyRectangle.h"
 #include "shared/domain/GameFactory.h"
+#include "shared/domain/Laser.h"
+#include "shared/domain/ship.h"
 
 #include "util/UMaths.h"
 #include "util/UFile.h"
@@ -88,6 +90,12 @@ int main() {
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
 
+	auto lasers = LASER_FACTORY->buildLasers();
+	for (auto& laser : lasers) {
+		laser->init();
+	}
+	((aa::Spaceship*)ship)->setLasers(lasers);
+
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
@@ -115,12 +123,19 @@ int main() {
 		}
 		ship->loop(lap);
 
+		for (auto& laser : lasers) {
+			laser->loop(lap);
+		}
+
 		sky->draw();
 		for (auto& ast : asteroids) {
 			ast->draw();
 		}
 		ship->draw();
-
+		for (auto& laser : lasers) {
+			laser->draw();
+		}
+		
 		FACTORY->draw();
 
 		glfwSwapBuffers(window);

@@ -16,6 +16,8 @@
 
 #include "shared/domain/RootObject.h"
 #include "shared/domain/Asteroid.h"
+#include "shared/domain/Laser.h"
+#include "shared/domain/ship.h"
 
 #include "util/UFile.h"
 #include "util/UInput.h"
@@ -81,6 +83,12 @@ int main() {
 	auto sky = new aa::SkyRectangle(AA_ROOT);
 	sky->init();
 
+	auto lasers = LASER_FACTORY->buildLasers();
+	for (auto& laser : lasers) {
+		laser->init();
+	}
+	((aa::Spaceship*)ship)->setLasers(lasers);
+
 	std::vector <aa::Object3d*> asteroids;
 	for (int i = 0; i < NUM_ASTEROIDS; i++) {
 		auto ast = FACTORY->buildLargeAsteroid();
@@ -92,6 +100,7 @@ int main() {
 		ast->init();
 		asteroids.push_back(ast);
 	}
+	((aa::Spaceship*)ship)->setLasers(lasers);
 
 	//	main loop in while()
 
@@ -119,6 +128,9 @@ int main() {
 			sky->loop(lap);
 
 			ship->loop(lap);
+			for (auto& laser : lasers) {
+				laser->loop(lap);
+			}
 		}
 
 		{	// draw in vulkan
@@ -130,6 +142,9 @@ int main() {
 			}
 
 			ship->draw();
+			for (auto& laser : lasers) {
+				laser->draw();
+			}
 			FACTORY->draw();
 
 			aa::VulkanRegistrar::postdraw();

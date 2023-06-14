@@ -10,6 +10,8 @@
 #include "collision/CollisionShape.h"
 #include "util/UInput.h"
 
+#include "domain/Laser.h"
+
 
 using namespace aa;
 
@@ -97,6 +99,37 @@ void Spaceship::loop(float lap)
 		}
 	}
 
+	handleRotation(lap);
+	moveForward(lap);
+
+	handleShooting(lap);
+
+	if (position.x > 5300) position.x = -5300;
+	if (position.x < -5300) position.x = 5300;
+
+	if (position.y > 5300) position.y = -5300;
+	if (position.y < -5300) position.y = 5300;
+
+	if (collisionShape) {
+		collisionShape->setPosition(position);
+		collisionShape->setRotation(physics.meshRotation);
+	}
+
+}
+
+void Spaceship::draw()
+{
+	Object3d::draw();
+	
+	if (!hasBeenDestroyed) {
+		shipMesh->draw();
+	}
+
+}
+
+
+void Spaceship::handleRotation(float lap)
+{
 	{	// handling input - changing direction (left/right)
 		int rotationDirection = (UInput::isLeftKeyPressed() ? 1 : 0) + (UInput::isRightKeyPressed() ? -1 : 0);
 
@@ -145,12 +178,27 @@ void Spaceship::loop(float lap)
 
 		shipMesh->setRotation(frameRotation);
 	}
+}
 
+void Spaceship::handleShooting(float lap)
+{
+	shooterTimer += lap;
+	if (UInput::isSpaceBarPressed() && shooterTimer > 0.33f) {
+		shooterTimer = 0;
+		
+		auto& laser = lasers[laserIdx++];
+		laserIdx %= lasers.size();
+		laser->spawn(position, physics.rotation);
+	}
+}
+
+void Spaceship::moveForward(float lap)
+{
 	{	// handling input - moving forward
 		int inputPower = (UInput::isUpKeyPressed() ? -1 : 0);
 
 		auto additiveFrameMovement = physics.forwardAcceleration * lap * inputPower;
-		
+
 		physics.forwardSpeed += physics.rotation * additiveFrameMovement;
 
 		float ratio = 1.0f;
@@ -171,28 +219,4 @@ void Spaceship::loop(float lap)
 		position += physics.forwardSpeed;
 		shipMesh->setPosition(position);
 	}
-
-
-	if (position.x > 5300) position.x = -5300;
-	if (position.x < -5300) position.x = 5300;
-
-	if (position.y > 5300) position.y = -5300;
-	if (position.y < -5300) position.y = 5300;
-
-	if (collisionShape) {
-		collisionShape->setPosition(position);
-		collisionShape->setRotation(physics.meshRotation);
-	}
-
-}
-
-void Spaceship::draw()
-{
-	Object3d::draw();
-	
-	if (!hasBeenDestroyed) {
-		shipMesh->draw();
-	}
-
-
 }
