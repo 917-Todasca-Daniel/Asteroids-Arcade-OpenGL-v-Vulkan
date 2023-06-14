@@ -1,7 +1,10 @@
 # Asteroids Arcade Game: OpenGL vs Vulkan
-
+Code source of my Bachelor's Thesis for UBB 2023, a comparison between Vulkan 1.3 and OpenGL 4.7 Graphics APIs in terms of performance and the development process. Implements a copy of the Arcade classic game, [Asteroids](https://www.echalk.co.uk/amusements/Games/asteroidsClassic/ateroids.html).
 
 ## Images  
+![14 June](img/14-june.png)
+*14 june 2023: Screenshot of the test program*
+
 ![29 May](img/29-may.png)                 
 *29 may 2023: Many asteroids!*
 
