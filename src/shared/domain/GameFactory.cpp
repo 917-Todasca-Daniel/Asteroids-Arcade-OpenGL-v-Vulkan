@@ -401,7 +401,7 @@ CollisionShape* GameFactory::createSmallAsteroidCollision(float scale)
 		HULL_ASTEROID2
 	);
 	CollisionHull* collisionHull = new CollisionHull(
-		nullptr, COLLISION_ASTEROID, COLLISION_SHIP,
+		nullptr, COLLISION_ASTEROID, COLLISION_GUN | COLLISION_SHIP,
 		points, scale
 	);
 	return collisionHull;
@@ -717,7 +717,7 @@ Object3d* VulkanGraphicsFactory::buildAsteroid(const char *fbxPath, const char* 
 		hullPath
 	);
 	CollisionHull* collisionHull = new CollisionHull(
-		nullptr, COLLISION_ASTEROID, COLLISION_ASTEROID,
+		nullptr, COLLISION_ASTEROID, COLLISION_GUN | COLLISION_SHIP,
 		points, scale
 	);
 

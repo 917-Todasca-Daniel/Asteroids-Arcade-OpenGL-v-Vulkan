@@ -106,6 +106,7 @@ void Laser::spawn(Vector3d position, Quaternion forwardDirection) {
 	this->setPosition(position);
 
 	isActive = true;
+	activityTimer = 0.0f;
 
 	laserMesh->setPosition(position);
 	laserMesh->setRotation(forwardDirection);

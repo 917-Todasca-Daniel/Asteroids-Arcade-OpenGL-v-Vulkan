@@ -24,7 +24,7 @@ Spaceship::Spaceship(
 ) : Object3d(parent, position), shipMesh(mesh),
 	collisionShape(collision),
 	physics {
-		Vector3d	(.0f, -40.0f, .0f),
+		Vector3d	(.0f, -30.0f, .0f),
 		Vector3d	(.0f, .0f, .0f),
 		Vector3d	(.0f, .0f, .0f),
 		Vector3d	(.0f, .0f, .0f),
@@ -48,7 +48,7 @@ Spaceship::~Spaceship()
 void Spaceship::onAsteroidCollision() 
 {
 	physics = {
-		Vector3d(.0f, -40.0f, .0f),
+		Vector3d(.0f, -30.0f, .0f),
 		Vector3d(.0f, .0f, .0f),
 		Vector3d(.0f, .0f, .0f),
 		Vector3d(.0f, .0f, .0f),
@@ -186,9 +186,16 @@ void Spaceship::handleShooting(float lap)
 	if (UInput::isSpaceBarPressed() && shooterTimer > 0.33f) {
 		shooterTimer = 0;
 		
-		auto& laser = lasers[laserIdx++];
+		auto laser = lasers[laserIdx++];
 		laserIdx %= lasers.size();
-		laser->spawn(position, physics.rotation);
+
+		Vector3d offset(-100, 0, 0);
+		laser->spawn(position + physics.rotation * offset, physics.rotation);
+
+		laser = lasers[laserIdx++];
+		laserIdx %= lasers.size();
+		offset.x = 100;
+		laser->spawn(position + physics.rotation * offset, physics.rotation);
 	}
 }
 
@@ -199,8 +206,9 @@ void Spaceship::moveForward(float lap)
 
 		auto additiveFrameMovement = physics.forwardAcceleration * lap * inputPower;
 
+		auto prevSpeed = physics.forwardSpeed;
 		physics.forwardSpeed += physics.rotation * additiveFrameMovement;
-
+		
 		float ratio = 1.0f;
 		float maxSpeed = 12.0f;
 		auto sp = physics.forwardSpeed;
@@ -211,12 +219,10 @@ void Spaceship::moveForward(float lap)
 			physics.forwardSpeed.y /= ratio;
 			physics.forwardSpeed.z /= ratio;
 		}
-
 		if (inputPower == 0) {
 			physics.forwardSpeed = physics.forwardSpeed * (1.0f - lap);
 		}
-
-		position += physics.forwardSpeed;
+		position += (physics.forwardSpeed + prevSpeed) * 0.5f * lap * 500;
 		shipMesh->setPosition(position);
 	}
 }
