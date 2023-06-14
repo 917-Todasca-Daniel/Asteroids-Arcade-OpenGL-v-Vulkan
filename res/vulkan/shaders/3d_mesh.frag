@@ -23,7 +23,7 @@ void main()
 	u_LightDirection = vec3(-1.0, -1.0, -1.0);
 	u_ViewPos = vec3(0.0, 0.0, 100.0);
 
-    vec3 ambientMaterial = vec3(0.1, 0.1, 0.1);
+    vec3 ambientMaterial = vec3(0.7, 0.7, 0.7);
     vec3 diffuseMaterial = vec3(1.0, 1.0, 1.0);
     vec3 specularMaterial = vec3(0.5, 0.5, 0.5);
 
